@@ -39,6 +39,7 @@ dependencies:
   http: ^0.13.5
   intl:
   fluttertoast:
+  image_picker: ^0.8.4+9
 
 dev_dependencies:
   flutter_test:

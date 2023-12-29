@@ -6,7 +6,8 @@ class ApiServicves{
   static const String veriftOtp = baseUrl+'verify_otp';
   static const String Vendorregister = baseUrl+'vendor_registration';
   static const String login = baseUrl+'login';
+  static const String vendorsendOtp = baseUrl+'send_otp';
   static const String getBanners = baseUrl+'get_banners';
-  static const String forgetPassword = baseUrl+'forgot_pass_driver';
+  static const String typeofShops = baseUrl+'type_shops';
 }
 

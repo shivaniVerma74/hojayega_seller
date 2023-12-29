@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
+import '../Helper/color.dart';
+import 'SignUpPersonal.dart';
+
 class VerifyOtp extends StatefulWidget {
   final OTP;
   const VerifyOtp({super.key, this.OTP});
@@ -20,20 +23,19 @@ class _OtpState extends State<VerifyOtp> {
       height: 56,
       textStyle: const TextStyle(fontSize: 20, color:Colors.white, fontWeight: FontWeight.w600),
       decoration: BoxDecoration(
-        color: const Color(0xFF112C48),
-        border: Border.all(color: const Color(0xFF112C48)),
+        color:colors.primary,
+        border: Border.all(color: colors.primary,),
         borderRadius: BorderRadius.circular(6),
       ),
     );
 
     final focusedPinTheme = defaultPinTheme.copyDecorationWith(
-      border: Border.all(color: const Color(0xFF112C48)),
+      border: Border.all(color:  colors.primary,),
       borderRadius: BorderRadius.circular(6),
     );
-
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration?.copyWith(
-        color: const Color(0xFF112C48),
+        color:  colors.primary,
       ),
     );
     return Scaffold(
@@ -43,10 +45,7 @@ class _OtpState extends State<VerifyOtp> {
             Column(
               children: [
                 SizedBox(
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height,
+                    height: MediaQuery.of(context).size.height,
                     child: FittedBox(
                       fit: BoxFit.fill,
                       child: Image.asset(
@@ -89,8 +88,8 @@ class _OtpState extends State<VerifyOtp> {
                 ),
                 child: Column(
                   children: [
-                    SizedBox(height: 10,),
-                    Text("OTP: ${widget.OTP}", style: TextStyle(fontWeight: FontWeight.w600),),
+                    const SizedBox(height: 10,),
+                    Text("OTP: ${widget.OTP}", style: const TextStyle(fontWeight: FontWeight.w600),),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(10, 30, 10, 0),
                       child: SizedBox(
@@ -121,7 +120,7 @@ class _OtpState extends State<VerifyOtp> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // Navigator.push(context, MaterialPageRoute(builder:(context)=> const CreateAccount()));
+                            Navigator.push(context, MaterialPageRoute(builder:(context)=> SignUpPersonal()));
                           }
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green),

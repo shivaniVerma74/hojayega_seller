@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hojayega_seller/AuthView/IntroScreen.dart';
+import 'package:hojayega_seller/Screen/HomeScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'AuthView/Login.dart';
 
@@ -15,28 +17,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    // getValidation();
-    _navigateToHome();
+    getValidation();
     super.initState();
   }
 
-  // Future getValidation() async {
-  //   final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //   String? user_id = sharedPreferences.getString('user_id');
-  //   print("user id in splash screen $user_id");
-  //   finalOtp = user_id;
-  //   _navigateToHome();
-  // }
+  Future getValidation() async {
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? vendor_id = sharedPreferences.getString('vendor_id');
+    print("vendor id in splash screen $vendor_id");
+    finalOtp = vendor_id;
+    _navigateToHome();
+  }
 
   _navigateToHome() {
     Future.delayed(const Duration(milliseconds: 35),() {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const IntroScreen()));
-      // if (finalOtp == null || finalOtp ==  '') {
-      //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const LoginPage()));
-      // } else {
-      //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>  BottomNavBar()));
-      //  }
-      },
+      if (finalOtp == null || finalOtp ==  '') {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const LoginPage()));
+      } else {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>  HomeScreen()));
+      }
+    },
     );
   }
 

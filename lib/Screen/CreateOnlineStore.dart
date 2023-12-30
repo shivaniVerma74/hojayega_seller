@@ -5,7 +5,9 @@ import 'package:hojayega_seller/Helper/api.path.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../Helper/color.dart';
+import '../Model/CategoryModel.dart';
 import '../Model/ShopModel.dart';
+import 'AllCategory.dart';
 
 class CreateOnlineStore extends StatefulWidget {
   const CreateOnlineStore({super.key});
@@ -21,6 +23,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
     // TODO: implement initState
     super.initState();
     shopType();
+    getCat();
   }
 
   ShopModel? shopModel;
@@ -40,6 +43,30 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
       print("shop type responsee $finalResult");
       setState(() {
         shopModel = finalResult;
+      });
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  CategoryModel? categoryModel;
+  getCat() async {
+    var headers = {
+      'Cookie': 'ci_session=2af0bd20724524e1ebfba0e830885dbff718f536'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getCategories));
+    request.fields.addAll({
+      'roll': '2'
+    });
+
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = CategoryModel.fromJson(json.decode(finalResponse));
+      print("categoryyyy responsee $finalResult");
+      setState(() {
+        categoryModel = finalResult;
       });
     } else {
       print(response.reasonPhrase);
@@ -68,7 +95,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
     ];
 
     int _len = 5;
-    int selectedCheckboxIndex = -1; // To track the selected checkbox
+    bool selectedCheckboxIndex = false; // To track the selected checkbox
 
     String _getTitle() {
       if (selectedCheckboxIndex == -1) {
@@ -77,6 +104,9 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
         return "Checkbox Demo : Item $selectedCheckboxIndex Selected";
       }
     }
+
+    var select;
+    String? categoriesId;
 
     return Scaffold(
       backgroundColor: colors.appbarColor,
@@ -162,26 +192,32 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                           height: 20,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal, // Horizontal scroll direction
-                            itemCount: _len,
+                            itemCount: shopModel?.data?.length ?? 0,
                             itemBuilder: (context, index) {
                               return Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Checkbox(
-                                    onChanged: (bool? checked) {
+                                    onChanged: ( checked) {
+                                      print("jjcjcjjf");
+                                     // print("${checked}");
                                       setState(() {
-                                        if (checked != null && checked) {
-                                          selectedCheckboxIndex = index;
+                                        if ( checked==true) {
+                                          print(checked);
+                                          print(index);
+                                          selectedCheckboxIndex = checked??false;
                                         } else {
-                                          selectedCheckboxIndex = -1;
+                                          selectedCheckboxIndex = false;
                                         }
                                       });
+                                      print(selectedCheckboxIndex);
                                     },
-                                    value: selectedCheckboxIndex == index,
+                                    checkColor: colors.secondary,
+                                    value: selectedCheckboxIndex,
                                   ),
                                   Text(
-                                   "${shopModel?.data?[index].name}",
-                                    style: TextStyle(color: colors.secondary),
+                                   "${shopModel?.data?[index].name.toString()}",
+                                    style: const TextStyle(color: colors.primary, fontWeight: FontWeight.w600),
                                   ),
                                 ],
                               );
@@ -211,65 +247,81 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                           height: 10,
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 2, right: 2),
+                          margin: const EdgeInsets.only(left: 2, right: 2),
                           height: 400,
                           width: double.infinity,
                           child: GridView.builder(
                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
-                                crossAxisSpacing: 1,
-                                mainAxisSpacing: 1,
+                                crossAxisSpacing: 5,
+                                mainAxisSpacing: 5,
+                                 childAspectRatio: 2/2.6
                                  // mainAxisExtent: 200
                             ),
-                            itemCount: 10,
+                            itemCount: categoryModel?.data?.length ?? 0,
                             itemBuilder: (context, index) {
-                              return Container(
-                                decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(12),
-                                        topLeft: Radius.circular(12),
-                                    ),
-                                    color: Colors.white),
+                              return InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    categoriesId = categoryModel?.data?[index].id.toString();
+print(categoriesId);
+                                  });
+                                },
                                 child: Column(
                                   children: [
-                                    Image.asset('assets/images/dummy.png',),
-                                    // const Text(
-                                    //   'RB saloon',
-                                    //   style: TextStyle(fontSize: 13),
-                                    // ),
-                                    // Row(
-                                    //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    //   children: const [
-                                    //     Text(
-                                    //       '2KM',
-                                    //       style: TextStyle(fontSize: 13),
-                                    //     ),
-                                    //     Text(
-                                    //       'open',
-                                    //       style: TextStyle(fontSize: 13),
-                                    //     ),
-                                    //   ],
-                                    // ),
+                                    Stack(
+                                      children: [
+                                        Container(
+                                          height: 90,
+                                          decoration:  BoxDecoration(
+                                              borderRadius: BorderRadius.circular(2),
+                                              border: Border.all(),
+                                              color: Colors.white),
+                                          child: Column(
+                                            children: [
+                                              Image.network('${ApiServicves.imageUrl}${categoryModel?.data?[index].img}', fit: BoxFit.fill,),
+                                            ],
+                                          ),
+                                        ),
+                                        categoriesId == categoryModel?.data?[index].id.toString()
+                                            ? Positioned(
+                                          top: 50,
+                                          child: Icon(
+                                              Icons.check_circle,
+                                              color: colors.black54),
+                                        ) :  SizedBox(),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 7),
+                                    Text(
+                                      '${categoryModel?.data?[index].cName}',
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
                                   ],
                                 ),
                               );
                             },
                           ),
                         ),
-                        Center(
-                          child: Card(
-                            child: Container(
-                              child: Center(child: Text('Next',style: TextStyle(color: Colors.white, ),),),
-                              decoration: BoxDecoration(color: colors.secondary,
-                                borderRadius:  BorderRadius.circular(5),
-                              ),
-                              //   width: MediaQuery.of(context),
-                              // decoration: BoxDecoration(borderRadius: ),
-                              height:MediaQuery.of(context).size.height *0.05,
-                              width: MediaQuery.of(context).size.width *.6,
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => AllCategory()));
+                          },
+                          child: Center(
+                            child: Card(
+                              child: Container(
+                                child: Center(child: Text('Next',style: TextStyle(color: Colors.white, ),),),
+                                decoration: BoxDecoration(color: colors.secondary,
+                                  borderRadius:  BorderRadius.circular(5),
+                                ),
+                                //   width: MediaQuery.of(context),
+                                // decoration: BoxDecoration(borderRadius: ),
+                                height:MediaQuery.of(context).size.height *0.05,
+                                width: MediaQuery.of(context).size.width *.6,
+                                 ),
                                ),
                              ),
-                           ),
+                        ),
                          ],
                         ),
                       ),

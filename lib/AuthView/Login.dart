@@ -1,9 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/AuthView/SignUpPersonal.dart';
+import 'package:hojayega_seller/Screen/HomeScreen.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Helper/api.path.dart';
+import '../Helper/color.dart';
 import 'SignUp.dart';
 
 class LoginPage extends StatefulWidget {
@@ -36,40 +41,39 @@ class _LoginPageState extends State<LoginPage> {
     return emailRegex.hasMatch(email);
   }
 
-  // userLogin() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   var headers = {
-  //     'Cookie': 'ci_session=f26b98128123d8304685b8bd593560b8d95aef80'
-  //   };
-  //   var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.login));
-  //   request.fields.addAll(
-  //       {'email': email.text, 'password': password.text, 'device_token': ''});
-  //
-  //   request.headers.addAll(headers);
-  //   http.StreamedResponse response = await request.send();
-  //   if (response.statusCode == 200) {
-  //     var result = await response.stream.bytesToString();
-  //     var finaResult = jsonDecode(result);
-  //     print("responseee $finaResult");
-  //     if (finaResult['error'] == false) {
-  //       user_id = finaResult['data']['id'];
-  //       user_name = finaResult['data']['username'];
-  //       user_mobile = finaResult['data']['mobile'];
-  //       user_email = finaResult['data']['email'];
-  //       await prefs.setString('user_id', finaResult['data']['id'].toString());
-  //       print(
-  //           '____user data is___$user_id $user_email $user_mobile ${user_name}___');
-  //       setState(() {});
-  //       Fluttertoast.showToast(msg: '${finaResult['message']}');
-  //       Navigator.pushReplacement(
-  //           context, MaterialPageRoute(builder: (context) => BottomNavBar()));
-  //     } else {
-  //       Fluttertoast.showToast(msg: "${finaResult['message']}");
-  //     }
-  //   } else {
-  //     print(response.reasonPhrase);
-  //   }
-  // }
+  vendorLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var headers = {
+      'Cookie': 'ci_session=f26b98128123d8304685b8bd593560b8d95aef80'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.login));
+    request.fields.addAll(
+        {'email': email.text, 'password': password.text, });
+     print("login parraaa ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      var finaResult = jsonDecode(result);
+      print("responseee $finaResult");
+      if (finaResult['error'] == false) {
+        vendor_id = finaResult['data']['id'];
+        vendor_name = finaResult['data']['username'];
+        vendor_mobile = finaResult['data']['mobile'];
+        vendor_email = finaResult['data']['email'];
+        await prefs.setString('vendor_id', finaResult['data']['id'].toString());
+        print('____user data is___$vendor_id $vendor_email $vendor_mobile ${vendor_name}___');
+        setState(() {});
+        Fluttertoast.showToast(msg: '${finaResult['message']}');
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      } else {
+        Fluttertoast.showToast(msg: "${finaResult['message']}");
+      }
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -290,12 +294,12 @@ class _LoginPageState extends State<LoginPage> {
                           child: ElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                // userLogin();
-                                Navigator.push(context, MaterialPageRoute(builder:(context)=> SignUpPersonal()));
+                                vendorLogin();
+                                // Navigator.push(context, MaterialPageRoute(builder:(context)=> SignUpPersonal()));
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
+                                backgroundColor: colors.secondary,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8))),

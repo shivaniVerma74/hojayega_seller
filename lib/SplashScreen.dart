@@ -4,6 +4,7 @@ import 'package:hojayega_seller/Screen/HomeScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'AuthView/Login.dart';
+import 'Screen/BottomBar.dart';
 
 String? finalOtp;
 class SplashScreen extends StatefulWidget {
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (finalOtp == null || finalOtp ==  '') {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const LoginPage()));
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>  HomeScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>  BottomNavBar()));
       }
     },
     );

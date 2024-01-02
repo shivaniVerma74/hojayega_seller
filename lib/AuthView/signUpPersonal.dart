@@ -50,51 +50,54 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   TextEditingController friendcodeCtr = TextEditingController();
   TextEditingController currentAddressCtr = TextEditingController();
   TextEditingController pincodeCtr = TextEditingController();
+  TextEditingController gstCtr = TextEditingController();
 
   vendorRegister() async {
-    var request =
-        http.MultipartRequest('POST', Uri.parse(ApiServicves.Vendorregister));
+    var request = http.MultipartRequest('POST', Uri.parse("https://developmentalphawizz.com/hojayega/Vendorapi/vendor_registration"));
     request.fields.addAll({
       'name': nameCtr.text,
       'shop_name': shopnameCtr.text,
-      'company_name': comapnynameCtr.text,
+      // 'company_name': comapnynameCtr.text,
       'year_of_experience': yearOfExperianceCtr.text,
       'mobile': mobileCtr.text,
       'email': emailCtr.text,
       'password': passwordCtr.text,
       'dob': dobCtr.text,
       'refferal_code': referalCtr.text,
-      'address': addresCtr.text,
+      // 'address': addresCtr.text,
       'land_mark': landmarkCtr.text,
       'friend_code': friendcodeCtr.text,
       'bank_name': banknameCtr.text,
       'account_number': accountNumberCtr.text,
       'ifsc_code': ifsccodeCtr.text,
-      'upi_id': upiIdCtr.text
+      'upi_id': upiIdCtr.text,
+      "shop_type": _selectedOption3 == "service" ? "1" : "2",
+      "gst_no": gstCtr.text
     });
     print("register parameter ${request.fields}");
     request.files.add(await http.MultipartFile.fromPath(
-        'upload_location', _locationImage!.path.toString()),
+        'upload_location', _locationImage?.path ?? ""),
     );
     request.files.add(await http.MultipartFile.fromPath(
-        'shop_image', _image!.path.toString()));
+        'shop_image', _image?.path ?? ""));
     request.files.add(await http.MultipartFile.fromPath(
-        'pan_image', _image2!.path.toString()));
+        'pan_image', _image2?.path ?? ""));
     request.files.add(await http.MultipartFile.fromPath(
-        'adhar_front', _image3!.path.toString()));
+        'adhar_front', _image3?.path ?? ""));
     request.files.add(await http.MultipartFile.fromPath(
-        'adhar_back', _image4!.path.toString()));
+        'adhar_back', _image4?.path ?? ""));
     request.files.add(await http.MultipartFile.fromPath(
-        'adhar_back', _image5!.path.toString()));
-    request.files.add(
-        await http.MultipartFile.fromPath('qr_code', qrImage!.path.toString()));
+        'selfi_image', _image6?.path ?? ""));
+    request.files.add(await http.MultipartFile.fromPath('qr_code', qrImage?.path ?? ""));
     print("register imagesss ${request.files}");
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
+      print("resonsewwwwww ${response.statusCode}");
       var result = await response.stream.bytesToString();
       var finaResult = jsonDecode(result);
       print("resonse $finaResult");
-      if (finaResult['error'] == false) {
+      if (finaResult['response_code'] == '1') {
+        print("kjkkhkhkjhkjhjk");
         Fluttertoast.showToast(msg: '${finaResult['message']}');
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ThankYou()));
       } else {
@@ -121,17 +124,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
   bool isValidEmail(String email) {
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
-
-  String? _dropItem1;
-  List<String> items = ['North', 'South', 'East', 'West'];
-  String? _dropItem2;
-  List<String> items2 = ['Maddhya Pradesh', 'Rajisthan', 'Gujarat', 'U.P'];
-  String? _dropItem3;
-  List<String> items3 = ['Indore', 'Bhopal', 'jaipur', 'Ujjain'];
 
   var i = 1;
   String _selectedOption = '1';
@@ -150,6 +145,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   String _selectedOption2 = 'user';
   String _selectedOption3 = 'service';
   var arrValue = ['Cake', 'fragile', 'Ready', 'Non'];
+
   TextEditingController dobCtr = TextEditingController();
 
   File? _image;
@@ -261,6 +257,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     request.fields.addAll({
       'city_id': city_Id.toString()
     });
+    print("get aresaa ${request.fields}");
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       String responseData = await response.stream.transform(utf8.decoder).join();
@@ -355,6 +352,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             setState(() {
                               i = 2;
                               _selectedOption2 = value!;
+                              print("typeppppppp $_selectedOption2");
                             });
                           },
                         ),
@@ -381,10 +379,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             onChanged: (String? value) {
                               setState(() {
                                 _selectedOption3 = value!;
+                                print("imakjakjkjkajkjksj $_selectedOption3 $value");
                               });
                             },
                           ),
-                          Text("Service Provider"),
+                          const Text("Service Provider"),
                           //  SizedBox(width: 5,),
                           Radio<String>(
                             value: 'shop',
@@ -394,6 +393,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               setState(() {
                                 _selectedOption3 = value!;
                               });
+                              print("000000000000000 $_selectedOption3 $value");
                             },
                           ),
                           const Text("Shopkeeper")
@@ -638,7 +638,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     child: TextFormField(
                                       keyboardType: TextInputType.emailAddress,
                                       validator: _validateEmail,
-                                      controller: addresCtr,
+                                      controller: emailCtr,
                                       decoration: const InputDecoration(
                                           hintText: 'Email Address',
                                           enabledBorder: OutlineInputBorder(
@@ -1043,7 +1043,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                 //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    children: [
+                    children: const [
                       CircleAvatar(
                           backgroundColor: colors.primary, maxRadius: 8),
                       SizedBox(
@@ -1148,7 +1148,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             ),
                           ],
                         ),
-
                         Row(
                           children: [
                             Card(
@@ -1236,7 +1235,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       cityValue = value!;
                                       getArea("${cityValue!.id}");
                                       // stateName = stateValue!.name;
-                                      // print("name herererb $stateName");
+                                      print("name herererb $cityValue");
                                     });
                                   },
                                   underline: Container(),
@@ -1893,7 +1892,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                   Padding(
                     padding: const EdgeInsets.only(top: 10, left: 6),
                     child: Text(
-                      "GST Number(Optional)",
+                      "GST Number",
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: colors.text),
                     ),
@@ -1907,6 +1906,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           borderRadius: BorderRadius.circular(10),
                           color: colors.lightgray),
                       child: TextFormField(
+                        controller: gstCtr,
                         // style: (color: Colors.red
                         //  ),
                         decoration: InputDecoration(
@@ -1999,10 +1999,12 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CreateOnlineStore()));
+                      // if(gstCtr.text == ""){
+                      //  Fluttertoast.showToast(msg: "Please Fill Fields");
+                      // } else {
+                      //   vendorRegister();
+                      // }
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ThankYou()));
                     },
                     child: Center(
                       child: Card(

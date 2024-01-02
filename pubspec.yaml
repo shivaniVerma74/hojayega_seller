@@ -41,7 +41,10 @@ dependencies:
   fluttertoast:
   image_picker: ^0.8.4+9
   shared_preferences: ^2.0.11
+  fluid_bottom_nav_bar: ^1.4.0
   curved_navigation_bar: ^1.0.3
+  carousel_slider: ^4.1.1
+  file_picker:
 
 dev_dependencies:
   flutter_test:

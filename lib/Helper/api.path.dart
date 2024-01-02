@@ -15,13 +15,17 @@ class ApiServicves{
   static const String getArea = baseUrl+'get_regions';
   static const String getBanners = baseUrl+'get_banners';
   static const String getCategories = baseUrl+'get_categories_by_shop_services';
+  static const String getVendorProduct = baseUrl+'get_vendor_products';
   static const String getSubCategories = baseUrl+'get_categories_by_shop_services';
   static const String productchildCategories = baseUrl+'product_child_category';
   static const String typeofShops = baseUrl+'type_shops';
   static const String addProducts = baseUrl+'add_product';
-}
+  static const String vendorOrders = baseUrl+'get_vendor_orders';
+  static const String acceptRejectOrder = baseUrl+'accept_reject_order';
+  static const String notifications = baseUrl+'notifications';
+  static const String clearNotification = baseUrl+'clear_all';
 
-String? vendor_id;
+}
 String? vendor_name;
 String? vendor_mobile;
 String? vendor_email;

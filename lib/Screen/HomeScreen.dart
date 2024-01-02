@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:hojayega_seller/Screen/BusinessCard.dart';
+import 'package:hojayega_seller/Screen/DeliveryCard.dart';
 import 'package:http/http.dart' as http;
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
+import 'Calender.dart';
+import 'Orders.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,11 +27,14 @@ class _HomePageState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    getBanner();
   }
 
-  Future<void> fetchData() async {
-    var response = await http.get(Uri.parse('https://developmentalphawizz.com/hojayega/api/get_banners'));
+  int _pageIndex = 0;
+
+
+  Future<void> getBanner() async {
+    var response = await http.get(Uri.parse(ApiServicves.getBanners));
     if (response.statusCode == 200) {
       setState(() {
         homepageimagemodel = Homepageimagemodel.fromJson(json.decode(response.body));
@@ -37,7 +44,6 @@ class _HomePageState extends State<HomeScreen> {
     }
   }
 
-  int _pageIndex = 0;
 
   var arrNames = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop', 'Track \nOrder'];
   var iconsNames = [
@@ -108,415 +114,415 @@ class _HomePageState extends State<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: colors.appbarColor,
-      appBar: AppBar(
-        leading: Container(
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(10)),
-          margin: EdgeInsets.all(8), // Adjust padding inside container
-          child: IconButton(
-            icon: Icon(Icons.menu), // Drawer icon
-            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: colors.primary,
-        foregroundColor: Colors.white, //(0xff112C48),
-        iconTheme: IconThemeData(color: colors.secondary),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(30.0)),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 30,
-              width: 50,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10), color: Colors.white),
-              child: IconButton(
-                icon: const Icon(Icons.notifications),
-                onPressed: () {
-                  // Add your notification icon tap logic here
-                },
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 8,
-          ),
-          const CircleAvatar(
-            backgroundColor: colors.whiteTemp,
-            maxRadius: 20,
-            child: Icon(Icons.person, color:colors.primary,)
-          ),
-          const SizedBox(
-            width: 15,
-          ),
-        ],
-      ),
-      bottomNavigationBar: CurvedNavigationBar(
-        color: colors.primary,
-        height: 70,
-        backgroundColor: colors.appbarColor,
-        items: const <Widget>[
-          Icon(Icons.home,color: colors.whiteTemp),
-          Icon(Icons.list,color: colors.whiteTemp),
-          Icon(Icons.production_quantity_limits_sharp,color: colors.whiteTemp),
-          Icon(Icons.watch_later,color: colors.whiteTemp),
-        ],
-        onTap: (index1) {
-          //Handle button tap
-          setState(() {
-            _pageIndex = index1;
-          });
-        },
-      ),
-      drawer: Drawer(
-        child: ListView(
-            children: [
-           DrawerHeader(
-            decoration: const BoxDecoration(
-              // border: Border(bottom: BorderSide(color: Colors.black)),
-                gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [colors.primary, colors.primary])),
-            child: Row(
-              children: [
-                const SizedBox(
-                  width: 10,
-                ),
-                const CircleAvatar(
-                  backgroundImage: AssetImage(
-                    "assets/images/bike.png",
-                  ),
-                  radius: 40,
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Hello!',
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
-                    vendor_name == null || vendor_name == ""
-                        ? const Text(
-                      'Demo',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    )
-                        : Text(
-                      '$vendor_name',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const  myprofile_screen()),
-              // );
-              setState(() {
-                currentIndex = 1;
-              });
-            },
-            child: DrawerIconTab(
-              titlee: 'Home',
-              icon: Icons.home,
-              tabb: 1,
-              indexx: currentIndex,
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => const  OfferJobWidget()),
-                // );
-                setState(() {
-                  currentIndex = 2;
-                });
-              },
-              child: DrawerIconTab(
-                  titlee: 'My favorite',
-                  icon: Icons.file_present_outlined,
-                  tabb: 2,
-                  indexx: currentIndex)),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const CoursesPage()),
-                // );
-                setState(() {
-                  currentIndex = 3;
-                });
-              },
-              child: DrawerIconTab(
-                  titlee: 'My Account',
-                  icon: Icons.file_copy,
-                  tabb: 3,
-                  indexx: currentIndex,
-              ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => const  CoursesPage()),
-                // );
-                setState(() {
-                  currentIndex = 4;
-                });
-              },
-              child: DrawerIconTab(
-                titlee: 'Become a merchant',
-                icon: Icons.file_copy,
-                tabb: 4,
-                indexx: currentIndex,
-              )),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => const  CoursesPage()),
-                // );
-                setState(() {
-                  currentIndex = 5;
-                });
-              },
-              child: DrawerIconTab(
-                titlee: 'My Bookings',
-                icon: Icons.file_copy,
-                tabb: 5,
-                indexx: currentIndex,
-              )),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => const PaymentHistoryPage()),
-                // );
-                setState(() {
-                  currentIndex = 6;
-                });
-              },
-              child: DrawerIconTab(
-                titlee: 'My Orders',
-                icon: Icons.payment,
-                tabb: 6,
-                indexx: currentIndex,
-              ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-            onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const mySubscription()),
-              // );
-              setState(() {
-                currentIndex = 7;
-              });
-            },
-            child: DrawerIconTab(
-              titlee: 'My Cart',
-              icon: Icons.my_library_books_sharp,
-              tabb: 7,
-              indexx: currentIndex,
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const MyProfile()),
-                // );
-                setState(() {
-                  currentIndex = 8;
-                });
-              },
-              child: DrawerIconTab(
-                titlee: 'My Profile',
-                icon: Icons.headphones,
-                tabb: 8,
-                indexx: currentIndex,
-              )),
-          const SizedBox(
-            height: 5,
-          ),
-          InkWell(
-            onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => PrivacyPolicy()),
-              // );
-              setState(() {
-                currentIndex = 9;
-              });
-            },
-            child: DrawerIconTab(
-              titlee: 'Notification',
-              icon: Icons.privacy_tip,
-              tabb: 9,
-              indexx: currentIndex,
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => const TermsConditionsWidget()),
-                // );
-                setState(() {
-                  currentIndex = 10;
-                });
-                // share();
-              },
-              child: DrawerIconTab(
-                titlee: 'Share the app',
-                icon: Icons.confirmation_num,
-                tabb: 10,
-                indexx: currentIndex,
-              )),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => const FaqPage()),
-                // );
-
-                setState(() {
-                  currentIndex = 11;
-                });
-              },
-              child: DrawerIconTab(
-                titlee: 'Send Feedback',
-                icon: Icons.question_answer,
-                tabb: 11,
-                indexx: currentIndex,
-              )),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => const LoginPage()),
-                // );
-
-                setState(() {
-                  currentIndex = 12;
-                });
-              },
-              child: DrawerIconTab(
-                titlee: 'Refer & Earn',
-                icon: Icons.question_answer,
-                tabb: 12,
-                indexx: currentIndex,
-              )),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => const LoginPage()),
-                // );
-                setState(() {
-                  currentIndex = 13;
-                });
-              },
-              child: DrawerIconTab(
-                titlee: 'Help & Support',
-                icon: Icons.question_answer,
-                tabb: 13,
-                indexx: currentIndex,
-              )),
-          SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutUS()),
-                // );
-                setState(() {
-                  currentIndex = 14;
-                });
-              },
-              child: DrawerIconTab(
-                titlee: 'About Us',
-                icon: Icons.question_answer,
-                tabb: 14,
-                indexx: currentIndex,
-              )),
-          const SizedBox(
-            height: 5,
-          ),
-          InkWell(
-              onTap: () {
-                setState(() {
-                  currentIndex = 15;
-                });
-                logout(context);
-              },
-              child: DrawerIconTab(
-                titlee: 'Log Out',
-                icon: Icons.logout_outlined,
-                tabb: 15,
-                indexx: currentIndex,
-              )),
-          const SizedBox(
-            height: 20,
-          ),
-        ]),
-      ),
+      // appBar: AppBar(
+      //   leading: Container(
+      //     decoration: BoxDecoration(
+      //         color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      //     margin: EdgeInsets.all(8), // Adjust padding inside container
+      //     child: IconButton(
+      //       icon: Icon(Icons.menu), // Drawer icon
+      //       onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+      //     ),
+      //   ),
+      //   centerTitle: true,
+      //   backgroundColor: colors.primary,
+      //   foregroundColor: Colors.white, //(0xff112C48),
+      //   iconTheme: IconThemeData(color: colors.secondary),
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.vertical(bottom: Radius.circular(30.0)),
+      //   ),
+      //   actions: [
+      //     Padding(
+      //       padding: const EdgeInsets.all(8.0),
+      //       child: Container(
+      //         height: 30,
+      //         width: 50,
+      //         decoration: BoxDecoration(
+      //             borderRadius: BorderRadius.circular(10), color: Colors.white),
+      //         child: IconButton(
+      //           icon: const Icon(Icons.notifications),
+      //           onPressed: () {
+      //             // Add your notification icon tap logic here
+      //           },
+      //         ),
+      //       ),
+      //     ),
+      //     const SizedBox(
+      //       width: 8,
+      //     ),
+      //     const CircleAvatar(
+      //       backgroundColor: colors.whiteTemp,
+      //       maxRadius: 20,
+      //       child: Icon(Icons.person, color:colors.primary,)
+      //     ),
+      //     const SizedBox(
+      //       width: 15,
+      //     ),
+      //   ],
+      // ),
+      // bottomNavigationBar: CurvedNavigationBar(
+      //   color: colors.primary,
+      //   height: 70,
+      //   backgroundColor: colors.appbarColor,
+      //   items: const <Widget>[
+      //     Icon(Icons.home,color: colors.whiteTemp),
+      //     Icon(Icons.list,color: colors.whiteTemp),
+      //     Icon(Icons.production_quantity_limits_sharp,color: colors.whiteTemp),
+      //     Icon(Icons.watch_later,color: colors.whiteTemp),
+      //   ],
+      //   onTap: (index1) {
+      //     //Handle button tap
+      //     setState(() {
+      //       _pageIndex = index1;
+      //       // Navigator.push(context, MaterialPageRoute(builder: (context) => Orders()));
+      //     });
+      //   },
+      // ),
+      // drawer: Drawer(
+      //   child: ListView(
+      //       children: [
+      //      DrawerHeader(
+      //       decoration: const BoxDecoration(
+      //         // border: Border(bottom: BorderSide(color: Colors.black)),
+      //           gradient: LinearGradient(
+      //               begin: Alignment.centerLeft,
+      //               end: Alignment.centerRight,
+      //               colors: [colors.primary, colors.primary])),
+      //       child: Row(
+      //         children: [
+      //           const SizedBox(
+      //             width: 10,
+      //           ),
+      //           const CircleAvatar(
+      //             backgroundImage: AssetImage(
+      //               "assets/images/bike.png",
+      //             ),
+      //             radius: 40,
+      //           ),
+      //           const SizedBox(
+      //             width: 10,
+      //           ),
+      //           Column(
+      //             crossAxisAlignment: CrossAxisAlignment.start,
+      //             mainAxisAlignment: MainAxisAlignment.center,
+      //             children: [
+      //               const Text(
+      //                 'Hello!',
+      //                 style: TextStyle(
+      //                     fontSize: 24,
+      //                     fontWeight: FontWeight.bold,
+      //                     color: Colors.white),
+      //               ),
+      //               vendor_name == null || vendor_name == ""
+      //                   ? const Text(
+      //                 'Demo',
+      //                 style: TextStyle(fontSize: 16, color: Colors.white),
+      //                 ): Text(
+      //                 '$vendor_name',
+      //                 style: TextStyle(fontSize: 16, color: Colors.white),
+      //               ),
+      //             ],
+      //           )
+      //         ],
+      //       ),
+      //     ),
+      //     InkWell(
+      //       onTap: () {
+      //         // Navigator.push(
+      //         //   context,
+      //         //   MaterialPageRoute(builder: (context) => const  myprofile_screen()),
+      //         // );
+      //         setState(() {
+      //           currentIndex = 1;
+      //         });
+      //       },
+      //       child: DrawerIconTab(
+      //         titlee: 'Home',
+      //         icon: Icons.home,
+      //         tabb: 1,
+      //         indexx: currentIndex,
+      //       ),
+      //     ),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(
+      //           //       builder: (context) => const  OfferJobWidget()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 2;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //             titlee: 'My favorite',
+      //             icon: Icons.file_present_outlined,
+      //             tabb: 2,
+      //             indexx: currentIndex)),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(builder: (context) => const CoursesPage()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 3;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //             titlee: 'My Account',
+      //             icon: Icons.file_copy,
+      //             tabb: 3,
+      //             indexx: currentIndex,
+      //         ),
+      //     ),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(
+      //           //       builder: (context) => const  CoursesPage()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 4;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'Become a merchant',
+      //           icon: Icons.file_copy,
+      //           tabb: 4,
+      //           indexx: currentIndex,
+      //         )),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(
+      //           //       builder: (context) => const  CoursesPage()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 5;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'My Bookings',
+      //           icon: Icons.file_copy,
+      //           tabb: 5,
+      //           indexx: currentIndex,
+      //         )),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(
+      //           //       builder: (context) => const PaymentHistoryPage()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 6;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'My Orders',
+      //           icon: Icons.payment,
+      //           tabb: 6,
+      //           indexx: currentIndex,
+      //         ),
+      //     ),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //       onTap: () {
+      //         // Navigator.push(
+      //         //   context,
+      //         //   MaterialPageRoute(builder: (context) => const mySubscription()),
+      //         // );
+      //         setState(() {
+      //           currentIndex = 7;
+      //         });
+      //       },
+      //       child: DrawerIconTab(
+      //         titlee: 'My Cart',
+      //         icon: Icons.my_library_books_sharp,
+      //         tabb: 7,
+      //         indexx: currentIndex,
+      //       ),
+      //     ),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(builder: (context) => const MyProfile()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 8;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'My Profile',
+      //           icon: Icons.headphones,
+      //           tabb: 8,
+      //           indexx: currentIndex,
+      //         )),
+      //     const SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //       onTap: () {
+      //         // Navigator.push(
+      //         //   context,
+      //         //   MaterialPageRoute(builder: (context) => PrivacyPolicy()),
+      //         // );
+      //         setState(() {
+      //           currentIndex = 9;
+      //         });
+      //       },
+      //       child: DrawerIconTab(
+      //         titlee: 'Notification',
+      //         icon: Icons.privacy_tip,
+      //         tabb: 9,
+      //         indexx: currentIndex,
+      //       ),
+      //     ),
+      //     const SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(
+      //           //       builder: (context) => const TermsConditionsWidget()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 10;
+      //           });
+      //           // share();
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'Share the app',
+      //           icon: Icons.confirmation_num,
+      //           tabb: 10,
+      //           indexx: currentIndex,
+      //         )),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(
+      //           //       builder: (context) => const FaqPage()),
+      //           // );
+      //
+      //           setState(() {
+      //             currentIndex = 11;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'Send Feedback',
+      //           icon: Icons.question_answer,
+      //           tabb: 11,
+      //           indexx: currentIndex,
+      //         )),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(
+      //           //       builder: (context) => const LoginPage()),
+      //           // );
+      //
+      //           setState(() {
+      //             currentIndex = 12;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'Refer & Earn',
+      //           icon: Icons.question_answer,
+      //           tabb: 12,
+      //           indexx: currentIndex,
+      //         )),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(
+      //           //   context,
+      //           //   MaterialPageRoute(
+      //           //       builder: (context) => const LoginPage()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 13;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'Help & Support',
+      //           icon: Icons.question_answer,
+      //           tabb: 13,
+      //           indexx: currentIndex,
+      //         )),
+      //     SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           // Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutUS()),
+      //           // );
+      //           setState(() {
+      //             currentIndex = 14;
+      //           });
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'About Us',
+      //           icon: Icons.question_answer,
+      //           tabb: 14,
+      //           indexx: currentIndex,
+      //         )),
+      //     const SizedBox(
+      //       height: 5,
+      //     ),
+      //     InkWell(
+      //         onTap: () {
+      //           setState(() {
+      //             currentIndex = 15;
+      //           });
+      //           logout(context);
+      //         },
+      //         child: DrawerIconTab(
+      //           titlee: 'Log Out',
+      //           icon: Icons.logout_outlined,
+      //           tabb: 15,
+      //           indexx: currentIndex,
+      //         )),
+      //     const SizedBox(
+      //       height: 20,
+      //     ),
+      //   ]),
+      // ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -544,14 +550,11 @@ class _HomePageState extends State<HomeScreen> {
                             Container(
                               width: 40,
                               height: 40,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(
-                                    5,
-                                  ),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,),
                                   color: colors.primary),
                               child: Image.asset(iconsNames[index]),
                             ),
-                            Text(arrNames[index])
+                            Text(arrNames[index]),
                           ],
                         ),
                       );
@@ -563,20 +566,22 @@ class _HomePageState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                              5,
-                            ),
-                            color: colors.whiteTemp),
-                        child: Image.asset('assets/images/calender.png')),
-                    Text("Calender")
-                  ],
+              InkWell(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Calender()));
+                },
+                child: Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,),
+                              color: colors.whiteTemp),
+                          child: Image.asset('assets/images/calender.png')),
+                      const Text("Calender")
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -590,9 +595,8 @@ class _HomePageState extends State<HomeScreen> {
               border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
               columnWidths: const <int, TableColumnWidth>{
                  0: FixedColumnWidth(125.0),
-           1: FixedColumnWidth(125.0),
-           2: FixedColumnWidth(90.0),
-                // Define column widths if needed
+                 1: FixedColumnWidth(125.0),
+                 2: FixedColumnWidth(90.0),
               },
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
@@ -677,8 +681,7 @@ class _HomePageState extends State<HomeScreen> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3,
-                    (index) => Container(
+              children: List.generate(3, (index) => Container(
                   width: 8.0,
                   height: 8.0,
                   margin: EdgeInsets.symmetric(horizontal: 4.0),
@@ -696,16 +699,66 @@ class _HomePageState extends State<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  width: 130,
-                  child: Image.asset('assets/images/homeblue.png'),
-                ), Container(
-                  width: 130,
-                  child: Image.asset('assets/images/homered.png'),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryCard()));
+                  },
+                  child: Container(
+                    height: 100,
+                    width: 170,
+                    decoration: BoxDecoration(
+                      image: const DecorationImage(
+                        image: AssetImage("assets/images/homered.png"),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(20)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 25),
+                      child: Column(
+                        children: const [
+                          Text("Delivery Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 ),),
+                          Text("500", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => BusinessCard()));
+                  },
+                  child: Container(
+                    height: 100,
+                    width: 170,
+                    decoration: BoxDecoration(
+                      image: const DecorationImage(
+                        image: AssetImage("assets/images/homeblue.png"),
+                        fit: BoxFit.cover,
+                      ),borderRadius: BorderRadius.circular(20)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 25),
+                      child: Column(
+                        children: const [
+                          Text("Busines Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
+                          Text("500", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 ))
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Container(
+                //   width: 150,
+                //   child: Image.asset('assets/images/homeblue.png'),
+                // ),
+                //   Container(
+                //   width: 150,
+                //   child: Image.asset('assets/images/homered.png'),
+                // ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -728,7 +781,7 @@ logout(context) async {
                 // setState(() {
                 //   removesession();
                 // });
-                Navigator.pop(context);
+                // Navigator.pop(context);
                 // SystemNavigator.pop();
                 Navigator.pushReplacement(
                     context,

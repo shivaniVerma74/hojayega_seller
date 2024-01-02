@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
+import '../Screen/BottomBar.dart';
 import 'SignUp.dart';
 
 class LoginPage extends StatefulWidget {
@@ -41,6 +42,9 @@ class _LoginPageState extends State<LoginPage> {
     return emailRegex.hasMatch(email);
   }
 
+  String? vendor_id;
+
+
   vendorLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var headers = {
@@ -62,11 +66,10 @@ class _LoginPageState extends State<LoginPage> {
         vendor_mobile = finaResult['data']['mobile'];
         vendor_email = finaResult['data']['email'];
         await prefs.setString('vendor_id', finaResult['data']['id'].toString());
-        print('____user data is___$vendor_id $vendor_email $vendor_mobile ${vendor_name}___');
+        print('____vendor data is___$vendor_id $vendor_email $vendor_mobile ${vendor_name}___');
         setState(() {});
         Fluttertoast.showToast(msg: '${finaResult['message']}');
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBar()));
       } else {
         Fluttertoast.showToast(msg: "${finaResult['message']}");
       }
@@ -152,12 +155,18 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               Expanded(
-                                child: Card(
+                                child:
+                                Card(
                                   color: Colors.grey.shade200,
                                   elevation: 5,
                                   child: TextFormField(
                                     controller: email,
-                                    validator: _validateEmail,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Fill This Field';
+                                      }
+                                      return null;
+                                    },
                                     // keyboardType: TextInputType.phone,
                                     decoration: InputDecoration(
                                       hintText: "Email/Phone Number",

@@ -23,6 +23,7 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../Screen/notificationScreen.dart';
 import 'color.dart';
 
 class Btn extends StatelessWidget {
@@ -67,4 +68,129 @@ class Btn extends StatelessWidget {
       ),
     );
   }
+}
+
+
+Widget homeAppBar(BuildContext context,
+    {required String text, required VoidCallback ontap}) {
+  return
+    Container(
+      height: 80,
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      //padding: EdgeInsets.only(top: 10),
+      decoration: const BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [colors.primary, colors.primary]),
+          borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(15),
+              bottomRight: Radius.circular(15))),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: ontap,
+            child: Container(
+              // margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Icon(
+                Icons.menu,
+                color: colors.primary,
+              ),
+            ),
+          ),
+          const Text(
+            'Home',
+            style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+                fontWeight: FontWeight.bold),
+          ),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const NotificationScreen()),
+              );
+            },
+            child: Container(
+              // margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Icon(
+                Icons.notifications_active_rounded,
+                color: colors.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+}
+
+
+Widget commonAppBar(BuildContext context,
+    {required String text, bool? isActionButton}) {
+  return
+    Container(
+        height: 80,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        //padding: EdgeInsets.only(top: 10),
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [colors.primary, colors.primary]),
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(15),
+                bottomRight: Radius.circular(15))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              onTap: () {
+                //   Navigator.pop(context);
+              },
+              child: Container(
+                // margin: EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: colors.primary,
+                ),
+              ),
+            ),
+            Container(
+              child: Text(
+                text,
+                style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            isActionButton == false
+                ? Container(
+              width: 40,
+              ): Container(
+              // margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10)),
+              child: const Icon(
+                Icons.notifications_active_rounded,
+                color: colors.primary,
+              ),
+            ),
+          ],
+        ),
+    );
 }

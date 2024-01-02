@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -66,7 +67,6 @@ class _AddProductState extends State<AddProduct> {
     // fetchData();
     getData();
     getCategory();
-
     // getSubCategory("");
     super.initState();
   }
@@ -181,41 +181,47 @@ class _AddProductState extends State<AddProduct> {
     });
   }
 
+  String? vendor_id;
+
   getData() async {
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? vendor_id = sharedPreferences.getString('vendor_id');
-    print("vendor id in splash screen $vendor_id");
+    print("vendor id add product screen $vendor_id");
   }
 
   addProductApi() async {
-
     var headers = {
       'Cookie': 'ci_session=2844e71eb13a14bad7faba0b8d00d5626590d23e'
     };
-    var request =
-        http.MultipartRequest('POST', Uri.parse(ApiServicves.addProducts));
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.addProducts));
     request.fields.addAll({
       'name': _nameCtr.text,
       'product_description': _fullDesCtr.text,
       'product_price': _priceCtr.text,
       'selling_price': _sellingPriceCtr.text,
-      'cat_id': catId.toString(),
-      'sub_cat_id': service_Id.toString(),
-      'child_cat_id': selectedChild.toString(),
+      'cat_id': category_Id.toString(),
+      'sub_cat_id': subCatId.toString(),
+      'child_cat_id': childCatId.toString(),
       'unit': _unitCtr.text,
       'unit_type': _unittypeCtr.text,
       'vid': vendor_id.toString(),
     });
     print("add producttt apiii ${request.fields}");
-    request.files.add(await http.MultipartFile.fromPath(
-        'main_image', _image!.path.toString()));
+    for (var i = 0; i < (imagePathList.length ?? 0); i++) {
+      print('Imageeeeeeeeeeee $imagePathList');
+      imagePathList[i] == ""
+          ? null
+          : request.files.add(await http.MultipartFile.fromPath(
+          'main_image[]', imagePathList[i].toString()));
+    }
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var result = await response.stream.bytesToString();
       var finalResult = jsonDecode(result);
       Fluttertoast.showToast(msg: "${finalResult['message']}");
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeScreen()));
+      Navigator.pop(context);
+      // Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeScreen()));
       setState(() {
         isLodding = false;
       });
@@ -232,10 +238,11 @@ class _AddProductState extends State<AddProduct> {
   String? selectedState;
   String? selectedSub;
   String? selectedChild;
-  String? stateId;
+  String? category_Id;
   String? serviceId;
   String? subCatId;
   String? childCatId;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -250,7 +257,7 @@ class _AddProductState extends State<AddProduct> {
           ),
           title: const Text('Add Product'),
           backgroundColor: colors.primary),
-      body:
+        body:
           // getBrandModel == null ? const Center(
           //     child: CircularProgressIndicator()) :
           SingleChildScrollView(
@@ -383,10 +390,10 @@ class _AddProductState extends State<AddProduct> {
                                 getCatModel!.data!.forEach((element) {
                                   if (element.cName == value) {
                                     selectedSateIndex = getCatModel!.data!.indexOf(element);
-                                    stateId = element.id;
+                                    category_Id = element.id;
                                     serviceId = element.serviceType;
-                                    print("select category id is $stateId");
-                                    getSubCategory(stateId!, serviceId);
+                                    print("select category id is $category_Id");
+                                    getSubCategory(category_Id!, serviceId);
                                   }
                                 });
                               });
@@ -631,43 +638,43 @@ class _AddProductState extends State<AddProduct> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 10, left: 6),
-                    child: Text(
-                      "Product Image",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: colors.text),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      imageCode = 1;
-                      getImageGallery();
-                    },
-                    child: Card(
-                      child: Container(
-                        height: 140,
-                        width: MediaQuery.of(context).size.width/1.2,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                        ),
-                        child: _image != null
-                            ? Image.file(
-                          _image!.absolute,
-                          fit: BoxFit.fill,
-                        )
-                            : Icon(
-                          Icons.file_upload_outlined,
-                          color: colors.secondary,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // const Padding(
+                  //   padding: EdgeInsets.only(top: 10, left: 6),
+                  //   child: Text(
+                  //     "Product Image",
+                  //     style: TextStyle(
+                  //         fontWeight: FontWeight.bold, color: colors.text),
+                  //   ),
+                  // ),
+                  // const SizedBox(
+                  //   height: 10,
+                  // ),
+                  // InkWell(
+                  //   onTap: () {
+                  //     imageCode = 1;
+                  //     getImageGallery();
+                  //   },
+                  //   child: Card(
+                  //     child: Container(
+                  //       height: 140,
+                  //       width: MediaQuery.of(context).size.width/1.2,
+                  //       decoration: BoxDecoration(
+                  //         borderRadius: BorderRadius.circular(10),
+                  //         color: Colors.white,
+                  //         // image: DecorationImage(image:FileImage(_image!.absolute) )
+                  //       ),
+                  //       child: _image != null
+                  //           ? Image.file(
+                  //         _image!.absolute,
+                  //         fit: BoxFit.fill,
+                  //       )
+                  //           : Icon(
+                  //         Icons.file_upload_outlined,
+                  //         color: colors.secondary,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   // const SizedBox(height: 20,),
                   // Custom_Text(text: 'Short Description', text2: ' *',),
                   // SizedBox(height: 15,),
@@ -991,6 +998,7 @@ class _AddProductState extends State<AddProduct> {
                   //     )
                   //   ],
                   // ),
+                  uploadMultiImmage(),
                   SizedBox(
                     height: 30,
                   ),
@@ -1012,6 +1020,198 @@ class _AddProductState extends State<AddProduct> {
         ),
       ),
     );
+  }
+
+
+  Widget uploadMultiImmage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(
+          height: 10,
+        ),
+        InkWell(
+          onTap: () async {
+            pickImageDialog(context, 1);
+            // await pickImages();
+          },
+          child: Container(
+            height: 40,
+            width: 145,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: colors.primary),
+            child: Center(
+              child: Text(
+                "Upload Product Images",
+                style: TextStyle(color: colors.whiteTemp, fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Visibility(
+            visible: isImages,
+            child:  buildGridView()),
+      ],
+    );
+  }
+
+  Widget buildGridView() {
+    return Container(
+      height: 270,
+      child: GridView.builder(
+        itemCount: imagePathList.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+        itemBuilder: (BuildContext context, int index) {
+          return Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Container(
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: colors.primary)
+                  ),
+                  width: MediaQuery.of(context).size.width/2.8,
+                  height: 170,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    child: Image.file(
+                        File(imagePathList[index]), fit: BoxFit.cover),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 109,
+                // bottom: 10,
+                child:
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      imagePathList.remove(imagePathList[index]);
+                    });
+                  },
+                  child: Icon(
+                    Icons.remove_circle,
+                    size: 30,
+                    color: Colors.red.withOpacity(0.7),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+
+  void pickImageDialog(BuildContext context,int i) async {
+    return await showDialog<void>(
+      context: context,
+      // barrierDismissible: barrierDismissible, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(6))),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              InkWell(
+                onTap: () async {
+                  _getFromGallery();
+                },
+                child:  Container(
+                  child: ListTile(
+                      title:  Text("Gallery"),
+                      leading: Icon(
+                        Icons.image,
+                        color: colors.primary,
+                      ),
+                  ),
+                ),
+              ),
+              Container(
+                width: 200,
+                height: 1,
+                color: Colors.black12,
+              ),
+              InkWell(
+                onTap: () async {
+                  _getFromCamera();
+                  // getImage(ImgSource.Camera, context, i);
+                },
+                child: Container(
+                  child: ListTile(
+                    title: Text("Camera"),
+                    leading: Icon(
+                      Icons.camera,
+                      color: colors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  File? _imageFile;
+
+  _getFromCamera() async {
+    PickedFile? pickedFile = await ImagePicker().getImage(
+      source: ImageSource.camera,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+        imagePathList.add(_imageFile?.path ?? "");
+        isImages = true;
+      });
+      Navigator.pop(context);
+    }
+  }
+
+
+  _getFromGallery() async {
+    PickedFile? pickedFile = await ImagePicker().getImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+        imagePathList.add(_imageFile?.path ?? "");
+        isImages = true;
+      });
+      Navigator.pop(context);
+    }
+  }
+
+  List imagePathList = [];
+  bool isImages = false;
+  Future<void> getFromGallery() async {
+    var result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: true,
+      allowCompression: true,
+    );
+    if (result != null) {
+      setState(() {
+        isImages = true;
+        // servicePic = File(result.files.single.path.toString());
+      });
+      imagePathList = result.paths.toList();
+      // imagePathList.add(result.paths.toString()).toList();
+      print("Sproduct image === $imagePathList");
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+      // User canceled the picker
+    }
   }
 
   TextEditingController tagC = TextEditingController();

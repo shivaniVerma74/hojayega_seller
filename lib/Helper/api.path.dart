@@ -24,13 +24,19 @@ class ApiServicves{
   static const String acceptRejectOrder = baseUrl+'accept_reject_order';
   static const String notifications = baseUrl+'notifications';
   static const String clearNotification = baseUrl+'clear_all';
+  static const String addAmount = baseUrl+'add_wallet';
+  static const String walletTransaction = baseUrl+'get_wallet_transactions';
+  static const String onOffStatus = baseUrl+'update_open_close_status';
+  static const String updateOrderItem = baseUrl+'update_orders_items';
+  static const String updateOrders = baseUrl+'update_orders';
+  static const String checkAvailablity = baseUrl+'check_availibility';
+  static const String promotionAdd = baseUrl+'add_promotion';
 
 }
+
 String? vendor_name;
 String? vendor_mobile;
 String? vendor_email;
-
-
 
 class DrawerIconTab extends StatefulWidget {
   final IconData? icon;
@@ -38,8 +44,7 @@ class DrawerIconTab extends StatefulWidget {
   final int? tabb;
   final int? indexx;
 
-  DrawerIconTab({Key? key, this.icon, this.titlee, this.tabb, this.indexx})
-      : super(key: key);
+  DrawerIconTab({Key? key, this.icon, this.titlee, this.tabb, this.indexx}) : super(key: key);
 
   @override
   State<DrawerIconTab> createState() => _DrawerIconTabState();

@@ -181,12 +181,12 @@ class _AddProductState extends State<AddProduct> {
     });
   }
 
-  String? vendor_id;
+  String? vendorId;
 
   getData() async {
-    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? vendor_id = sharedPreferences.getString('vendor_id');
-    print("vendor id add product screen $vendor_id");
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    vendorId = preferences.getString('vendor_id');
+    print("vendor id add product screen $vendorId");
   }
 
   addProductApi() async {
@@ -203,8 +203,8 @@ class _AddProductState extends State<AddProduct> {
       'sub_cat_id': subCatId.toString(),
       'child_cat_id': childCatId.toString(),
       'unit': _unitCtr.text,
-      'unit_type': _unittypeCtr.text,
-      'vid': vendor_id.toString(),
+      'unit_type': unitValue.toString(),
+      'vid': vendorId.toString()
     });
     print("add producttt apiii ${request.fields}");
     for (var i = 0; i < (imagePathList.length ?? 0); i++) {
@@ -242,6 +242,9 @@ class _AddProductState extends State<AddProduct> {
   String? serviceId;
   String? subCatId;
   String? childCatId;
+  String? unitValue = 'Kg';
+  List<String> unitTypes = ['Kg', 'g',];
+
 
   @override
   Widget build(BuildContext context) {
@@ -446,7 +449,8 @@ class _AddProductState extends State<AddProduct> {
                       ? SizedBox.shrink()
                       : Container(
                           height: 50,
-                          child: DropdownButton<String>(
+                          child:
+                          DropdownButton<String>(
                             isExpanded: true,
                             hint: const Text(
                               'Select Subcategory',
@@ -634,7 +638,72 @@ class _AddProductState extends State<AddProduct> {
                   const SizedBox(
                     height: 10,
                   ),
-                  CustomTextFormField(controller: _unittypeCtr, hintText: 'Unit Type'),
+                  DropdownButton<String>(
+                    isExpanded: true,
+                    hint: const Text(
+                      'Select Unit',
+                      style: TextStyle(
+                          color: colors.text,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15),
+                    ),
+                    // dropdownColor: colors.primary,
+                    value: unitValue,
+                    icon: const Padding(
+                      padding: EdgeInsets.only(left: 10.0, top: 5),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Colors.grey,
+                        size: 25,
+                      ),
+                    ),
+                    // elevation: 16,
+                    style: const TextStyle(
+                        color: colors.secondary,
+                        fontWeight: FontWeight.bold),
+                    underline: Padding(
+                      padding: const EdgeInsets.only(left: 0, right: 0),
+                      child: Container(
+                        // height: 2,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onChanged: (String? value) {
+                      // This is called when the user selects an item.
+                      setState(() {
+                        unitValue = value;
+                      });
+                    },
+                    items: unitTypes.map((items) {
+                      return DropdownMenuItem(
+                        value: items.toString(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: Container(
+                                width:
+                                MediaQuery.of(context).size.width/1.42,
+                                child: Padding(
+                                  padding:
+                                  const EdgeInsets.only(top: 5),
+                                  child: Text(
+                                    items.toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                        color: colors.text),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  Divider(color: Colors.grey,),
                   const SizedBox(
                     height: 10,
                   ),

@@ -19,14 +19,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
   initState() {
     super.initState();
     getData();
-    getNotification();
+
   }
 
-  String? vendor_id;
+  String? vendorId;
   getData() async {
-    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? vendor_id = sharedPreferences.getString('vendor_id');
-    print("vendor id order screen $vendor_id");
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    vendorId = preferences.getString('vendorId');
+    return  getNotification();
   }
 
   NotificationModel? getNotiList;
@@ -36,7 +36,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.notifications));
     request.fields.addAll({
-      'user_id': '1'
+      'user_id': vendorId.toString()
     });
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -59,12 +59,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.clearNotification));
     request.fields.addAll({
-      'user_id': '1'
+      'user_id': vendorId.toString()
     });
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       print(await response.stream.bytesToString());
+      Navigator.pop(context);
     }
     else {
       print(response.reasonPhrase);
@@ -94,15 +95,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 SizedBox(
                   height: 10,
                 ),
-
                 Row(
                   children:  [
                     const Text(
                       'Today',
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 17,
                           color: colors.blackTemp,
-                          fontWeight: FontWeight.w400),
+                          fontWeight: FontWeight.w600),
                     ),
                     Spacer(),
                     InkWell(
@@ -112,9 +112,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       child: const Text(
                         'Clear All',
                         style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 17,
                             color: colors.blackTemp,
-                            fontWeight: FontWeight.w400),
+                            fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
@@ -122,7 +122,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 const SizedBox(
                   height: 10,
                 ),
-                getNotiList?.notifications?.length ==""
+                getNotiList?.responseCode == "0"
                     ? Container(
                   height: MediaQuery.of(context).size.height / 1.6,
                   width: MediaQuery.of(context).size.width,
@@ -134,7 +134,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           fontWeight: FontWeight.bold),
                     ),
                   ),
-                ) :
+                ):
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: ListView.builder(

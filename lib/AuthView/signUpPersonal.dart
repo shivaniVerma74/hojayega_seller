@@ -1,18 +1,16 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hojayega_seller/Helper/api.path.dart';
-import 'package:hojayega_seller/Model/GetCityModel.dart';
+import 'package:http/http.dart';
+import 'dart:io';
+import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../Helper/api.path.dart';
 import '../Helper/color.dart';
 import '../Model/GetAreaModel.dart';
+import '../Model/GetCityModel.dart';
 import '../Model/StateModel.dart';
-import '../Screen/CreateOnlineStore.dart';
 import '../Screen/ThankYouScreen.dart';
 
 class SignUpPersonal extends StatefulWidget {
@@ -24,82 +22,125 @@ class SignUpPersonal extends StatefulWidget {
 
 class _SignUpPersonalState extends State<SignUpPersonal> {
 
-
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    dropdownController.text = items[0];
     getstate();
   }
-  TextEditingController nameCtr = TextEditingController();
-  TextEditingController shopnameCtr = TextEditingController();
-  TextEditingController comapnynameCtr = TextEditingController();
-  TextEditingController yearOfExperianceCtr = TextEditingController();
-  TextEditingController mobileCtr = TextEditingController();
-  TextEditingController passwordCtr = TextEditingController();
-  TextEditingController confirmPasswordCtr = TextEditingController();
-  TextEditingController referalCtr = TextEditingController();
-  TextEditingController addresCtr = TextEditingController();
-  TextEditingController emailCtr = TextEditingController();
-  TextEditingController banknameCtr = TextEditingController();
-  TextEditingController accountNumberCtr = TextEditingController();
-  TextEditingController ifsccodeCtr = TextEditingController();
-  TextEditingController upiIdCtr = TextEditingController();
-  TextEditingController landmarkCtr = TextEditingController();
-  TextEditingController friendcodeCtr = TextEditingController();
-  TextEditingController currentAddressCtr = TextEditingController();
-  TextEditingController pincodeCtr = TextEditingController();
-  TextEditingController gstCtr = TextEditingController();
+
+  var nameController = TextEditingController();
+  var shopController = TextEditingController();
+  var yearController = TextEditingController();
+  var phoneController = TextEditingController();
+  var emailController = TextEditingController();
+  var passwordController = TextEditingController();
+  var confirmPasswordController = TextEditingController();
+  var dobController = TextEditingController();
+  var refferalcodeController = TextEditingController();
+  var addressController = TextEditingController();
+  var landController = TextEditingController();
+
+  //var regionController =TextEditingController();
+  var dropdownController = TextEditingController();
+
+  var stateController = TextEditingController();
+  var cityController = TextEditingController();
+  var pincodeController = TextEditingController();
+  var currentlocationController = TextEditingController();
+
+  var banknameController = TextEditingController();
+  var accountNumberController = TextEditingController();
+  var ifscController = TextEditingController();
+  var upiidContoler = TextEditingController();
+  var qrCodeController = TextEditingController();
+
+  var shopimageController = TextEditingController();
+  var penCardController = TextEditingController();
+  var aadharCardContoller = TextEditingController();
+  var aadharCardBackContoller = TextEditingController();
+  var gstNumberController = TextEditingController();
+  var shopAtContoller = TextEditingController();
+  var selfiContoller = TextEditingController();
 
   vendorRegister() async {
-    var request = http.MultipartRequest('POST', Uri.parse("https://developmentalphawizz.com/hojayega/Vendorapi/vendor_registration"));
+    var headers = {
+      'Cookie': 'ci_session=1933939351e474eec93704742fca8b88967a1584'
+    };
+
+    var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            "https://developmentalphawizz.com/hojayega/Vendorapi/vendor_registration"));
     request.fields.addAll({
-      'name': nameCtr.text,
-      'shop_name': shopnameCtr.text,
+      'name': nameController.text,
+      'shop_name': shopController.text,
       // 'company_name': comapnynameCtr.text,
-      'year_of_experience': yearOfExperianceCtr.text,
-      'mobile': mobileCtr.text,
-      'email': emailCtr.text,
-      'password': passwordCtr.text,
-      'dob': dobCtr.text,
-      'refferal_code': referalCtr.text,
-      // 'address': addresCtr.text,
-      'land_mark': landmarkCtr.text,
-      'friend_code': friendcodeCtr.text,
-      'bank_name': banknameCtr.text,
-      'account_number': accountNumberCtr.text,
-      'ifsc_code': ifsccodeCtr.text,
-      'upi_id': upiIdCtr.text,
+      'year_of_experience': yearController.text,
+      'mobile': phoneController.text,
+      'email': emailController.text,
+      'password': passwordController.text,
+      'dob': dobController.text,
+      'refferal_code': refferalcodeController.text,
+      'address': currentlocationController.text,
+      'land_mark': landController.text,
+      'friend_code': 'aaa', //;;;;;;;;;
+      'bank_name': banknameController.text,
+      'account_number': accountNumberController.text,
+      'ifsc_code': ifscController.text,
+      'upi_id': upiidContoler.text,
+      'roll': '1',
+      'city': '2',
+      'state': '3',
+      'region': '4',
       "shop_type": _selectedOption3 == "service" ? "1" : "2",
-      "gst_no": gstCtr.text
+      "gst_no": gstNumberController.text
     });
     print("register parameter ${request.fields}");
-    request.files.add(await http.MultipartFile.fromPath(
-        'upload_location', _locationImage?.path ?? ""),
+    request.files.add(
+      await http.MultipartFile.fromPath(
+          'upload_location', _currentlocationimage?.path ?? ""),
     );
-    request.files.add(await http.MultipartFile.fromPath(
-        'shop_image', _image?.path ?? ""));
-    request.files.add(await http.MultipartFile.fromPath(
-        'pan_image', _image2?.path ?? ""));
-    request.files.add(await http.MultipartFile.fromPath(
-        'adhar_front', _image3?.path ?? ""));
-    request.files.add(await http.MultipartFile.fromPath(
-        'adhar_back', _image4?.path ?? ""));
-    request.files.add(await http.MultipartFile.fromPath(
-        'selfi_image', _image6?.path ?? ""));
-    request.files.add(await http.MultipartFile.fromPath('qr_code', qrImage?.path ?? ""));
+    request.files.add(
+        await http.MultipartFile.fromPath('shop_image', _image?.path ?? ""));
+    request.files.add(
+        await http.MultipartFile.fromPath('pan_image', _image2?.path ?? ""));
+    request.files.add(
+        await http.MultipartFile.fromPath('adhar_front', _image3?.path ?? ""));
+    request.files.add(
+        await http.MultipartFile.fromPath('adhar_back', _image4?.path ?? ""));
+    request.files.add(
+        await http.MultipartFile.fromPath('adhar_back', _image5?.path ?? ""));
+    request.files.add(
+        await http.MultipartFile.fromPath('selfi_image', _image6?.path ?? ""));
+    request.files.add(
+        await http.MultipartFile.fromPath('qr_code', _qrimage?.path ?? ""));
     print("register imagesss ${request.files}");
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
-      print("resonsewwwwww ${response.statusCode}");
+      print("resonse-------${response.statusCode}");
       var result = await response.stream.bytesToString();
       var finaResult = jsonDecode(result);
-      print("resonse $finaResult");
+      print("resonse===== $finaResult");
       if (finaResult['response_code'] == '1') {
-        print("kjkkhkhkjhkjhjk");
+        print("ggghhhhhjjff");
         Fluttertoast.showToast(msg: '${finaResult['message']}');
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ThankYou()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => ThankYou()));
+        nameController.clear();
+        shopController.clear();
+        yearController.clear();
+        passwordController.clear();
+        emailController.clear();
+        dobController.clear();
+        refferalcodeController.clear();
+        currentlocationController.clear();
+        landController.clear();
+        banknameController.clear();
+        accountNumberController.clear();
+        ifscController.clear();
+        upiidContoler.clear();
       } else {
         Fluttertoast.showToast(msg: "${finaResult['message']}");
       }
@@ -108,49 +149,58 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     }
   }
 
-  bool validateMobile(String value) {
-    String pattern = r'^[0-9]{10}$';
-    RegExp regExp = RegExp(pattern);
-    return regExp.hasMatch(value);
-  }
-
-  String? _validateEmail(value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    } else if (!isValidEmail(value)) {
-      return 'Please enter a valid email address';
-    }
-    return null;
-  }
-
-  bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(email);
-  }
-
   var i = 1;
   String _selectedOption = '1';
-  final _formKey = GlobalKey<FormState>();
   var arNames = ['1', '2', '3', '4']; // Your items
+
+  String errorText = '';
+
+  void validateDropdown() {
+    if (dropdownController.text.isEmpty) {
+      setState(() {
+        errorText = 'Please select an item';
+      });
+    } else {
+      setState(() {
+        errorText = '';
+      });
+    }
+  }
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool isVisible = true;
+  String? _validateEmail(value) {
+    if (value!.isEmpty) {
+      return "Please enter an email";
+    }
+    RegExp emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegExp.hasMatch(value)) {
+      return "Please enter a valid email";
+    }
+  }
+
   var data = [
     'Personal Information',
     'Address',
     'Account Details',
-    'Upload Documents',
+    'Upload Document',
   ];
-  bool isChecked = false;
-  bool isVisible = false;
-  bool isVisibleConfirm = false;
+
+  String? _dropItem1;
+  List<String> items = ['North', 'South', 'East', 'West'];
+  String? _dropItem2;
+  List<String> items2 = ['Maddhya Pradesh', 'Rajisthan', 'Gujarat', 'U.P'];
+  String? _dropItem3;
+  List<String> items3 = ['Indore', 'Bhopal', 'jaipur', 'Ujjain'];
 
   String _selectedOption2 = 'user';
   String _selectedOption3 = 'service';
   var arrValue = ['Cake', 'fragile', 'Ready', 'Non'];
 
-  TextEditingController dobCtr = TextEditingController();
-
+  File? _qrimage;
+  File? _currentlocationimage;
   File? _image;
-  File? _locationImage;
-  File? qrImage;
   File? _image2;
   File? _image3;
   File? _image4;
@@ -173,22 +223,43 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         _image4 = File(pickedFile.path);
       } else if (pickedFile != null && imageCode == 5) {
         _image5 = File(pickedFile.path);
-      }
-      else if (pickedFile != null && imageCode == 6) {
+      } else if (pickedFile != null && imageCode == 6) {
         _image6 = File(pickedFile.path);
-      }
-      else if (pickedFile != null && imageCode == 7) {
-        _locationImage = File(pickedFile.path);
-      }
-      else if (pickedFile != null && imageCode == 8) {
-        qrImage = File(pickedFile.path);
-      }
-      else {
+      } else if (pickedFile != null && imageCode == 7) {
+        _currentlocationimage = File(pickedFile.path);
+      } else if (pickedFile != null && imageCode == 8) {
+        _qrimage = File(pickedFile.path);
+      } else {
         print('no image picked');
       }
     });
   }
 
+  Future _getImageFromCamera() async {
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+    setState(() {
+      if (pickedFile != null && imageCode == 1) {
+        _image = File(pickedFile.path);
+      } else if (pickedFile != null && imageCode == 2) {
+        _image2 = File(pickedFile.path);
+      } else if (pickedFile != null && imageCode == 3) {
+        _image3 = File(pickedFile.path);
+      } else if (pickedFile != null && imageCode == 4) {
+        _image4 = File(pickedFile.path);
+      } else if (pickedFile != null && imageCode == 5) {
+        _image5 = File(pickedFile.path);
+      } else if (pickedFile != null && imageCode == 6) {
+        _image6 = File(pickedFile.path);
+      } else if (pickedFile != null && imageCode == 7) {
+        _currentlocationimage = File(pickedFile.path);
+      } else if (pickedFile != null && imageCode == 8) {
+        _qrimage = File(pickedFile.path);
+      } else {
+        print('no image picked');
+      }
+    });
+  }
 
   List<CityData> cityList = [];
   List<CountryData> countryList = [];
@@ -274,6 +345,33 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
 
+  Future<void> _showPickerOptions() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.photo_library),
+              title: Text('Gallery'),
+              onTap: () {
+                getImageGallery();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.camera_alt),
+              title: Text('Camera'),
+              onTap: () {
+                _getImageFromCamera();
+                // _getImage(ImageSource.camera);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _getStepCard(String step) {
     switch (step) {
       case '1':
@@ -282,87 +380,48 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black, width: 2),
-            ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black, width: 2)),
             child: Padding(
               padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: const [
-                      CircleAvatar(
-                          backgroundColor: colors.primary, maxRadius: 8),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        "Personal Information",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: colors.primary),
-                      ),
-                    ],
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: Text(
-                      "Kindly complete the form below, specifying the\npurpose of your application",
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8, bottom: 5),
-                    child: Text(
-                      "User Type",
-                      style: TextStyle(
-                          color: colors.secondary, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 40,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.black)),
-                    child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // SizedBox(width: 5,),
-                        Radio<String>(
-                          value: 'user',
-                          activeColor: colors.secondary,
-                          groupValue: _selectedOption2,
-                          onChanged: (String? value) {
-                            setState(() {
-                              _selectedOption2 = value!;
-                            });
-                          },
-                        ),
-                        Text("User"),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: const [
+                        CircleAvatar(
+                            backgroundColor: colors.primary, maxRadius: 8),
                         SizedBox(
-                          width: 75,
+                          width: 5,
                         ),
-                        Radio<String>(
-                          value: 'merchant',
-                          activeColor: colors.secondary,
-                          groupValue: _selectedOption2,
-                          onChanged: (String? value) {
-                            setState(() {
-                              i = 2;
-                              _selectedOption2 = value!;
-                              print("typeppppppp $_selectedOption2");
-                            });
-                          },
+                        Text(
+                          "Personal Information",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: colors.primary),
                         ),
-                        Text("Merchant")
                       ],
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Container(
+                    const Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child: Text(
+                        "Kindly complete the form below, specifying the\npurpose of your application",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8, bottom: 5),
+                      child: Text(
+                        "User Type",
+                        style: TextStyle(
+                            color: colors.secondary,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Container(
                       width: double.infinity,
                       height: 40,
                       decoration: BoxDecoration(
@@ -373,38 +432,75 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         children: [
                           // SizedBox(width: 5,),
                           Radio<String>(
-                            value: 'service',
-                            activeColor: colors.secondary,
-                            groupValue: _selectedOption3,
+                            value: 'user',
+                            activeColor: Colors.green,
+                            groupValue: _selectedOption2,
                             onChanged: (String? value) {
                               setState(() {
-                                _selectedOption3 = value!;
-                                print("imakjakjkjkajkjksj $_selectedOption3 $value");
+                                _selectedOption2 = value!;
                               });
                             },
                           ),
-                          const Text("Service Provider"),
-                          //  SizedBox(width: 5,),
+                          Text("User"),
+                          SizedBox(
+                            width: 75,
+                          ),
                           Radio<String>(
-                            value: 'shop',
-                            activeColor: colors.secondary,
-                            groupValue: _selectedOption3,
+                            value: 'merchant',
+                            activeColor: Colors.green,
+                            groupValue: _selectedOption2,
                             onChanged: (String? value) {
                               setState(() {
-                                _selectedOption3 = value!;
+                                i = 2;
+                                _selectedOption2 = value!;
                               });
-                              print("000000000000000 $_selectedOption3 $value");
                             },
                           ),
-                          const Text("Shopkeeper")
+                          Text("Merchant")
                         ],
                       ),
                     ),
-                  ),
-                  if (i == 2)
-                    Form(
-                      key: _formKey,
-                      child: Padding(
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        width: double.infinity,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.black)),
+                        child: Row(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // SizedBox(width: 5,),
+                            Radio<String>(
+                              value: 'service',
+                              activeColor: Colors.green,
+                              groupValue: _selectedOption3,
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _selectedOption3 = value!;
+                                });
+                              },
+                            ),
+                            Text("Service Provider"),
+                            //  SizedBox(width: 5,),
+                            Radio<String>(
+                              value: 'shop',
+                              activeColor: Colors.green,
+                              groupValue: _selectedOption3,
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _selectedOption3 = value!;
+                                });
+                              },
+                            ),
+                            Text("Shopkeeper")
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (i == 2)
+                      Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: Column(
                           children: [
@@ -420,10 +516,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/person.png')),
-                                ),
-                                SizedBox(
-                                  width: 10,
+                                          'assets/images/name.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -434,13 +527,13 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+                                      controller: nameController,
                                       validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter your name';
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter  Name';
                                         }
                                         return null;
                                       },
-                                      controller: nameCtr,
                                       decoration: const InputDecoration(
                                           hintText: 'Name',
                                           enabledBorder: OutlineInputBorder(
@@ -454,9 +547,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
                             Row(
                               children: [
                                 Card(
@@ -469,10 +559,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/shopname.png')),
-                                ),
-                                SizedBox(
-                                  width: 10,
+                                          'assets/images/shop name company name.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -483,13 +570,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter your shop name';
-                                        }
-                                        return null;
-                                      },
-                                      controller: shopnameCtr,
+                                      controller: shopController,
                                       decoration: const InputDecoration(
                                           hintText: 'Shop Name/Company Name',
                                           enabledBorder: OutlineInputBorder(
@@ -498,13 +579,16 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.white))),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter shop name';
+                                        }
+                                        return null;
+                                      },
                                     ),
                                   ),
                                 ),
                               ],
-                            ),
-                            SizedBox(
-                              height: 5,
                             ),
                             Row(
                               children: [
@@ -518,10 +602,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/yearofexperience.png')),
-                                ),
-                                SizedBox(
-                                  width: 10,
+                                          'assets/images/year of experience.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -532,13 +613,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter Year of Experience';
-                                        }
-                                        return null;
-                                      },
-                                      controller: yearOfExperianceCtr,
+                                      controller: yearController,
                                       decoration: const InputDecoration(
                                           hintText: 'Year of Experience',
                                           enabledBorder: OutlineInputBorder(
@@ -547,13 +622,16 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.white))),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter your experience';
+                                        }
+                                        return null;
+                                      },
                                     ),
                                   ),
                                 ),
                               ],
-                            ),
-                            SizedBox(
-                              height: 5,
                             ),
                             Row(
                               children: [
@@ -567,10 +645,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/phonenumber.png')),
-                                ),
-                                SizedBox(
-                                  width: 10,
+                                          'assets/images/phone number.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -581,20 +656,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Mobile number is required';
-                                        }
-                                        if (!validateMobile(value)) {
-                                          return 'Invalid Mobile Number';
-                                        }
-                                        return null;
-                                      },
-                                      keyboardType: TextInputType.number,
-                                      controller: mobileCtr,
-                                      maxLength: 10,
+                                      controller: phoneController,
                                       decoration: const InputDecoration(
-                                          counterText: "",
                                           hintText: 'Phone Number',
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
@@ -602,13 +665,18 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.white))),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter Phone Number';
+                                        } else if (value.length < 10) {
+                                          return 'At least 10 characters required';
+                                        }
+                                        return null;
+                                      },
                                     ),
                                   ),
                                 ),
                               ],
-                            ),
-                            SizedBox(
-                              height: 5,
                             ),
                             Row(
                               children: [
@@ -624,9 +692,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/email address.png')),
                                 ),
-                                SizedBox(
-                                  width: 10,
-                                ),
                                 Card(
                                   child: Container(
                                     width: 220,
@@ -636,9 +701,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
-                                      keyboardType: TextInputType.emailAddress,
+                                      controller: emailController,
                                       validator: _validateEmail,
-                                      controller: emailCtr,
                                       decoration: const InputDecoration(
                                           hintText: 'Email Address',
                                           enabledBorder: OutlineInputBorder(
@@ -652,9 +716,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
                             Row(
                               children: [
                                 Card(
@@ -669,9 +730,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/password.png')),
                                 ),
-                                SizedBox(
-                                  width: 10,
-                                ),
                                 Card(
                                   child: Container(
                                     width: 220,
@@ -681,17 +739,17 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+                                      controller: passwordController,
                                       validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter password';
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter password';
+                                        } else if (value.length < 8) {
+                                          return 'At least 8 characters required';
                                         }
                                         return null;
                                       },
-                                      maxLength: 8,
-                                      controller: passwordCtr,
                                       obscureText: isVisible ? false : true,
                                       decoration: InputDecoration(
-                                          counterText: "",
                                           suffixIcon: IconButton(
                                             onPressed: () {
                                               setState(() {
@@ -704,11 +762,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               isVisible
                                                   ? Icons.remove_red_eye
                                                   : Icons.visibility_off,
-                                              color: Colors.green,
+                                              color: Colors.blueAccent,
                                             ),
                                           ),
                                           hintText: 'Password',
-                                          enabledBorder: OutlineInputBorder(
+                                          enabledBorder: const OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.white)),
                                           focusedBorder: OutlineInputBorder(
@@ -718,9 +776,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                   ),
                                 ),
                               ],
-                            ),
-                            SizedBox(
-                              height: 5,
                             ),
                             Row(
                               children: [
@@ -736,9 +791,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/password.png')),
                                 ),
-                                SizedBox(
-                                  width: 10,
-                                ),
                                 Card(
                                   child: Container(
                                     width: 220,
@@ -748,31 +800,29 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+                                      controller: confirmPasswordController,
+                                      obscureText: isVisible ? false : true,
                                       validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter confirm password';
+                                        if (value != passwordController.text
+                                                .toString()) {
+                                          return 'Enter Not Match';
                                         }
                                         return null;
                                       },
-                                      maxLength: 8,
-                                      controller: confirmPasswordCtr,
-                                      obscureText:
-                                          isVisibleConfirm ? false : true,
                                       decoration: InputDecoration(
-                                          counterText: "",
                                           suffixIcon: IconButton(
                                             onPressed: () {
                                               setState(() {
-                                                isVisibleConfirm
-                                                    ? isVisibleConfirm = false
-                                                    : isVisibleConfirm = true;
+                                                isVisible
+                                                    ? isVisible = false
+                                                    : isVisible = true;
                                               });
                                             },
                                             icon: Icon(
-                                              isVisibleConfirm
+                                              isVisible
                                                   ? Icons.remove_red_eye
                                                   : Icons.visibility_off,
-                                              color: Colors.green,
+                                              color: Colors.blueAccent,
                                             ),
                                           ),
                                           hintText: 'Confirm Password',
@@ -787,9 +837,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
                             Row(
                               children: [
                                 Card(
@@ -802,10 +849,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/daetofbirth.png')),
-                                ),
-                                SizedBox(
-                                  width: 10,
+                                          'assets/images/password.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -816,50 +860,26 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+                                      controller: dobController,
                                       validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter date of birth';
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter DOB';
                                         }
                                         return null;
                                       },
-                                      controller: dobCtr,
-                                      onTap: () async {
-                                        DateTime? datePicked =
-                                            await showDatePicker(
-                                                context: context,
-                                                initialDate: DateTime.now(),
-                                                firstDate: DateTime(2000),
-                                                lastDate: DateTime(2024));
-                                        if (datePicked != null) {
-                                          print(
-                                              'Date Selected:${datePicked.day}-${datePicked.month}-${datePicked.year}');
-                                          String formettedDate =
-                                              DateFormat('dd-MM-yyyy')
-                                                  .format(datePicked);
-                                          setState(() {
-                                            dobCtr.text = formettedDate;
-                                          });
-                                        }
-                                      },
-                                      decoration: const InputDecoration(
-                                        hintText: 'Date of Birth',
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
-                                        ),
-                                      ),
+                                      decoration: InputDecoration(
+                                          hintText: 'Date of Birth',
+                                          enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white)),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white))),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
                             Row(
                               children: [
                                 Card(
@@ -872,10 +892,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/refferalcode.png')),
-                                ),
-                                SizedBox(
-                                  width: 10,
+                                          'assets/images/password.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -886,14 +903,14 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+                                      controller: refferalcodeController,
                                       validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter refferal code';
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter Refferal Code';
                                         }
                                         return null;
                                       },
-                                      controller: referalCtr,
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                           hintText: 'Refferal Code',
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
@@ -906,488 +923,1126 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Row(
-                              children: [
-                                Card(
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Card(
+                                child: InkWell(
+                                  onTap: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      setState(() {
+                                        _selectedOption = '2';
+                                      });
+
+                                      // Navigator.pushReplacement(
+                                      //   context,
+                                      //   MaterialPageRoute(builder: (context) => HomeScreen()),
+                                      // );
+                                      print(nameController.text.toString());
+                                      print(shopController.text.toString());
+                                      print(yearController.text.toString());
+                                      print(phoneController.text.toString());
+                                      print(emailController.text.toString());
+                                      print(passwordController.text.toString());
+                                      print(confirmPasswordController.text
+                                          .toString());
+                                      print(dobController.text.toString());
+                                      print(refferalcodeController.text
+                                          .toString());
+                                    }
+                                  },
                                   child: Container(
-                                      width: 50,
+                                    child: Center(
+                                      child: Text(
+                                        'Next',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: colors.secondary,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    //   width: MediaQuery.of(context),
+                                    // decoration: BoxDecoration(borderRadius: ),
+                                    height: MediaQuery.of(context).size.height *
+                                        0.05,
+                                    width:
+                                        MediaQuery.of(context).size.width * .6,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      case '2':
+        return Form(
+          key: _formKey,
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black, width: 2)),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                            backgroundColor: colors.primary, maxRadius: 8),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          "Address",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: colors.primary),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Card(
+                                child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: Image.asset('assets/images/current address.png')),
+                              ),
+                              Card(
+                                child: Container(
+                                  width: 220,
+                                  height: 50,
+                                  // color: Colors.black,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: colors.lightgray),
+                                  child: TextFormField(
+                                    controller: addressController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Enter Current Address';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: const InputDecoration(
+                                        suffixIcon: Icon(
+                                          Icons.location_searching_sharp,
+                                          color: colors.secondary,
+                                        ),
+                                        hintText: 'Current Address',
+                                        enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.white)),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.white))),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Card(
+                                child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: Image.asset(
+                                        'assets/images/land mark.png'),
+                                ),
+                              ),
+                              Card(
+                                child: Container(
+                                  width: 220,
+                                  height: 50,
+                                  // color: Colors.black,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: colors.lightgray),
+                                  child: TextFormField(
+                                    controller: landController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Enter Land Mark';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: const InputDecoration(
+                                        hintText: 'Land Mark',
+                                        enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.white)),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.white))),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Card(
+                                child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: Image.asset('assets/images/state.png')),
+                              ),
+                              Card(
+                                child: Container(
+                                  width: 220,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child:
+                                  DropdownButton(
+                                    isExpanded: true,
+                                    value: stateValue,
+                                    hint: const Text('State'),
+                                    // Down Arrow Icon
+                                    icon: const Icon(Icons.keyboard_arrow_down),
+                                    // Array list of items
+                                    items: stateList.map((items) {
+                                      return
+                                        DropdownMenuItem(
+                                          value: items,
+                                          child: Container(
+                                              child: Text(items.name.toString())),
+                                        );
+                                    }).toList(),
+                                    onChanged: (StataData? value) {
+                                      setState(() {
+                                        stateValue = value!;
+                                        getCity("${stateValue!.id}");
+                                        stateName = stateValue!.name;
+                                        print("name herererb $stateName");
+                                      });
+                                    },
+                                    underline: Container(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Card(
+                                child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child:
+                                    Image.asset('assets/images/state.png')),
+                              ),
+                              Card(
+                                child: Container(
+                                  width: 220,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: DropdownButton(
+                                    isExpanded: true,
+                                    value: cityValue,
+                                    hint: const Text('City'),
+                                    // Down Arrow Icon
+                                    icon: const Icon(Icons.keyboard_arrow_down),
+                                    // Array list of items
+                                    items: cityList.map((items) {
+                                      return DropdownMenuItem(value: items, child: Container(child: Text(items.name.toString())),
+                                      );
+                                    }).toList(),
+                                    onChanged: (CityData? value) {
+                                      setState(() {
+                                        cityValue = value!;
+                                        getArea("${cityValue!.id}");
+                                        // stateName = stateValue!.name;
+                                        print("name herererb $cityValue");
+                                      });
+                                    },
+                                    underline: Container(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Card(
+                                child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child:
+                                    Image.asset('assets/images/region.png')),
+                              ),
+                              Card(
+                                child: Container(
+                                  width: 220,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: DropdownButton(
+                                    isExpanded: true,
+                                    value: countryValue,
+                                    hint: const Text('Region'),
+                                    // Down Arrow Icon
+                                    icon: const Icon(Icons.keyboard_arrow_down),
+                                    // Array list of items
+                                    items: countryList.map((items) {
+                                      return
+                                        DropdownMenuItem(
+                                          value: items,
+                                          child: Container(
+                                              child: Text(items.name.toString())),
+                                        );
+                                    }).toList(),
+                                    // After selecting the desired option,it will
+                                    // change button value to selected value
+                                    onChanged: (CountryData? value) {
+                                      setState(() {
+                                        countryValue = value!;
+                                        // getstate("${countryValue!.id}");
+                                        // ("${stateValue!.id}");
+                                        // stateName = stateValue!.name;
+                                        // print("name herererb $stateName");
+                                      });
+                                    },
+                                    underline: Container(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Card(
+                                child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: Image.asset(
+                                        'assets/images/pincode.png')),
+                              ),
+                              Card(
+                                child: Container(
+                                  width: 220,
+                                  height: 50,
+                                  // color: Colors.black,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: colors.lightgray),
+                                  child: TextFormField(
+                                    controller: pincodeController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Enter Pin code';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: const InputDecoration(
+                                        hintText: 'Pincode',
+                                        enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.white)),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.white))),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Card(
+                                child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: Image.asset(
+                                        'assets/images/upload current location.png')),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  imageCode = 7;
+                                  //  getImageGallery();
+                                  _showPickerOptions();
+                                },
+                                child: Card(
+                                  child: Container(
+                                    height: 80,
+                                    width: 220,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white,
+                                      // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                    ),
+                                    child: _currentlocationimage != null
+                                        ? Image.file(
+                                            _currentlocationimage!.absolute,
+                                            fit: BoxFit.fill,
+                                          )
+                                        : Icon(
+                                            Icons.file_upload_outlined,
+                                            color: colors.secondary,
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Card(
+                            child: InkWell(
+                              onTap: () {
+                                if (_dropItem1 == null) {
+                                  Fluttertoast.showToast(msg: "Slect Region");
+                                }
+                                if (_dropItem2 == null) {
+                                  Fluttertoast.showToast(msg: "Slect state");
+                                }
+
+                                if (_formKey.currentState!.validate() &&
+                                    _dropItem1 != null &&
+                                    _dropItem2 != null) {
+                                  print(addressController.text.toString());
+                                  print(landController.text.toString());
+                                  print(_dropItem1);
+                                  print(_dropItem2);
+                                  print(pincodeController.text.toString());
+                                  print(currentlocationController.text
+                                      .toString());
+                                  // validateDropdown();
+                                  // showToast();
+                                  setState(() {
+                                    _selectedOption = '3';
+                                  });
+                                }
+                              },
+                              child: Container(
+                                child: Center(
+                                  child: Text(
+                                    'Next',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.secondary,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                //   width: MediaQuery.of(context),
+                                // decoration: BoxDecoration(borderRadius: ),
+                                height:
+                                    MediaQuery.of(context).size.height * 0.05,
+                                width: MediaQuery.of(context).size.width * .6,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      case '3':
+        return Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.black, width: 2)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                                backgroundColor: colors.primary, maxRadius: 8),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Account Details",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: colors.primary),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Card(
+                                    child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: Image.asset(
+                                            'assets/images/bank name.png')),
+                                  ),
+                                  Card(
+                                    child: Container(
+                                      width: 220,
                                       height: 50,
                                       // color: Colors.black,
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
-                                      child: Image.asset(
-                                          'assets/images/refferalcode.png')),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter friend code';
-                                        }
-                                        return null;
-                                      },
-                                      controller: friendcodeCtr,
-                                      decoration: const InputDecoration(
-                                          hintText: 'Friend Code',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                      child: TextFormField(
+                                        controller: banknameController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter Bank Name';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: 'Bank Name',
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Checkbox(
-                                    value: isChecked,
-                                    activeColor: Colors.green,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4)),
-                                    onChanged: (val) {
-                                      setState(() {
-                                        isChecked = val!;
-                                      });
-                                    }),
-                                const Text(
-                                  'I agree to all',
-                                  style: TextStyle(fontSize: 8),
-                                ),
-                                TextButton(
-                                  onPressed: () {},
-                                  child: const Text(
-                                    'terms & condition',
-                                    style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                                const Text('and',
-                                    style: TextStyle(fontSize: 12)),
-                                TextButton(
-                                  onPressed: () {},
-                                  child: const Text(
-                                    'privacy policy',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            InkWell(
-                              onTap: () {
-                                if (_formKey.currentState!.validate()) {
-                                  // Navigator.push(context, MaterialPageRoute(builder:(context)=> BottomNavBar()));
-                                }
-                              },
-                              child: Container(
-                                height: 40,
-                                width: MediaQuery.of(context).size.width / 1.4,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: colors.secondary),
-                                child: Center(
-                                  child: Text(
-                                    "Next",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: colors.whiteTemp),
-                                  ),
-                                ),
+                                ],
                               ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
+                              Row(
+                                children: [
+                                  Card(
+                                    child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: Image.asset(
+                                            'assets/images/account number.png')),
+                                  ),
+                                  Card(
+                                    child: Container(
+                                      width: 220,
+                                      height: 50,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        controller: accountNumberController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter Accoutn Number';
+                                          } else if (value.length < 10) {
+                                            return 'At least 10 characters required';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: 'Account Number',
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Card(
+                                    child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: Image.asset(
+                                            'assets/images/IFSC code.png')),
+                                  ),
+                                  Card(
+                                    child: Container(
+                                      width: 220,
+                                      height: 50,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        controller: ifscController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter IFSC Code';
+                                          } else if (value.length < 10) {
+                                            return 'At least 10 characters required';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: 'IFSC code',
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.black, width: 2)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Card(
+                                    child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: Image.asset(
+                                            'assets/images/upi id.png')),
+                                  ),
+                                  Card(
+                                    child: Container(
+                                      width: 220,
+                                      height: 50,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        controller: upiidContoler,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter UPI ID';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: 'Upi Id',
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Card(
+                                    child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: Image.asset(
+                                            'assets/images/upload qr code.png')),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      imageCode = 8;
+                                      //  getImageGallery();
+                                      _showPickerOptions();
+                                    },
+                                    child: Card(
+                                      child: Container(
+                                        height: 80,
+                                        width: 220,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white,
+                                          // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                        ),
+                                        child: _qrimage != null
+                                            ? Image.file(
+                                                _qrimage!.absolute,
+                                                fit: BoxFit.fill,
+                                              )
+                                            : Icon(
+                                                Icons.file_upload_outlined,
+                                                color: colors.secondary,
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.05,
+              ),
+              Card(
+                child: InkWell(
+                  onTap: () {
+                    validateDropdown();
+                    if (_formKey.currentState!.validate()) {
+                      setState(() {
+                        _selectedOption = '4';
+                      });
+                    }
+                  },
+                  child: Container(
+                    child: Center(
+                      child: Text(
+                        'Next',
+                        style: TextStyle(
+                          color: Colors.white,
                         ),
                       ),
                     ),
-                ],
-              ),
-            ),
+                    decoration: BoxDecoration(
+                      color: colors.secondary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    //   width: MediaQuery.of(context),
+                    // decoration: BoxDecoration(borderRadius: ),
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    width: MediaQuery.of(context).size.width * .6,
+                  ),
+                ),
+              )
+            ],
           ),
         );
-      case '2':
-        return Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black, width: 2)),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: const [
-                      CircleAvatar(
-                          backgroundColor: colors.primary, maxRadius: 8),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        "Address",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: colors.primary),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Column(
+      case '4':
+        return Form(
+          key: _formKey,
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black, width: 2)),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Card(
-                              child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child: Image.asset(
-                                      'assets/images/current address.png')),
-                            ),
-                            Card(
-                              child: Container(
-                                width: 220,
-                                height: 50,
-                                // color: Colors.black,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: colors.lightgray),
-                                child: TextFormField(
-                                  controller: currentAddressCtr,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Please enter current address';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                      suffixIcon: Icon(
-                                        Icons.location_searching_sharp,
-                                        color: colors.secondary,
-                                      ),
-                                      hintText: 'Current Address',
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white)),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white))),
-                                ),
-                              ),
-                            ),
-                          ],
+                        CircleAvatar(
+                            backgroundColor: colors.primary, maxRadius: 8),
+                        SizedBox(
+                          width: 5,
                         ),
-                        Row(
-                          children: [
-                            Card(
-                              child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child: Image.asset(
-                                      'assets/images/landmark.png')),
-                            ),
-                            Card(
-                              child: Container(
-                                width: 220,
-                                height: 50,
-                                // color: Colors.black,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: colors.lightgray),
-                                child: TextFormField(
-                                  controller: landmarkCtr,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Please enter landmark';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: const InputDecoration(
-                                      hintText: 'Land Mark',
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white)),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white))),
-                                ),
-                              ),
-                            ),
-                          ],
+                        Text(
+                          "Upload Document",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: colors.primary),
                         ),
-                        Row(
-                          children: [
-                            Card(
-                              child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child: Image.asset('assets/images/state.png')),
-                            ),
-                            Card(
-                              child: Container(
-                                width: 220,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(5),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 6),
+                      child: Text(
+                        "Shop Image",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: colors.text),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        imageCode = 1;
+                        _showPickerOptions();
+                        // getImageGallery();
+                        // _getImageFromCamera();
+                      },
+                      child: Card(
+                        child: Container(
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            // image: DecorationImage(image:FileImage(_image!.absolute) )
+                          ),
+                          child: _image != null
+                              ? Image.file(
+                                  _image!.absolute,
+                                  fit: BoxFit.fill,
+                                )
+                              : Icon(
+                                  Icons.file_upload_outlined,
+                                  color: colors.secondary,
                                 ),
-                                child:
-                                DropdownButton(
-                                  isExpanded: true,
-                                  value: stateValue,
-                                  hint: const Text('State'),
-                                  // Down Arrow Icon
-                                  icon: const Icon(Icons.keyboard_arrow_down),
-                                  // Array list of items
-                                  items: stateList.map((items) {
-                                    return
-                                      DropdownMenuItem(
-                                        value: items,
-                                        child: Container(
-                                            child: Text(items.name.toString())),
-                                      );
-                                  }).toList(),
-                                  onChanged: (StataData? value) {
-                                    setState(() {
-                                      stateValue = value!;
-                                      getCity("${stateValue!.id}");
-                                      stateName = stateValue!.name;
-                                      print("name herererb $stateName");
-                                    });
-                                  },
-                                  underline: Container(),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
-                        Row(
-                          children: [
-                            Card(
-                              child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child:
-                                      Image.asset('assets/images/state.png')),
-                            ),
-                            Card(
-                              child: Container(
-                                width: 220,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 6),
+                      child: Text(
+                        "Pen Card",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: colors.text),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        imageCode = 2;
+                        //  getImageGallery();
+                        _showPickerOptions();
+                      },
+                      child: Card(
+                        child: Container(
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            // image: DecorationImage(image:FileImage(_image!.absolute) )
+                          ),
+                          child: _image2 != null
+                              ? Image.file(
+                                  _image2!.absolute,
+                                  fit: BoxFit.fill,
+                                )
+                              : Icon(
+                                  Icons.file_upload_outlined,
+                                  color: colors.secondary,
                                 ),
-                                child: DropdownButton(
-                                  isExpanded: true,
-                                  value: cityValue,
-                                  hint: const Text('City'),
-                                  // Down Arrow Icon
-                                  icon: const Icon(Icons.keyboard_arrow_down),
-                                  // Array list of items
-                                  items: cityList.map((items) {
-                                    return DropdownMenuItem(value: items, child: Container(child: Text(items.name.toString())),
-                                    );
-                                  }).toList(),
-                                  onChanged: (CityData? value) {
-                                    setState(() {
-                                      cityValue = value!;
-                                      getArea("${cityValue!.id}");
-                                      // stateName = stateValue!.name;
-                                      print("name herererb $cityValue");
-                                    });
-                                  },
-                                  underline: Container(),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
-                        Row(
-                          children: [
-                            Card(
-                              child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child:
-                                  Image.asset('assets/images/region.png')),
-                            ),
-                            Card(
-                              child: Container(
-                                width: 220,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 6),
+                      child: Text(
+                        "Aadhar Card Front",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: colors.text),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        imageCode = 3;
+                        //  getImageGallery();
+                        _showPickerOptions();
+                      },
+                      child: Card(
+                        child: Container(
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            // image: DecorationImage(image:FileImage(_image!.absolute) )
+                          ),
+                          child: _image3 != null
+                              ? Image.file(
+                                  _image3!.absolute,
+                                  fit: BoxFit.fill,
+                                )
+                              : Icon(
+                                  Icons.file_upload_outlined,
+                                  color: colors.secondary,
                                 ),
-                                child: DropdownButton(
-                                  isExpanded: true,
-                                  value: countryValue,
-                                  hint: const Text('Region'),
-                                  // Down Arrow Icon
-                                  icon: const Icon(Icons.keyboard_arrow_down),
-                                  // Array list of items
-                                  items: countryList.map((items) {
-                                    return
-                                      DropdownMenuItem(
-                                        value: items,
-                                        child: Container(
-                                            child: Text(items.name.toString())),
-                                      );
-                                  }).toList(),
-                                  // After selecting the desired option,it will
-                                  // change button value to selected value
-                                  onChanged: (CountryData? value) {
-                                    setState(() {
-                                      countryValue = value!;
-                                      // getstate("${countryValue!.id}");
-                                      // ("${stateValue!.id}");
-                                      // stateName = stateValue!.name;
-                                      // print("name herererb $stateName");
-                                    });
-                                  },
-                                  underline: Container(),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
-                        Row(
-                          children: [
-                            Card(
-                              child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child:
-                                      Image.asset('assets/images/pincode.png')),
-                            ),
-                            Card(
-                              child: Container(
-                                width: 220,
-                                height: 50,
-                                // color: Colors.black,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: colors.lightgray),
-                                child: TextFormField(
-                                  controller: pincodeCtr,
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Please enter pincode';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: const InputDecoration(
-                                    hintText: 'Pincode',
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.white),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.white),
-                                    ),
-                                  ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 6),
+                      child: Text(
+                        "Aadhar Card Back",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: colors.text),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        imageCode = 4;
+                        //  getImageGallery();
+                        _showPickerOptions();
+                      },
+                      child: Card(
+                        child: Container(
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            // image: DecorationImage(image:FileImage(_image!.absolute) )
+                          ),
+                          child: _image4 != null
+                              ? Image.file(
+                                  _image4!.absolute,
+                                  fit: BoxFit.fill,
+                                )
+                              : Icon(
+                                  Icons.file_upload_outlined,
+                                  color: colors.secondary,
                                 ),
-                              ),
-                            ),
-                          ],
                         ),
-                        Row(
-                          children: [
-                            Card(
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                // color: Colors.black,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: colors.lightgray),
-                                child: Image.asset(
-                                    'assets/images/uploadcurrentlocation.png'),
-                              ),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width/1.5,
-                              height: 70,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: colors.lightgray),
-                              child: InkWell(
-                                onTap: () {
-                                  imageCode = 7;
-                                  getImageGallery();
-                                },
-                                child: Card(
-                                  child: Container(
-                                    height: 120,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                      // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                    ),
-                                    child: _locationImage != null
-                                        ? Image.file(
-                                      _locationImage!.absolute,
-                                      fit: BoxFit.fill,
-                                    ): Center(child: Text("Upload Current Location"))
-                                  ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 6),
+                      child: Text(
+                        "GST Number(Optional)",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: colors.text),
+                      ),
+                    ),
+                    Card(
+                      child: Container(
+                        width: double.infinity,
+                        height: 60,
+                        // color: Colors.black,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: colors.lightgray),
+                        child: TextFormField(
+                          controller: gstNumberController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter GST Numbder';
+                            }
+                            return null;
+                          },
+
+                          // style: (color: Colors.red
+                          //  ),
+                          decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white))),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 6),
+                      child: Text(
+                        "Shop At",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: colors.text),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        imageCode = 5;
+                        //  getImageGallery();
+                        _showPickerOptions();
+                      },
+                      child: Card(
+                        child: Container(
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            // image: DecorationImage(image:FileImage(_image!.absolute) )
+                          ),
+                          child: _image5 != null
+                              ? Image.file(
+                                  _image5!.absolute,
+                                  fit: BoxFit.fill,
+                                )
+                              : Icon(
+                                  Icons.file_upload_outlined,
+                                  color: colors.secondary,
                                 ),
-                              ),
-                            ),
-                          ],
                         ),
-                        Card(
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 6),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                              backgroundColor: colors.grad1Color, maxRadius: 8),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Selfi",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: colors.text),
+                          ),
+                        ],
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        imageCode = 6;
+                        //  getImageGallery();
+                        _showPickerOptions();
+                      },
+                      child: Card(
+                        child: Container(
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            // image: DecorationImage(image:FileImage(_image!.absolute) )
+                          ),
+                          child: _image6 != null
+                              ? Image.file(
+                                  _image6!.absolute,
+                                  fit: BoxFit.fill,
+                                )
+                              : Icon(
+                                  Icons.file_upload_outlined,
+                                  color: colors.secondary,
+                                ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Center(
+                      child: Card(
+                        child: InkWell(
+                          onTap: () {
+                            if (_image == null ||
+                                _image2 == null ||
+                                _image3 == null ||
+                                _image4 == null ||
+                                _image5 == null ||
+                                _image6 == null) {
+                              Fluttertoast.showToast(msg: "Select All Images");
+                            }
+
+                            if (_formKey.currentState!.validate()) {
+                              // setState(() {
+                              //   _selectedOption = '2';
+                              // }
+                              vendorRegister();
+                              //  Navigator.push(context, MaterialPageRoute(builder: (context)=>Cal)
+                            }
+                            // if (_formKey.currentState!.validate()) {
+                            //   setState(() {
+                            //     _selectedOption = '4';
+                            //   });
+                            //
+                            // }
+                          },
                           child: Container(
                             child: Center(
                               child: Text(
@@ -1399,7 +2054,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             ),
                             decoration: BoxDecoration(
                               color: colors.secondary,
-                              borderRadius: BorderRadius.circular(5),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             //   width: MediaQuery.of(context),
                             // decoration: BoxDecoration(borderRadius: ),
@@ -1407,622 +2062,10 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             width: MediaQuery.of(context).size.width * .6,
                           ),
                         ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        );
-      case '3':
-        return Column(
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.black, width: 2)),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: const [
-                          CircleAvatar(
-                              backgroundColor: colors.primary, maxRadius: 8),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            "Account Details",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: colors.primary),
-                          ),
-                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Card(
-                                  child: Container(
-                                      width: 50,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: Image.asset(
-                                          'assets/images/bankname.png')),
-                                ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: banknameCtr,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter bank name';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: const InputDecoration(
-                                          hintText: 'Bank Name',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Card(
-                                  child: Container(
-                                      width: 50,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: Image.asset(
-                                          'assets/images/accountnumber.png')),
-                                ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: accountNumberCtr,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter account number';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: const InputDecoration(
-                                          hintText: 'Account Number',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Card(
-                                  child: Container(
-                                      width: 50,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: Image.asset(
-                                          'assets/images/IFSCcode.png')),
-                                ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: ifsccodeCtr,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter ifsc code';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: const InputDecoration(
-                                          hintText: 'IFSC code',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
+                    )
+                  ],
                 ),
-              ),
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.black, width: 2)),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Card(
-                                  child: Container(
-                                      width: 50,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: Image.asset(
-                                          'assets/images/upiid.png')),
-                                ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: upiIdCtr,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Please enter upi id';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: const InputDecoration(
-                                          hintText: 'Upi Id',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Card(
-                                  child: Container(
-                                      width: 50,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: Image.asset(
-                                          'assets/images/uploadqrcode.png')),
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width/1.5,
-                                  height: 70,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child: InkWell(
-                                    onTap: () {
-                                      imageCode = 8;
-                                      getImageGallery();
-                                    },
-                                    child: Card(
-                                      child: Container(
-                                          height: 120,
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: Colors.white,
-                                            // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                          ),
-                                          child: qrImage != null
-                                              ? Image.file(
-                                            qrImage!.absolute,
-                                            fit: BoxFit.fill,
-                                          ): Center(child: Text("Upload QR Code"))
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.05,
-            ),
-            Card(
-              child: Container(
-                child: Center(
-                  child: Text(
-                    'Next',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  color: colors.secondary,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                //   width: MediaQuery.of(context),
-                // decoration: BoxDecoration(borderRadius: ),
-                height: MediaQuery.of(context).size.height * 0.05,
-                width: MediaQuery.of(context).size.width * .6,
-              ),
-            ),
-          ],
-        );
-      case '4':
-        return Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black, width: 2)),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: const [
-                      CircleAvatar(
-                          backgroundColor: colors.primary, maxRadius: 8),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        "Upload Document",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: colors.primary),
-                      ),
-                    ],
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 10, left: 6),
-                    child: Text(
-                      "Shop Image",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: colors.text),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      imageCode = 1;
-                      getImageGallery();
-                    },
-                    child: Card(
-                      child: Container(
-                        height: 120,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                        ),
-                        child: _image != null
-                            ? Image.file(
-                                _image!.absolute,
-                                fit: BoxFit.fill,
-                              )
-                            : Icon(
-                                Icons.file_upload_outlined,
-                                color: colors.secondary,
-                              ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 6),
-                    child: Text(
-                      "Pen Card",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: colors.text),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      imageCode = 2;
-                      getImageGallery();
-                    },
-                    child: Card(
-                      child: Container(
-                        height: 120,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                        ),
-                        child: _image2 != null
-                            ? Image.file(
-                                _image2!.absolute,
-                                fit: BoxFit.fill,
-                              )
-                            : const Icon(
-                                Icons.file_upload_outlined,
-                                color: colors.secondary,
-                              ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 6),
-                    child: Text(
-                      "Aadhar Card Front",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: colors.text),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      imageCode = 3;
-                      getImageGallery();
-                    },
-                    child: Card(
-                      child: Container(
-                        height: 120,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                        ),
-                        child: _image3 != null
-                            ? Image.file(
-                                _image3!.absolute,
-                                fit: BoxFit.fill,
-                              )
-                            : Icon(
-                                Icons.file_upload_outlined,
-                                color: colors.secondary,
-                              ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 6),
-                    child: Text(
-                      "Aadhar Card Back",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: colors.text),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      imageCode = 4;
-                      getImageGallery();
-                    },
-                    child: Card(
-                      child: Container(
-                        height: 120,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                        ),
-                        child: _image4 != null
-                            ? Image.file(
-                                _image4!.absolute,
-                                fit: BoxFit.fill,
-                              )
-                            : Icon(
-                                Icons.file_upload_outlined,
-                                color: colors.secondary,
-                              ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 6),
-                    child: Text(
-                      "GST Number",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: colors.text),
-                    ),
-                  ),
-                  Card(
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      // color: Colors.black,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: colors.lightgray),
-                      child: TextFormField(
-                        controller: gstCtr,
-                        // style: (color: Colors.red
-                        //  ),
-                        decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white))),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 6),
-                    child: Text(
-                      "Shop At",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: colors.text),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      imageCode = 5;
-                      getImageGallery();
-                    },
-                    child: Card(
-                      child: Container(
-                        height: 120,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                        ),
-                        child: _image5 != null
-                            ? Image.file(
-                                _image5!.absolute,
-                                fit: BoxFit.fill,
-                              )
-                            : Icon(
-                                Icons.file_upload_outlined,
-                                color: colors.secondary,
-                              ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 6),
-                    child: Row(
-                      children: const [
-                        CircleAvatar(
-                            backgroundColor: colors.grad1Color, maxRadius: 8),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          "Selfi",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: colors.text),
-                        ),
-                      ],
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      imageCode = 6;
-                      getImageGallery();
-                    },
-                    child: Card(
-                      child: Container(
-                        height: 120,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                        ),
-                        child: _image6 != null
-                            ? Image.file(
-                                _image6!.absolute,
-                                fit: BoxFit.fill,
-                              )
-                            : const Icon(
-                                Icons.file_upload_outlined,
-                                color: colors.secondary,
-                              ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      // if(gstCtr.text == ""){
-                      //  Fluttertoast.showToast(msg: "Please Fill Fields");
-                      // } else {
-                      //   vendorRegister();
-                      // }
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => ThankYou()));
-                    },
-                    child: Center(
-                      child: Card(
-                        child: Container(
-                          child: Center(
-                              child: Text('Next',
-                                  style: TextStyle(color: Colors.white))),
-                          decoration: BoxDecoration(
-                            color: colors.secondary,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          height: MediaQuery.of(context).size.height * 0.05,
-                          width: MediaQuery.of(context).size.width * .6,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
               ),
             ),
           ),
@@ -2032,62 +2075,14 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     }
   }
 
-  Widget details() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: arNames.map((name) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Radio<String>(
-                value: name,
-                groupValue: _selectedOption,
-                onChanged: (String? value) {
-                  setState(() {
-                    _selectedOption = value!;
-                  });
-                },
-              ),
-              Text(
-                name,
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          );
-        }).toList(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // final defaultPinTheme = PinTheme(
-    //   width: 56,
-    //   height: 56,
-    //   textStyle: const TextStyle(fontSize: 20, color:Colors.white, fontWeight: FontWeight.w600),
-    //   decoration: BoxDecoration(
-    //     color: const Color(0xFF112C48),
-    //     border: Border.all(color: const Color(0xFF112C48)),
-    //     borderRadius: BorderRadius.circular(6),
-    //   ),
-    // );
-    //
-    // final focusedPinTheme = defaultPinTheme.copyDecorationWith(
-    //   border: Border.all(color: const Color(0xFF112C48)),
-    //   borderRadius: BorderRadius.circular(6),
-    // );
-    //
-    // final submittedPinTheme = defaultPinTheme.copyWith(
-    //   decoration: defaultPinTheme.decoration?.copyWith(
-    //     color: const Color(0xFF112C48),
-    //   ),
-    // );
+    Size mq = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: colors.appbarColor,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
             fit: BoxFit.fill,
             image: AssetImage(
@@ -2108,7 +2103,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "Sign up",
                       style: TextStyle(
@@ -2139,7 +2134,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           activeColor: colors.secondary,
                           onChanged: (String? value) {
                             setState(() {
-                              _selectedOption = value!;
+                              // _selectedOption = value!;
+                              // _selectedOption = value!;
                             });
                           },
                         ),
@@ -2156,418 +2152,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                 height: 50,
               ),
               _getStepCard(_selectedOption),
-
-              ///dfghjkl;
-              // Card(
-              //  shape: RoundedRectangleBorder(
-              //    borderRadius: BorderRadius.circular(10)
-              //  ),
-              //   child: Container(
-              //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),border: Border.all(color: Colors.black,width: 2)),
-              //     child: Padding(
-              //       padding: const EdgeInsets.all(10.0),
-              //       child: Column(
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         children: [
-              //           Row(
-              //             children: [
-              //               CircleAvatar(backgroundColor: colors.primary,maxRadius: 8),
-              //               SizedBox(width: 5,),
-              //               Text("Personal Information",style: TextStyle(fontWeight: FontWeight.bold,color: colors.primary),),
-              //             ],
-              //           ),
-              //           Padding(
-              //             padding: const EdgeInsets.only(top: 5),
-              //             child: Text("Kindly complete the form below, specifying the\npurpose of your application",style: TextStyle(fontSize: 12),),
-              //           ),
-              //
-              //           Padding(
-              //             padding: const EdgeInsets.only(top:8,bottom: 5 ),
-              //             child: Text("User Type",style: TextStyle(color: colors.secondary,fontWeight: FontWeight.bold),),
-              //           ),
-              //           Container(
-              //             width: double.infinity,
-              //             height: 40,
-              //             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),border: Border.all(color: Colors.black)),
-              //             child: Row(
-              //               // mainAxisAlignment: MainAxisAlignment.center,
-              //               children: [
-              //                 // SizedBox(width: 5,),
-              //                 Radio<String>(
-              //                   value: 'user',
-              //                   activeColor: Colors.green,
-              //                   groupValue: _selectedOption2,
-              //                   onChanged: (String? value) {
-              //                     setState(() {
-              //                       _selectedOption2 = value!;
-              //                     });
-              //                   },
-              //                 ),
-              //                 Text("User"),
-              //                 SizedBox(width: 75,),
-              //                 Radio<String>(
-              //                   value: 'merchant',
-              //
-              //                   activeColor: Colors.green,
-              //                   groupValue: _selectedOption2,
-              //                   onChanged: (String? value) {
-              //                     setState(() {
-              //                       i=2;
-              //                       _selectedOption2 = value!;
-              //                     });
-              //                   },
-              //                 ),
-              //                 Text("Merchant")
-              //               ],
-              //             ),
-              //           ) ,
-              //           Padding(
-              //             padding: const EdgeInsets.only(top: 10),
-              //             child: Container(
-              //               width: double.infinity,
-              //               height: 40,
-              //               decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),border: Border.all(color: Colors.black)),
-              //               child: Row(
-              //                 // mainAxisAlignment: MainAxisAlignment.center,
-              //                 children: [
-              //                   // SizedBox(width: 5,),
-              //                   Radio<String>(
-              //                     value: 'service',
-              //                     activeColor: Colors.green,
-              //                     groupValue: _selectedOption3,
-              //                     onChanged: (String? value) {
-              //                       setState(() {
-              //                         _selectedOption3 = value!;
-              //                       });
-              //                     },
-              //                   ),
-              //                   Text("Service Provider"),
-              //                   //  SizedBox(width: 5,),
-              //                   Radio<String>(
-              //                     value: 'shop',
-              //
-              //                     activeColor: Colors.green,
-              //                     groupValue: _selectedOption3,
-              //                     onChanged: (String? value) {
-              //                       setState(() {
-              //                         _selectedOption3 = value!;
-              //                       });
-              //                     },
-              //                   ),
-              //                   Text("Shopkeeper")
-              //                 ],
-              //               ),
-              //
-              //             ),
-              //           ),
-              //           if(i==2)
-              //
-              //             Padding(
-              //               padding: const EdgeInsets.only(top:5),
-              //               child: Column(
-              //                 children: [
-              //                   Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/name.png')
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Name',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/shop name company name.png')
-              //
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Shop Name/Company Name',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/year of experience.png')
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Year of Experience',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/phone number.png')
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Pjone Number',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),
-              //
-              //                   Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/email address.png')
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Email Address',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),
-              //                                 focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),  Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/password.png')
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Password',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),  Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/password.png')
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Confirm Password',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),  Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/password.png')
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Date of Birth',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),  Row(
-              //                     children: [
-              //                       Card(
-              //                         child: Container(
-              //                             width: 50,
-              //                             height: 50,
-              //                             // color: Colors.black,
-              //                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                             child: Image.asset('assets/images/password.png')
-              //                         ),
-              //                       ), Card(
-              //                         child: Container(
-              //                           width: 220,
-              //                           height: 50,
-              //                           // color: Colors.black,
-              //                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.lightgray),
-              //                           child: TextFormField(
-              //                             decoration: InputDecoration(hintText: 'Refferal Code',
-              //                                 enabledBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 ),focusedBorder: OutlineInputBorder(
-              //                                     borderSide: BorderSide(
-              //                                         color: Colors.white
-              //                                     )
-              //                                 )
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),
-              //                 ],
-              //               ),
-              //             )
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         )),

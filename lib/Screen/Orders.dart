@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Helper/api.path.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/color.dart';
 import '../Model/GetVendorOrderModel.dart';
 import 'HomeScreen.dart';
+import 'OrdreDetails.dart';
 
 class Orders extends StatefulWidget {
   const Orders({Key? key}) : super(key: key);
@@ -21,18 +23,14 @@ class _OrdersState extends State<Orders> {
   initState() {
     super.initState();
     getData();
-    getVendorOrder();
   }
 
-
-  String? vendor_id;
-
+  String? vendorId;
   getData() async {
-    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? vendor_id = sharedPreferences.getString('vendor_id');
-    print("vendor id order screen $vendor_id");
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+     vendorId = preferences.getString('vendor_id');
+    return getVendorOrder();
   }
-
 
   GetVendorOrderModel? vendorOrderModel;
   getVendorOrder() async {
@@ -41,7 +39,7 @@ class _OrdersState extends State<Orders> {
       'Cookie': 'ci_session=6430902524c1703efd1eeb4c66d3537c73dbe375'
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorOrders));
-    request.fields.addAll({'user_id': '137', 'status': selected == 1 ? "3" : ""});
+    request.fields.addAll({'user_id': vendorId.toString(), 'status': selected == 1 ? "3" : ""});
     print("parameterr ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -58,23 +56,31 @@ class _OrdersState extends State<Orders> {
     }
   }
 
-
   acceptRejectOrders(String? order_Id) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    vendorId = preferences.getString('vendor_id');
     var headers = {
       'Cookie': 'ci_session=c41e07862b19be167a9977bcab013b29c17d4dce'
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.acceptRejectOrder));
     request.fields.addAll({
       'order_id': order_Id.toString(),
-      'user_id': vendor_id.toString(),
+      'user_id': vendorId.toString(),
       'status': '1'
     });
    print("order acceot reheet is ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
-      Navigator.pop(context);
-      print(await response.stream.bytesToString());
+      var finalResponse = await response.stream.bytesToString();
+      final jsonresponse = json.decode(finalResponse);
+      if(jsonresponse["response_code"] == "1"){
+        Fluttertoast.showToast(msg: "status updated successfully");
+        setState(() {
+        });
+      } else {
+        Fluttertoast.showToast(msg: jsonresponse["message"]);
+      }
     }
     else {
       print(response.reasonPhrase);
@@ -402,6 +408,8 @@ class _OrdersState extends State<Orders> {
                           InkWell(
                             onTap: () {
                               acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
+                              setState(() {});
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails(model: vendorOrderModel?.orders?[i])));
                             },
                             child: Container(
                               height: 35,

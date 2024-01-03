@@ -21,15 +21,14 @@ class _PendingOrdersState extends State<PendingOrders> {
     // TODO: implement initState
     super.initState();
     getData();
-    getVendorOrder();
   }
 
 
- String? vendor_id;
+ String? vendorId;
  getData() async {
-   final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-   String? vendor_id = sharedPreferences.getString('vendor_id');
-   print("vendor id order screen $vendor_id");
+   final SharedPreferences preferences = await SharedPreferences.getInstance();
+   vendorId = preferences.getString('vendor_id');
+   return getVendorOrder();
  }
 
   GetVendorOrderModel? vendorOrderModel;
@@ -39,7 +38,7 @@ class _PendingOrdersState extends State<PendingOrders> {
       'Cookie': 'ci_session=6430902524c1703efd1eeb4c66d3537c73dbe375'
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorOrders));
-    request.fields.addAll({'user_id': '137', 'status': "0"});
+    request.fields.addAll({'user_id': vendorId.toString(), 'status': "0"});
     print("parameterr ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();

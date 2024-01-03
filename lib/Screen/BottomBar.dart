@@ -1,6 +1,11 @@
+
+import 'dart:convert';
+
 import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hojayega_seller/Screen/AllCategory.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/appButton.dart';
@@ -8,6 +13,9 @@ import '../Helper/color.dart';
 import 'HomeScreen.dart';
 import 'Orders.dart';
 import 'PendingOrders.dart';
+import 'PromotionAdds.dart';
+import 'notificationScreen.dart';
+import 'package:http/http.dart' as http;
 
 class BottomNavBar extends StatefulWidget {
   int? dIndex;
@@ -35,6 +43,31 @@ class _BottomNavBarState extends State<BottomNavBar> {
     }
     super.initState();
   }
+
+  var onOf = false;
+  String? vendorId;
+
+  Future<void> shopStatus() async {
+     SharedPreferences preferences = await SharedPreferences.getInstance();
+    vendorId = preferences.getString('vendorId');
+    var headers = {
+      'Cookie': 'ci_session=f02741f77bb53eeaf1a6be0a045cb6f11b68f1a6'
+    };
+    var request =
+    http.MultipartRequest('POST', Uri.parse(ApiServicves.onOffStatus));
+    request.fields.addAll(
+        {'user_id': '$vendorId', 'online_status': onOf ? '1' : '0'});
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResult = await response.stream.bytesToString();
+      final jsonResult = json.decode(finalResult);
+      setState(() {});
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +110,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                             end: Alignment.centerRight,
                             colors: [Color(0xff112C48), Color(0xff112C48)])),
                     child: Row(
+
                       children: [
                         const SizedBox(
                           width: 10,
@@ -97,21 +131,33 @@ class _BottomNavBarState extends State<BottomNavBar> {
                             const Text(
                               'Hello!',
                               style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white),
                             ),
                             vendor_name == null || vendor_name == ""
                                 ? const Text(
                               'Demo',
-                              style: TextStyle(fontSize: 16, color: Colors.white),
-                            )
+                              style: TextStyle(fontSize: 16, color: Colors.white))
                                 : Text(
                               '$vendor_name',
                               style: TextStyle(fontSize: 16, color: Colors.white),
                             ),
                           ],
-                        )
+                        ),
+                        SizedBox(width: 20,),
+                        onOf ? Text("Online", style: TextStyle(color: colors.whiteTemp),) :
+                        Text("Offline",style: TextStyle(color: colors.whiteTemp)),
+                        CupertinoSwitch(
+                            trackColor: Colors.green,
+                            value: onOf,
+                            onChanged: (value) {
+                              setState(() {
+                                onOf = value;
+                                shopStatus();
+                              });
+                            }
+                        ),
                       ],
                     ),
                   ),
@@ -126,8 +172,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                       });
                     },
                     child: DrawerIconTab(
-                      titlee: 'Home',
-                      icon: Icons.home,
+                      titlee: 'Profile',
+                      icon: Icons.person,
                       tabb: 1,
                       indexx: currentIndex,
                     ),
@@ -147,7 +193,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         });
                       },
                       child: DrawerIconTab(
-                          titlee: 'My favorite',
+                          titlee: 'Product Portfolio',
                           icon: Icons.file_present_outlined,
                           tabb: 2,
                           indexx: currentIndex)),
@@ -165,7 +211,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         });
                       },
                       child: DrawerIconTab(
-                          titlee: 'My Account',
+                          titlee: 'Switch User',
                           icon: Icons.file_copy,
                           tabb: 3,
                           indexx: currentIndex)),
@@ -174,18 +220,18 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   ),
                   InkWell(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const  CoursesPage()),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const  NotificationScreen()),
+                        );
                         setState(() {
                           currentIndex = 4;
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'Become a merchant',
-                        icon: Icons.file_copy,
+                        titlee: 'Notification',
+                        icon: Icons.notifications,
                         tabb: 4,
                         indexx: currentIndex,
                       )),
@@ -194,17 +240,17 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   ),
                   InkWell(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const  CoursesPage()),
-                        // );
                         setState(() {
                           currentIndex = 5;
                         });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const  PromotionAdds()),
+                        );
                       },
                       child: DrawerIconTab(
-                        titlee: 'My Bookings',
+                        titlee: 'Promotion & Adds',
                         icon: Icons.file_copy,
                         tabb: 5,
                         indexx: currentIndex,
@@ -224,7 +270,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'My Orders',
+                        titlee: 'Coupons',
                         icon: Icons.payment,
                         tabb: 6,
                         indexx: currentIndex,
@@ -243,7 +289,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                       });
                     },
                     child: DrawerIconTab(
-                      titlee: 'My Cart',
+                      titlee: 'Earnings',
                       icon: Icons.my_library_books_sharp,
                       tabb: 7,
                       indexx: currentIndex,
@@ -260,8 +306,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'My Profile',
-                        icon: Icons.headphones,
+                        titlee: 'Order history/Reports',
+                        icon: Icons.file_copy_sharp,
                         tabb: 8,
                         indexx: currentIndex,
                       )),
@@ -279,7 +325,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                       });
                     },
                     child: DrawerIconTab(
-                      titlee: 'Notification',
+                      titlee: 'Library',
                       icon: Icons.privacy_tip,
                       tabb: 9,
                       indexx: currentIndex,
@@ -301,7 +347,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         // share();
                       },
                       child: DrawerIconTab(
-                        titlee: 'Share the app',
+                        titlee: 'Automatic Booking',
                         icon: Icons.confirmation_num,
                         tabb: 10,
                         indexx: currentIndex,
@@ -322,7 +368,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'Send Feedback',
+                        titlee: 'Track Order',
                         icon: Icons.question_answer,
                         tabb: 11,
                         indexx: currentIndex,
@@ -343,7 +389,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'Refer & Earn',
+                        titlee: 'Business Card/Delivery Card',
                         icon: Icons.question_answer,
                         tabb: 12,
                         indexx: currentIndex,
@@ -363,7 +409,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'Help & Support',
+                        titlee: 'Settings',
                         icon: Icons.question_answer,
                         tabb: 13,
                         indexx: currentIndex,
@@ -379,7 +425,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'About Us',
+                        titlee: 'Help',
                         icon: Icons.question_answer,
                         tabb: 14,
                         indexx: currentIndex,

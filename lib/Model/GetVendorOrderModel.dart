@@ -139,7 +139,7 @@ class VendorOrders {
   String? _orderStatus;
   List<OrderItems>? _orderItems;
   num? _count;
-  VendorOrders copyWith({  DriverData? driverData,
+  VendorOrders copyWith({DriverData? driverData,
   String? orderId,
   String? total,
   String? date,

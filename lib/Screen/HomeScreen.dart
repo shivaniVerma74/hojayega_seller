@@ -718,7 +718,7 @@ class _HomePageState extends State<HomeScreen> {
                       child: Column(
                         children: const [
                           Text("Delivery Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 ),),
-                          Text("500", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
+                          Text("0.0", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
                         ],
                       ),
                     ),
@@ -742,7 +742,7 @@ class _HomePageState extends State<HomeScreen> {
                       child: Column(
                         children: const [
                           Text("Busines Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
-                          Text("500", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 ))
+                          Text("0.0", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 ))
                         ],
                       ),
                     ),

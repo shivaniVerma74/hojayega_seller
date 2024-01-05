@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/color.dart';
 import 'package:http/http.dart' as http;
+
+import 'BottomBar.dart';
 
 class AddPromotionAdds extends StatefulWidget {
   const AddPromotionAdds({Key? key}) : super(key: key);
@@ -23,6 +26,7 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getSetting();
     _razorpay = Razorpay();
     _razorpay?.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay?.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
@@ -59,6 +63,8 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
 
   TextEditingController startDateCtr = TextEditingController();
   TextEditingController endDateCtr = TextEditingController();
+  TextEditingController dayCtr = TextEditingController();
+  TextEditingController totalamtCtr = TextEditingController();
 
   Future<void> _showPickerOptions() async {
     showModalBottomSheet(
@@ -99,7 +105,9 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
+      var result = await response.stream.bytesToString();
+      var finaResult = jsonDecode(result);
+      Fluttertoast.showToast(msg: '${finaResult['message']}');
     }
     else {
       print(response.reasonPhrase);
@@ -109,7 +117,7 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
 
   Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
     Fluttertoast.showToast(msg: "Payment successfully");
-    addPromotionAdd();
+    // addPromotionAdd();
     Navigator.pop(context);
     // Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
   }
@@ -142,6 +150,35 @@ void openCheckout(amount) async {
 }
 
 
+String? banner_Charge;
+int? amount;
+
+getSetting() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var headers = {
+    'Cookie': 'ci_session=bfa970b6e13a45a52775a4cd4995efa6026d6895'
+  };
+  var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getSettings));
+  request.headers.addAll(headers);
+  http.StreamedResponse response = await request.send();
+  if (response.statusCode == 200) {
+    var result = await response.stream.bytesToString();
+    var finaResult = jsonDecode(result);
+    print("responseee $finaResult");
+    if (finaResult['status'] == 1) {
+      banner_Charge = finaResult['setting']['banner_per_day_charge'];
+      await prefs.setString('banner_Charge', finaResult['setting']['banner_per_day_charge'].toString());
+      print('____banner charge is$banner_Charge ___');
+      setState(() {});
+      // Fluttertoast.showToast(msg: '${finaResult['message']}');
+    } else {
+      // Fluttertoast.showToast(msg: "${finaResult['message']}");
+    }
+  } else {
+    print(response.reasonPhrase);
+  }
+}
+
   String? vendorId;
   addPromotionAdd() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -155,16 +192,18 @@ void openCheckout(amount) async {
       'user_id': vendorId.toString(),
       'start_date': startDateCtr.text,
       'end_date': endDateCtr.text,
-      'day': '2',
-      'total_amount': '200',
-      'transaction_id': '54asdf498asd',
+      'day': dayCtr.text,
+      'total_amount': totalamtCtr.text,
+      'transaction_id': 'wallet',
       'type': 'shop'
     });
+    print("===============${request.fields}===========");
     request.files.add(await http.MultipartFile.fromPath('image', _image!.path.toString()));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       print(await response.stream.bytesToString());
+      Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavBar()));
     }
     else {
       print(response.reasonPhrase);
@@ -239,7 +278,6 @@ void openCheckout(amount) async {
 
 final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
-
 @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -261,7 +299,7 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
           key: _formkey,
           child: Column(
             children: [
-              SizedBox(height: 20,),
+              const SizedBox(height: 20,),
               InkWell(
                 onTap: () {
                   imageCode = 1;
@@ -357,7 +395,7 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                               keyboardType: TextInputType.number,
                               maxLength: 10,
                               controller: endDateCtr,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                   // suffix: Text("₹"),
                                   contentPadding: EdgeInsets.symmetric(vertical: 0),
                                   counterText: '',
@@ -385,13 +423,19 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                     ),
                     width: MediaQuery.of(context).size.width/1.1,
                     child: TextFormField(
+                      readOnly: true,
                       style: const TextStyle(color: Colors.black),
                       // controller: oldPriceController,
                       keyboardType: TextInputType.number,
                       maxLength: 10,
-                      decoration: const InputDecoration(
-                          suffixIcon: Icon(Icons.calendar_month),
-                          contentPadding: EdgeInsets.only(top: 16),
+                      decoration: InputDecoration(
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              checkAvailability();
+                            },
+                              child: const Icon(Icons.calendar_month),
+                          ),
+                          contentPadding: const EdgeInsets.only(top: 16),
                           counterText: '',
                           border: InputBorder.none,
                           hintText: "Check Availability"
@@ -400,34 +444,72 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                   ),
                 ],
               ),
-              SizedBox(height: 16,),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                    height: 60,
-                    decoration: BoxDecoration(
-                        color: colors.whiteTemp,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: colors.primary)
-                    ),
-                    width: MediaQuery.of(context).size.width/1.1,
-                    child: TextFormField(
-                      style: const TextStyle(color: Colors.black),
-                      // controller: oldPriceController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 10,
-                      decoration: const InputDecoration(
-                          // suffixIcon: Icon(Icons.calendar_month),
-                          // contentPadding: EdgeInsets.only(top: 16),
-                          counterText: '',
-                          border: InputBorder.none,
-                          hintText: "Charges: "
-                      ),
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 16,),
+              Padding(
+                padding: const EdgeInsets.only(left: 15, right: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(top: 0, left: 12, right: 8),
+                          height: 60,
+                          decoration: BoxDecoration(
+                              color: colors.whiteTemp,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: colors.primary)
+                          ),
+                          width: MediaQuery.of(context).size.width/2-30,
+                          child: TextFormField(
+                            readOnly: true,
+                            style: const TextStyle(color: Colors.black),
+                            // controller: oldPriceController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 10,
+                            decoration:  InputDecoration(
+                              // suffixIcon: Icon(Icons.calendar_month),
+                              // contentPadding: EdgeInsets.only(top: 16),
+                                counterText: '',
+                                border: InputBorder.none,
+                                hintStyle: const TextStyle(fontWeight: FontWeight.w400),
+                                hintText: "Charges: $banner_Charge"
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(top: 0, left: 12, right: 8),
+                          height: 60,
+                          decoration: BoxDecoration(
+                              color: colors.whiteTemp,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: colors.primary)
+                          ),
+                          width: MediaQuery.of(context).size.width/2-30,
+                          child: TextFormField(
+                            onChanged:(value) => {
+                              totalamtCtr.text = "${(int.parse(banner_Charge??""))* (int.parse(value))} RS",
+                              print("===============${totalamtCtr.text}==========="),
+                            },
+                            style:  const TextStyle(color: Colors.black),
+                            controller: dayCtr,
+                            keyboardType: TextInputType.number,
+                            maxLength: 10,
+                            decoration:  const InputDecoration(
+                              // suffixIcon: Icon(Icons.calendar_month),
+                              // contentPadding: EdgeInsets.only(top: 16),
+                                counterText: '',
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(fontWeight: FontWeight.w400),
+                                hintText: "Enter Day"
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
               SizedBox(height: 16,),
               Column(
@@ -443,15 +525,12 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                     ),
                     width: MediaQuery.of(context).size.width/1.1,
                     child: TextFormField(
+                      readOnly: true,
                       style: const TextStyle(color: Colors.black),
-                      // controller: oldPriceController,
+                      controller: totalamtCtr,
                       keyboardType: TextInputType.number,
                       maxLength: 10,
                       decoration: const InputDecoration(
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.only(top: 16),
-                          child: Text("0 Rs"),
-                        ),
                         contentPadding: EdgeInsets.only(top: 16),
                           counterText: '',
                           border: InputBorder.none,
@@ -466,11 +545,12 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                 child: Card(
                   child: InkWell(
                     onTap: () {
-                      if (_image == null || startDateCtr.text == "" || startDateCtr.text == null || endDateCtr.text == "" || endDateCtr.text == ""
+                      if (_image == null || startDateCtr.text == "" || startDateCtr.text == null || endDateCtr.text == "" || endDateCtr.text == "" ||
+                          dayCtr.text == "" ||dayCtr.text == null  || totalamtCtr.text == null  || totalamtCtr.text == ""
                       ) {
                         Fluttertoast.showToast(msg: "Please Fill All Fields");
                       }
-                      // openCheckout(amount);
+                      addPromotionAdd();
                     },
                     child: Container(
                       child: Center(

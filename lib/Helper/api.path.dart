@@ -7,7 +7,7 @@ class ApiServicves{
   static const String imageUrl = "https://developmentalphawizz.com/hojayega/";
 
   static const String veriftOtp = baseUrl+'verify_otp';
-  static const String Vendorregister = baseUrl+'vendor_registration';
+  static const String vendorregister = baseUrl+'vendor_registration';
   static const String login = baseUrl+'login';
   static const String vendorsendOtp = baseUrl+'send_otp';
   static const String getState = baseUrl+'get_states';
@@ -31,7 +31,8 @@ class ApiServicves{
   static const String updateOrders = baseUrl+'update_orders';
   static const String checkAvailablity = baseUrl+'check_availibility';
   static const String promotionAdd = baseUrl+'add_promotion';
-
+  static const String getSettings = baseUrl+'general_setting';
+  static const String offers = baseUrl+'offer_add';
 }
 
 String? vendor_name;

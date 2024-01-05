@@ -59,12 +59,22 @@ class _PendingOrdersState extends State<PendingOrders> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    body: Column(
-      children: [
-        // Text("Pending Orders", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: colors.primary),),
-        SizedBox(height: 10,),
-        getPendingOrders(""),
-      ],
+    body: SingleChildScrollView(
+      child: Column(
+        children: [
+          // Text("Pending Orders", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: colors.primary),),
+          SizedBox(height: 10,),
+         ListView.builder(
+           shrinkWrap: true,
+           physics: NeverScrollableScrollPhysics(),
+           itemCount: vendorOrderModel?.orders?.length??0,
+           itemBuilder: (context, index) {
+
+           return getPendingOrders(context,index);
+         },)
+
+        ],
+      ),
     ),
     );
   }
@@ -86,7 +96,7 @@ class _PendingOrdersState extends State<PendingOrders> {
     Order('10:00 to 12:00 pm', 'Ujjain', 'Approved'),
   ];
 
-  getPendingOrders(index) {
+ Widget  getPendingOrders(BuildContext context,int index) {
     return Column(
       children: [
         vendorOrderModel?.orders?.isNotEmpty ?? false ?
@@ -115,14 +125,14 @@ class _PendingOrdersState extends State<PendingOrders> {
                   children: [
                     Container(
                       height: 50,
-                      child:  Center(child: Text("${vendorOrderModel?.orders?[index].orderId}")),
+                      child:  Center(child: Text("${vendorOrderModel?.orders?[index].orderId.toString()}")),
                     ),
                     Container(
                         height: 50,
-                        child: Center(child: Text("${vendorOrderModel?.orders?[index].time}")),),
+                        child: Center(child: Text("${vendorOrderModel?.orders?[index].time.toString()}")),),
                     Container(
                       height: 50,
-                      child: Center(child: Text("${vendorOrderModel?.orders?[index].address}")),
+                      child: Center(child: Text("${vendorOrderModel?.orders?[index].address.toString()}")),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 4, right: 4),

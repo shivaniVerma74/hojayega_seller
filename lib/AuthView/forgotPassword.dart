@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hojayega_seller/AuthView/Login.dart';
+
+import 'Verifyotp.dart';
 
 class Forget extends StatefulWidget {
   const Forget({super.key});
@@ -38,25 +41,25 @@ class _ForgetState extends State<Forget> {
                   )),
             ],
           ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.white,
-            ),
-            margin: const EdgeInsets.fromLTRB(20, 20, 0, 0),
-            height: 35,
-            width: 38,
-            child: IconButton(
-              icon: const Center(
-                  child: Icon(
-                Icons.arrow_back,
-                color: Colors.green,
-              )),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
+          // Container(
+          //   decoration: BoxDecoration(
+          //     borderRadius: BorderRadius.circular(8),
+          //     color: Colors.white,
+          //   ),
+          //   margin: const EdgeInsets.fromLTRB(20, 20, 0, 0),
+          //   height: 35,
+          //   width: 38,
+          //   child: IconButton(
+          //     icon: const Center(
+          //         child: Icon(
+          //       Icons.arrow_back,
+          //       color: Colors.green,
+          //     )),
+          //     onPressed: () {
+          //       Navigator.pop(context);
+          //     },
+          //   ),
+          // ),
           const Positioned(
               top: 60,
               left: 20,
@@ -77,18 +80,20 @@ class _ForgetState extends State<Forget> {
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
-              )),
+              ),
+          ),
           Positioned(
-              top: 150,
+              top: 140,
               left: 50,
               right: 50,
               child: Image.asset(
-                "assets/images/FORGOT PASSWORD.png",
+                "assets/images/forgetpassword.png",
                 scale: 1.4,
-              )),
+              ),
+          ),
           Positioned(
-            top: 440,
-            bottom: 200,
+            top: 380,
+            bottom: 50,
             left: 20,
             right: 20,
             child: SingleChildScrollView(
@@ -148,15 +153,16 @@ class _ForgetState extends State<Forget> {
                           ],
                         ),
                       ),
-                      SizedBox(
+                      SizedBox(height: 30,),
+                      Container(
                         height: 45,
                         width: 250,
                         child: ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              // Navigator.push(context, MaterialPageRoute(builder: (context) => VerifyOtp()));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => VerifyOtp()));
                             }
-                            // Navigator.push(context, MaterialPageRoute(builder: (context) => SignUp()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
@@ -166,6 +172,7 @@ class _ForgetState extends State<Forget> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 20,)
                     ],
                   ),
                 ),

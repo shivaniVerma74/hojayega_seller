@@ -211,6 +211,7 @@ class _OrdersState extends State<Orders> {
         vendorOrderModel?.orders?.isNotEmpty ?? false ?
         vendorOrderModel?.orders?.length == "" || vendorOrderModel?.orders?.length == null ? const Center(child: CircularProgressIndicator(color: colors.primary,)):
         ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: vendorOrderModel?.orders?.length ?? 0,
             itemBuilder: (c,i) {
@@ -344,7 +345,7 @@ class _OrdersState extends State<Orders> {
                     ),
                     ListView.builder(
                       shrinkWrap: true,
-                      itemCount: vendorOrderModel?.orders?[i].orderItems?.length ?? 0,
+                      itemCount: vendorOrderModel?.orders?[i].orderItems?.length??0,
                         itemBuilder: (c,i) {
                       return Padding(
                         padding: const EdgeInsets.only(left: 5, right: 2),
@@ -358,22 +359,21 @@ class _OrdersState extends State<Orders> {
                                   child: Container(
                                       width: 25,
                                       height: 25,
-                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,),
-                                          color: Colors.white),
-                                      child: Image.network("${vendorOrderModel?.orders?[i].orderItems?[i].productImage}", color: Colors.red,)),
+                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,), color: Colors.white),
+                                      child: Image.network(vendorOrderModel?.orders?[i].orderItems?[i].productImage??"", color: Colors.red,)),
                                 ),
                                 const SizedBox(width: 5,),
                                 vendorOrderModel?.orders?[i].orderItems?[i].productName == "" || vendorOrderModel?.orders?[i].orderItems?[i].productName == null ?
-                                Text("Foods", style: TextStyle(color: colors.primary),):
-                                 Container(
+                                const Text("Foods", style: TextStyle(color: colors.primary),):
+                                 SizedBox(
                                    width: 49,
-                                     child: Text("${vendorOrderModel?.orders?[i].orderItems?[i].productName}", style: TextStyle(color: colors.primary, overflow: TextOverflow.ellipsis),)),
+                                     child: Text("${vendorOrderModel?.orders?[i].orderItems?[i].productName}", style: const TextStyle(color: colors.primary, overflow: TextOverflow.ellipsis),)),
                                 const SizedBox(
                                   width: 75,
                                 ),
                                 vendorOrderModel?.orders?[i].orderItems?[i].unit == "" || vendorOrderModel?.orders?[i].orderItems?[i].unit == null ?
-                                Text("1Kg", style: TextStyle(color: colors.primary),) :
-                                 Text("${vendorOrderModel?.orders?[i].orderItems?[i].unit}", style: TextStyle(color: colors.primary),),
+                                const Text("-", style: TextStyle(color: colors.primary)) :
+                                 Text("${vendorOrderModel?.orders?[i].orderItems?[i].qty}", style: TextStyle(color: colors.primary),),
                                 const SizedBox(
                                   width: 40,
                                 ),
@@ -381,7 +381,7 @@ class _OrdersState extends State<Orders> {
                                 const SizedBox(
                                   width: 40,
                                 ),
-                                Text("${vendorOrderModel?.orders?[i].orderItems?[i].sellingPrice}rs", style: TextStyle(color: colors.primary),)
+                                Text("${vendorOrderModel?.orders?[i].orderItems?[i].sellingPrice}rs", style: const TextStyle(color: colors.primary),)
                               ],
                             )
                           ],

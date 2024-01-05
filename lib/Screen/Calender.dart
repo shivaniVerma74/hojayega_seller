@@ -114,7 +114,7 @@ class _CalenderState extends State<Calender> {
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(5)),
                                   child: Image.asset(
-                                      'assets/images/imgpsh_fullsize_anim.png'),
+                                      'assets/images/placeholder.png'),
                                 )
                               ],
                             ),

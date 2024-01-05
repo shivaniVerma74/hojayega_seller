@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
@@ -39,6 +41,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   var confirmPasswordController = TextEditingController();
   var dobController = TextEditingController();
   var refferalcodeController = TextEditingController();
+  var friendcodeController = TextEditingController();
   var addressController = TextEditingController();
   var landController = TextEditingController();
 
@@ -64,15 +67,20 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   var shopAtContoller = TextEditingController();
   var selfiContoller = TextEditingController();
 
+
+  String? vendor_name;
+  String? vendor_email;
+  String? roll;
+  String? vendor_id;
+
   vendorRegister() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     var headers = {
       'Cookie': 'ci_session=1933939351e474eec93704742fca8b88967a1584'
     };
 
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            "https://developmentalphawizz.com/hojayega/Vendorapi/vendor_registration"));
+        'POST', Uri.parse(ApiServicves.vendorregister));
     request.fields.addAll({
       'name': nameController.text,
       'shop_name': shopController.text,
@@ -85,15 +93,15 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       'refferal_code': refferalcodeController.text,
       'address': currentlocationController.text,
       'land_mark': landController.text,
-      'friend_code': 'aaa', //;;;;;;;;;
+      'friend_code': friendcodeController.text,
       'bank_name': banknameController.text,
       'account_number': accountNumberController.text,
       'ifsc_code': ifscController.text,
       'upi_id': upiidContoler.text,
-      'roll': '1',
-      'city': '2',
-      'state': '3',
-      'region': '4',
+      'roll': _selectedOption3 == "service" ? "1" : "2",
+      'city': cityId.toString(),
+      'state': stateId.toString(),
+      'region': countryId.toString(),
       "shop_type": _selectedOption3 == "service" ? "1" : "2",
       "gst_no": gstNumberController.text
     });
@@ -124,10 +132,17 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       var finaResult = jsonDecode(result);
       print("resonse===== $finaResult");
       if (finaResult['response_code'] == '1') {
+        vendor_id = finaResult['data']['id'];
+        await prefs.setString('vendor_id', finaResult['data']['id'].toString());
+        await prefs.setString('vendor_name', finaResult['data']['username'].toString());
+        await prefs.setString('vendor_email', finaResult['data']['email'].toString());
+        await prefs.setString('roll', finaResult['data']['roll'].toString());
+        vendor_name = finaResult['data']['username'];
+        vendor_email = finaResult['data']['email'];
+        roll = finaResult['data']['roll'];
         print("ggghhhhhjjff");
         Fluttertoast.showToast(msg: '${finaResult['message']}');
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => ThankYou()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ThankYou()));
         nameController.clear();
         shopController.clear();
         yearController.clear();
@@ -141,6 +156,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         accountNumberController.clear();
         ifscController.clear();
         upiidContoler.clear();
+        friendcodeController.clear();
       } else {
         Fluttertoast.showToast(msg: "${finaResult['message']}");
       }
@@ -170,6 +186,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool isVisible = true;
+  bool isVisibleTwo = true;
   String? _validateEmail(value) {
     if (value!.isEmpty) {
       return "Please enter an email";
@@ -268,6 +285,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   CountryData? countryValue;
   StataData? stateValue;
   String? stateName;
+  String? stateId;
+  String? cityId;
+  String? countryId;
   String? cityName;
 
   bool showPassword = false;
@@ -342,6 +362,45 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     else {
       print(response.reasonPhrase);
     }
+  }
+
+  String _dateValue = '';
+  var dateFormate;
+
+  String convertDateTimeDisplay(String date) {
+    final DateFormat displayFormater = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
+    final DateFormat serverFormater = DateFormat('yyyy-MM-dd');
+    final DateTime displayDate = displayFormater.parse(date);
+    final String formatted = serverFormater.format(displayDate);
+    return formatted;
+  }
+
+  Future _selectDate1() async {
+    DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2025),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+                primaryColor: colors.primary,
+                accentColor: Colors.black,
+                colorScheme: ColorScheme.light(primary: colors.primary),
+                buttonTheme:
+                ButtonThemeData(textTheme: ButtonTextTheme.accent)),
+            child: child!,
+          );
+        });
+    if (picked != null)
+      setState(() {
+        String yourDate = picked.toString();
+        _dateValue = convertDateTimeDisplay(yourDate);
+        dateFormate = DateFormat("dd/MM/yyyy").format(DateTime.parse(_dateValue ?? ""));
+      });
+    setState(() {
+      dobController = TextEditingController(text: _dateValue);
+    });
   }
 
 
@@ -516,7 +575,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/name.png')),
+                                          'assets/images/person.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -559,7 +618,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/shop name company name.png')),
+                                          'assets/images/shopname.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -602,7 +661,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/year of experience.png')),
+                                          'assets/images/yearofexperience.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -645,7 +704,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/phone number.png')),
+                                          'assets/images/phonenumber.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -656,8 +715,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      maxLength: 10,
                                       controller: phoneController,
                                       decoration: const InputDecoration(
+                                        counterText: "",
                                           hintText: 'Phone Number',
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
@@ -762,7 +824,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               isVisible
                                                   ? Icons.remove_red_eye
                                                   : Icons.visibility_off,
-                                              color: Colors.blueAccent,
+                                              color: colors.secondary,
                                             ),
                                           ),
                                           hintText: 'Password',
@@ -801,7 +863,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         color: colors.lightgray),
                                     child: TextFormField(
                                       controller: confirmPasswordController,
-                                      obscureText: isVisible ? false : true,
+                                      obscureText: isVisibleTwo ? false : true,
                                       validator: (value) {
                                         if (value != passwordController.text
                                                 .toString()) {
@@ -813,16 +875,16 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           suffixIcon: IconButton(
                                             onPressed: () {
                                               setState(() {
-                                                isVisible
-                                                    ? isVisible = false
-                                                    : isVisible = true;
+                                                isVisibleTwo
+                                                    ? isVisibleTwo = false
+                                                    : isVisibleTwo = true;
                                               });
                                             },
                                             icon: Icon(
-                                              isVisible
+                                              isVisibleTwo
                                                   ? Icons.remove_red_eye
                                                   : Icons.visibility_off,
-                                              color: Colors.blueAccent,
+                                              color: colors.secondary,
                                             ),
                                           ),
                                           hintText: 'Confirm Password',
@@ -849,7 +911,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/password.png')),
+                                          'assets/images/daetofbirth.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -860,6 +922,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+                                      onTap: () {
+                                        _selectDate1();
+                                      },
                                       controller: dobController,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -892,7 +957,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                               BorderRadius.circular(10),
                                           color: colors.lightgray),
                                       child: Image.asset(
-                                          'assets/images/password.png')),
+                                          'assets/images/refferalcode.png')),
                                 ),
                                 Card(
                                   child: Container(
@@ -923,6 +988,49 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 ),
                               ],
                             ),
+                            Row(
+                              children: [
+                                Card(
+                                  child: Container(
+                                      width: 50,
+                                      height: 50,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                          BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: Image.asset(
+                                          'assets/images/refferalcode.png')),
+                                ),
+                                Card(
+                                  child: Container(
+                                    width: 220,
+                                    height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: TextFormField(
+                                      controller: friendcodeController,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter Friend Code';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: InputDecoration(
+                                          hintText: 'Friend Code',
+                                          enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white)),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white))),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: Card(
@@ -932,22 +1040,16 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       setState(() {
                                         _selectedOption = '2';
                                       });
-
-                                      // Navigator.pushReplacement(
-                                      //   context,
-                                      //   MaterialPageRoute(builder: (context) => HomeScreen()),
-                                      // );
                                       print(nameController.text.toString());
                                       print(shopController.text.toString());
                                       print(yearController.text.toString());
                                       print(phoneController.text.toString());
                                       print(emailController.text.toString());
                                       print(passwordController.text.toString());
-                                      print(confirmPasswordController.text
-                                          .toString());
+                                      print(confirmPasswordController.text.toString());
                                       print(dobController.text.toString());
-                                      print(refferalcodeController.text
-                                          .toString());
+                                      print(refferalcodeController.text.toString());
+                                      print(friendcodeController.text.toString());
                                     }
                                   },
                                   child: Container(
@@ -1073,7 +1175,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: Image.asset(
-                                        'assets/images/land mark.png'),
+                                        'assets/images/landmark.png'),
                                 ),
                               ),
                               Card(
@@ -1146,7 +1248,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         stateValue = value!;
                                         getCity("${stateValue!.id}");
                                         stateName = stateValue!.name;
-                                        print("name herererb $stateName");
+                                        stateId = stateValue!.id;
+                                        print("name herererb $stateName $stateId" );
                                       });
                                     },
                                     underline: Container(),
@@ -1191,8 +1294,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       setState(() {
                                         cityValue = value!;
                                         getArea("${cityValue!.id}");
+                                        cityId = cityValue!.id;
                                         // stateName = stateValue!.name;
-                                        print("name herererb $cityValue");
+                                        print("name herererb $cityValue $cityId");
                                       });
                                     },
                                     underline: Container(),
@@ -1242,10 +1346,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     onChanged: (CountryData? value) {
                                       setState(() {
                                         countryValue = value!;
+                                        countryId = countryValue!.id;
                                         // getstate("${countryValue!.id}");
                                         // ("${stateValue!.id}");
                                         // stateName = stateValue!.name;
-                                        // print("name herererb $stateName");
+                                        print("name herererb $countryId");
                                       });
                                     },
                                     underline: Container(),
@@ -1276,6 +1381,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       borderRadius: BorderRadius.circular(10),
                                       color: colors.lightgray),
                                   child: TextFormField(
+                                    maxLength: 6,
                                     controller: pincodeController,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -1284,6 +1390,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       return null;
                                     },
                                     decoration: const InputDecoration(
+                                      counterText: "",
                                         hintText: 'Pincode',
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
@@ -1307,7 +1414,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: Image.asset(
-                                        'assets/images/upload current location.png')),
+                                        'assets/images/uploadcurrentlocation.png'),
+                                ),
                               ),
                               InkWell(
                                 onTap: () {
@@ -1320,7 +1428,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     height: 80,
                                     width: 220,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(5),
                                       color: Colors.white,
                                       // image: DecorationImage(image:FileImage(_image!.absolute) )
                                     ),
@@ -1341,20 +1449,18 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           Card(
                             child: InkWell(
                               onTap: () {
-                                if (_dropItem1 == null) {
+                                if (countryValue== null) {
                                   Fluttertoast.showToast(msg: "Slect Region");
                                 }
-                                if (_dropItem2 == null) {
+                                if (stateValue == null) {
                                   Fluttertoast.showToast(msg: "Slect state");
                                 }
 
-                                if (_formKey.currentState!.validate() &&
-                                    _dropItem1 != null &&
-                                    _dropItem2 != null) {
+                                if (_formKey.currentState!.validate() && stateValue != null && cityValue != null) {
                                   print(addressController.text.toString());
                                   print(landController.text.toString());
-                                  print(_dropItem1);
-                                  print(_dropItem2);
+                                  print(countryValue);
+                                  print(stateValue);
                                   print(pincodeController.text.toString());
                                   print(currentlocationController.text
                                       .toString());
@@ -1376,7 +1482,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: colors.secondary,
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
                                 //   width: MediaQuery.of(context),
                                 // decoration: BoxDecoration(borderRadius: ),
@@ -1388,7 +1494,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           )
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -1414,7 +1520,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
-                          children: [
+                          children: const [
                             CircleAvatar(
                                 backgroundColor: colors.primary, maxRadius: 8),
                             SizedBox(
@@ -1444,7 +1550,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                                 BorderRadius.circular(10),
                                             color: colors.lightgray),
                                         child: Image.asset(
-                                            'assets/images/bank name.png')),
+                                            'assets/images/bankname.png')),
                                   ),
                                   Card(
                                     child: Container(
@@ -1463,7 +1569,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           }
                                           return null;
                                         },
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                             hintText: 'Bank Name',
                                             enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
@@ -1488,7 +1594,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                                 BorderRadius.circular(10),
                                             color: colors.lightgray),
                                         child: Image.asset(
-                                            'assets/images/account number.png')),
+                                            'assets/images/accountnumber.png')),
                                   ),
                                   Card(
                                     child: Container(
@@ -1510,7 +1616,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           }
                                           return null;
                                         },
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                             hintText: 'Account Number',
                                             enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
@@ -1535,7 +1641,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                                 BorderRadius.circular(10),
                                             color: colors.lightgray),
                                         child: Image.asset(
-                                            'assets/images/IFSC code.png')),
+                                            'assets/images/IFSCcode.png')),
                                   ),
                                   Card(
                                     child: Container(
@@ -1556,7 +1662,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           }
                                           return null;
                                         },
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                             hintText: 'IFSC code',
                                             enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
@@ -1606,7 +1712,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                                 BorderRadius.circular(10),
                                             color: colors.lightgray),
                                         child: Image.asset(
-                                            'assets/images/upi id.png')),
+                                            'assets/images/upiid.png')),
                                   ),
                                   Card(
                                     child: Container(
@@ -1625,7 +1731,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           }
                                           return null;
                                         },
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                             hintText: 'Upi Id',
                                             enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
@@ -1650,7 +1756,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                                 BorderRadius.circular(10),
                                             color: colors.lightgray),
                                         child: Image.asset(
-                                            'assets/images/upload qr code.png')),
+                                            'assets/images/uploadqrcode.png')),
                                   ),
                                   InkWell(
                                     onTap: () {
@@ -1673,7 +1779,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                                 _qrimage!.absolute,
                                                 fit: BoxFit.fill,
                                               )
-                                            : Icon(
+                                            : const Icon(
                                                 Icons.file_upload_outlined,
                                                 color: colors.secondary,
                                               ),
@@ -1714,7 +1820,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     ),
                     decoration: BoxDecoration(
                       color: colors.secondary,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                     //   width: MediaQuery.of(context),
                     // decoration: BoxDecoration(borderRadius: ),
@@ -1743,7 +1849,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                   //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
-                      children: [
+                      children: const [
                         CircleAvatar(
                             backgroundColor: colors.primary, maxRadius: 8),
                         SizedBox(
@@ -1757,8 +1863,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 6),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
                         "Shop Image",
                         style: TextStyle(
@@ -1793,8 +1899,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 6),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
                         "Pen Card",
                         style: TextStyle(
@@ -1828,8 +1934,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 6),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
                         "Aadhar Card Front",
                         style: TextStyle(
@@ -1863,8 +1969,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 6),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
                         "Aadhar Card Back",
                         style: TextStyle(
@@ -1891,15 +1997,15 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                   _image4!.absolute,
                                   fit: BoxFit.fill,
                                 )
-                              : Icon(
+                              : const Icon(
                                   Icons.file_upload_outlined,
                                   color: colors.secondary,
                                 ),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 6),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
                         "GST Number(Optional)",
                         style: TextStyle(
@@ -1916,16 +2022,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             color: colors.lightgray),
                         child: TextFormField(
                           controller: gstNumberController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Enter GST Numbder';
-                            }
-                            return null;
-                          },
-
                           // style: (color: Colors.red
                           //  ),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.white)),
                               focusedBorder: OutlineInputBorder(
@@ -1933,8 +2032,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 6),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
                         "Shop At",
                         style: TextStyle(
@@ -1971,7 +2070,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     Padding(
                       padding: const EdgeInsets.only(top: 10, left: 6),
                       child: Row(
-                        children: [
+                        children: const [
                           CircleAvatar(
                               backgroundColor: colors.grad1Color, maxRadius: 8),
                           SizedBox(
@@ -2028,20 +2127,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 _image6 == null) {
                               Fluttertoast.showToast(msg: "Select All Images");
                             }
-
-                            if (_formKey.currentState!.validate()) {
-                              // setState(() {
-                              //   _selectedOption = '2';
-                              // }
-                              vendorRegister();
-                              //  Navigator.push(context, MaterialPageRoute(builder: (context)=>Cal)
-                            }
+                            vendorRegister();
                             // if (_formKey.currentState!.validate()) {
-                            //   setState(() {
-                            //     _selectedOption = '4';
-                            //   });
-                            //
+                            //   vendorRegister();
                             // }
+                            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ThankYou()));
                           },
                           child: Container(
                             child: Center(
@@ -2054,7 +2144,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             ),
                             decoration: BoxDecoration(
                               color: colors.secondary,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(5),
                             ),
                             //   width: MediaQuery.of(context),
                             // decoration: BoxDecoration(borderRadius: ),

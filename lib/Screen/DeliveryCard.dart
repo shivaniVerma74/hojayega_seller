@@ -176,7 +176,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
                           SizedBox(
                             height: 10,
                           ),
-                          wallet_balance_added == null ? Text("₹ 0.0",
+                          wallet_balance_added == null ? Text("₹ 500",
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,

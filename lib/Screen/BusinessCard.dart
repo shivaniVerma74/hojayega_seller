@@ -172,7 +172,7 @@ class _BusinessCardState extends State<BusinessCard> {
                         children: [
                           const Text("Business Card Balance ", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 19 ),),
                           const SizedBox(height: 10,),
-                          wallet_balance_added == null ? Text("₹ 0.0",
+                          wallet_balance_added == null ? Text("₹ 500",
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,

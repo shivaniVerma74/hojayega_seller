@@ -1,10 +1,10 @@
 import 'dart:convert';
-
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Screen/BusinessCard.dart';
 import 'package:hojayega_seller/Screen/DeliveryCard.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
@@ -27,6 +27,7 @@ class _HomePageState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    getSetting();
     getBanner();
   }
 
@@ -108,6 +109,33 @@ class _HomePageState extends State<HomeScreen> {
       ),
     );
   }
+
+  String? card_limit;
+getSetting() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+  var headers = {
+    'Cookie': 'ci_session=bfa970b6e13a45a52775a4cd4995efa6026d6895'
+  };
+  var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getSettings));
+  request.headers.addAll(headers);
+  http.StreamedResponse response = await request.send();
+  if (response.statusCode == 200) {
+    var result = await response.stream.bytesToString();
+    var finaResult = jsonDecode(result);
+    print("responseee $finaResult");
+    if (finaResult['status'] == 1) {
+      card_limit = finaResult['setting']['cart_limit'];
+      await prefs.setString('card_limit', finaResult['setting']['cart_limit'].toString());
+      print('____credit data limit is$card_limit ___');
+      setState(() {});
+      // Fluttertoast.showToast(msg: '${finaResult['message']}');
+    } else {
+      // Fluttertoast.showToast(msg: "${finaResult['message']}");
+    }
+  } else {
+    print(response.reasonPhrase);
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -716,9 +744,9 @@ class _HomePageState extends State<HomeScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 25),
                       child: Column(
-                        children: const [
+                        children:  [
                           Text("Delivery Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 ),),
-                          Text("0.0", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
+                          Text("$card_limit", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
                         ],
                       ),
                     ),
@@ -740,9 +768,9 @@ class _HomePageState extends State<HomeScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 25),
                       child: Column(
-                        children: const [
-                          Text("Busines Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
-                          Text("0.0", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 ))
+                        children: [
+                          const Text("Busines Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18)),
+                          Text("$card_limit", style: const TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18))
                         ],
                       ),
                     ),

@@ -444,5 +444,4 @@ DriverData copyWith({  String? name,
     map['email'] = _email;
     return map;
   }
-
 }

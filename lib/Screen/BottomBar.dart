@@ -31,6 +31,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final GlobalKey<ScaffoldState> _key = GlobalKey(); // Create a key
   @override
   void initState() {
+    getData();
     if (widget.dIndex != null) {
       selectedIndex = widget.dIndex!;
       _child = widget.dIndex == 1
@@ -44,6 +45,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
     super.initState();
   }
 
+  String? vendorName;
+  String? vendorEmail;
+  getData() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    vendorName = preferences.getString('vendor_name');
+    vendorEmail = preferences.getString('vendor_email');
+    print("===============$vendorEmail $vendorName===========");
+  }
   var onOf = false;
   String? vendorId;
 
@@ -109,55 +118,65 @@ class _BottomNavBarState extends State<BottomNavBar> {
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,
                             colors: [Color(0xff112C48), Color(0xff112C48)])),
-                    child: Row(
-
+                    child: Column(
                       children: [
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const CircleAvatar(
-                          backgroundImage: AssetImage(
-                            "assets/images/bike.png",
+                        Padding(
+                          padding: const EdgeInsets.only(top: 30),
+                          child: Row(
+                            children: [
+                              const SizedBox(
+                                width: 0,
+                              ),
+                              const CircleAvatar(
+                                backgroundImage: AssetImage(
+                                  "assets/images/bike.png",
+                                ),
+                                radius: 30,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Hello!',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                  vendorEmail == null || vendorEmail == ""
+                                      ? const Text(
+                                    'Demo',
+                                    style: TextStyle(fontSize: 15, color: Colors.white))
+                                      : Text(
+                                    '$vendorEmail',
+                                    style: TextStyle(fontSize: 15, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          radius: 40,
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            const Text(
-                              'Hello!',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            vendor_name == null || vendor_name == ""
-                                ? const Text(
-                              'Demo',
-                              style: TextStyle(fontSize: 16, color: Colors.white))
-                                : Text(
-                              '$vendor_name',
-                              style: TextStyle(fontSize: 16, color: Colors.white),
+                            onOf ? const Text("Online", style: TextStyle(color: colors.whiteTemp, fontSize: 15),) :
+                            const Text("Offline",style: TextStyle(color: colors.whiteTemp, fontSize: 15)),
+                            CupertinoSwitch(
+                                trackColor: Colors.green,
+                                value: onOf,
+                                onChanged: (value) {
+                                  setState(() {
+                                    onOf = value;
+                                    shopStatus();
+                                  });
+                                }
                             ),
                           ],
-                        ),
-                        SizedBox(width: 20,),
-                        onOf ? Text("Online", style: TextStyle(color: colors.whiteTemp),) :
-                        Text("Offline",style: TextStyle(color: colors.whiteTemp)),
-                        CupertinoSwitch(
-                            trackColor: Colors.green,
-                            value: onOf,
-                            onChanged: (value) {
-                              setState(() {
-                                onOf = value;
-                                shopStatus();
-                              });
-                            }
-                        ),
+                        )
                       ],
                     ),
                   ),
@@ -414,7 +433,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         tabb: 13,
                         indexx: currentIndex,
                       )),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   InkWell(
@@ -486,17 +505,17 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   unselectedForegroundColor: Colors.white,
                   //  selectedIndex == 1 ? colors.primary : colors.white10,
                   extras: {"label": "Pending History"}),
-              FluidNavBarIcon(
-                  icon: Icons.wheelchair_pickup,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  unselectedForegroundColor: Colors.white,
-                  backgroundColor: colors.primary,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "Pick & Drop"}),
+              // FluidNavBarIcon(
+              //     icon: Icons.wheelchair_pickup,
+              //     // unselectedForegroundColor: Colors.grey,
+              //     selectedForegroundColor: Colors.white,
+              //     unselectedForegroundColor: Colors.white,
+              //     backgroundColor: colors.primary,
+              //     //  selectedIndex == 1 ? colors.primary : colors.white10,
+              //     extras: {"label": "Pick & Drop"}),
             ],
             onChange: _handleNavigationChange,
-            style: FluidNavBarStyle(
+            style: const FluidNavBarStyle(
               barBackgroundColor: colors.primary,
             ),
             scaleFactor: 1.2,

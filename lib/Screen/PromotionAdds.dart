@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hojayega_seller/Helper/api.path.dart';
+import 'package:hojayega_seller/Screen/BottomBar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/color.dart';
 import 'AddPromotionAdds.dart';
 
@@ -16,6 +20,13 @@ class PromotionAdds extends StatefulWidget {
 }
 
 class _PromotionAddsState extends State<PromotionAdds> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getSetting();
+  }
 
   int selected = 0;
   @override
@@ -153,7 +164,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
                 ),
               ),
             ),
-            selected == '0' ? getFirstTap() : getsecondTapFields()
+            selected == 0 ? getFirstTap() : getsecondTapFields()
           ],
         ),
       ),
@@ -173,9 +184,9 @@ class _PromotionAddsState extends State<PromotionAdds> {
             ],
           ),
         ),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         Image.asset("assets/images/specialdeal.png"),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Row(
@@ -191,9 +202,89 @@ class _PromotionAddsState extends State<PromotionAdds> {
     );
   }
 
+  String? banner_Charge;
+  int? amount;
+
+  getSetting() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var headers = {
+      'Cookie': 'ci_session=bfa970b6e13a45a52775a4cd4995efa6026d6895'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getSettings));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      var finaResult = jsonDecode(result);
+      print("responseee $finaResult");
+      if (finaResult['status'] == 1) {
+        banner_Charge = finaResult['setting']['banner_per_day_charge'];
+        await prefs.setString('banner_Charge', finaResult['setting']['banner_per_day_charge'].toString());
+        print('____banner charge is$banner_Charge ___');
+        setState(() {});
+        // Fluttertoast.showToast(msg: '${finaResult['message']}');
+      } else {
+        // Fluttertoast.showToast(msg: "${finaResult['message']}");
+      }
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
+
+  String? vendorId;
+  addOffers() async{
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    vendorId = preferences.getString('vendor_id');
+    print("vendor id add product screen $vendorId");
+    var headers = {
+      'Cookie': 'ci_session=60bef4788330603caab520de3a388682e1b2fdea'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.offers));
+    request.fields.addAll({
+      'user_id': vendorId.toString(),
+      'type': 'shop',
+      'total_amount': totalamtCtr.text,
+      'transaction_id': 'wallet'
+    });
+    print("===============${request.fields}===========");
+    request.files.add(await http.MultipartFile.fromPath('image', _image!.path.toString()));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavBar()));
+      print(await response.stream.bytesToString());
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  checkAvailability() async {
+    var headers = {
+      'Cookie': 'ci_session=a7ed57b5c2abb7aa515a4dd255b0524db51e286b'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.checkAvailablity));
+    request.fields.addAll({
+      'start_date': startDateCtr.text,
+      'end_date': endDateCtr.text
+    });
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      var finaResult = jsonDecode(result);
+      Fluttertoast.showToast(msg: '${finaResult['message']}');
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
 
   TextEditingController startDateCtr = TextEditingController();
   TextEditingController endDateCtr = TextEditingController();
+
   String _dateValue = '';
   var dateFormate;
 
@@ -261,6 +352,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
   }
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  TextEditingController totalAmtCtr = TextEditingController();
 
   var imageCode;
   File? _image;
@@ -316,6 +408,8 @@ class _PromotionAddsState extends State<PromotionAdds> {
       },
     );
   }
+  TextEditingController dayCtr = TextEditingController();
+  TextEditingController totalamtCtr = TextEditingController();
 
   getsecondTapFields() {
     return Form(
@@ -356,118 +450,185 @@ class _PromotionAddsState extends State<PromotionAdds> {
               ),
             ),
           ),
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 15, right: 15),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Padding(
+          //         padding: const EdgeInsets.only(top: 12, bottom: 12),
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             Container(
+          //               padding: EdgeInsets.only(top: 0, left: 12, right: 8),
+          //               height: 50,
+          //               decoration: BoxDecoration(
+          //                   color: colors.whiteTemp,
+          //                   borderRadius: BorderRadius.circular(10),
+          //                   border: Border.all(color: colors.primary)
+          //               ),
+          //               width: MediaQuery.of(context).size.width/1.1,
+          //               child: TextFormField(
+          //                 onTap: () {
+          //                   _selectDate1();
+          //                 },
+          //                 // enabled: false,
+          //                 style: const TextStyle(color: Colors.black),
+          //                 controller: startDateCtr,
+          //                 keyboardType: TextInputType.number,
+          //                 maxLength: 10,
+          //                 decoration: const InputDecoration(
+          //                   // suffix: Text("₹"),
+          //                     contentPadding: EdgeInsets.symmetric(vertical: 0),
+          //                     counterText: '',
+          //                     border: InputBorder.none,
+          //                     hintText: "Start Date"
+          //                 ),
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //       // Padding(
+          //       //   padding: const EdgeInsets.only(top: 12, bottom: 12),
+          //       //   child: Column(
+          //       //     crossAxisAlignment: CrossAxisAlignment.start,
+          //       //     children: [
+          //       //       Container(
+          //       //         padding: EdgeInsets.only(top: 0, left: 12, right: 8),
+          //       //         height: 50,
+          //       //         decoration: BoxDecoration(
+          //       //             color: colors.whiteTemp,
+          //       //             borderRadius: BorderRadius.circular(10),
+          //       //             border: Border.all(color: colors.primary)
+          //       //         ),
+          //       //         width: MediaQuery.of(context).size.width/2-30,
+          //       //         child: TextFormField(
+          //       //           onTap: () {
+          //       //             _selectEndDate();
+          //       //           },
+          //       //           style: TextStyle(color: Colors.black),
+          //       //           keyboardType: TextInputType.number,
+          //       //           maxLength: 10,
+          //       //           controller: endDateCtr,
+          //       //           decoration: InputDecoration(
+          //       //             // suffix: Text("₹"),
+          //       //               contentPadding: EdgeInsets.symmetric(vertical: 0),
+          //       //               counterText: '',
+          //       //               border: InputBorder.none,
+          //       //               hintText: "End Date"
+          //       //           ),
+          //       //         ),
+          //       //       ),
+          //       //     ],
+          //       //   ),
+          //       // ),
+          //     ],
+          //   ),
+          // ),
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Container(
+          //       padding: EdgeInsets.only(top: 0, left: 12, right: 8),
+          //       height: 50,
+          //       decoration: BoxDecoration(
+          //           color: colors.whiteTemp,
+          //           borderRadius: BorderRadius.circular(10),
+          //           border: Border.all(color: colors.primary)
+          //       ),
+          //       width: MediaQuery.of(context).size.width/1.1,
+          //       child: TextFormField(
+          //         style: const TextStyle(color: Colors.black),
+          //         // controller: oldPriceController,
+          //         keyboardType: TextInputType.number,
+          //         maxLength: 10,
+          //         decoration: const InputDecoration(
+          //             suffixIcon: Icon(Icons.calendar_month),
+          //             contentPadding: EdgeInsets.only(top: 16),
+          //             counterText: '',
+          //             border: InputBorder.none,
+          //             hintText: "Check Availability"
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          SizedBox(height: 16,),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 12, bottom: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                        height: 50,
-                        decoration: BoxDecoration(
-                            color: colors.whiteTemp,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: colors.primary)
-                        ),
-                        width: MediaQuery.of(context).size.width/2-30,
-                        child: TextFormField(
-                          onTap: () {
-                            _selectDate1();
-                          },
-                          // enabled: false,
-                          style: const TextStyle(color: Colors.black),
-                          controller: startDateCtr,
-                          keyboardType: TextInputType.number,
-                          maxLength: 10,
-                          decoration: const InputDecoration(
-                            // suffix: Text("₹"),
-                              contentPadding: EdgeInsets.symmetric(vertical: 0),
-                              counterText: '',
-                              border: InputBorder.none,
-                              hintText: "Start Date"
-                          ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top: 0, left: 12, right: 8),
+                      height: 60,
+                      decoration: BoxDecoration(
+                          color: colors.whiteTemp,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: colors.primary)
+                      ),
+                      width: MediaQuery.of(context).size.width/2-30,
+                      child: TextFormField(
+                        readOnly: true,
+                        style: const TextStyle(color: Colors.black),
+                        // controller: oldPriceController,
+                        keyboardType: TextInputType.number,
+                        maxLength: 10,
+                        decoration:  InputDecoration(
+                          // suffixIcon: Icon(Icons.calendar_month),
+                          // contentPadding: EdgeInsets.only(top: 16),
+                            counterText: '',
+                            border: InputBorder.none,
+                            hintStyle: const TextStyle(fontWeight: FontWeight.w400),
+                            hintText: "Charges: $banner_Charge"
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 12, bottom: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                        height: 50,
-                        decoration: BoxDecoration(
-                            color: colors.whiteTemp,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: colors.primary)
-                        ),
-                        width: MediaQuery.of(context).size.width/2-30,
-                        child: TextFormField(
-                          onTap: () {
-                            _selectEndDate();
-                          },
-                          style: TextStyle(color: Colors.black),
-                          keyboardType: TextInputType.number,
-                          maxLength: 10,
-                          controller: endDateCtr,
-                          decoration: InputDecoration(
-                            // suffix: Text("₹"),
-                              contentPadding: EdgeInsets.symmetric(vertical: 0),
-                              counterText: '',
-                              border: InputBorder.none,
-                              hintText: "End Date"
-                          ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top: 0, left: 12, right: 8),
+                      height: 60,
+                      decoration: BoxDecoration(
+                          color: colors.whiteTemp,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: colors.primary)
+                      ),
+                      width: MediaQuery.of(context).size.width/2-30,
+                      child: TextFormField(
+                        onChanged:(value) => {
+                          totalAmtCtr.text = "${(int.parse(banner_Charge??""))* (int.parse(value))} RS",
+                          print("===============${totalAmtCtr.text}==========="),
+                        },
+                        style:  const TextStyle(color: Colors.black),
+                        controller: dayCtr,
+                        keyboardType: TextInputType.number,
+                        maxLength: 10,
+                        decoration:  const InputDecoration(
+                          // suffixIcon: Icon(Icons.calendar_month),
+                          // contentPadding: EdgeInsets.only(top: 16),
+                            counterText: '',
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(fontWeight: FontWeight.w400),
+                            hintText: "Enter Day"
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                height: 60,
-                decoration: BoxDecoration(
-                    color: colors.whiteTemp,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: colors.primary)
-                ),
-                width: MediaQuery.of(context).size.width/1.1,
-                child: TextFormField(
-                  style: const TextStyle(color: Colors.black),
-                  // controller: oldPriceController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 10,
-                  decoration: const InputDecoration(
-                      suffixIcon: Icon(Icons.calendar_month),
-                      contentPadding: EdgeInsets.only(top: 16),
-                      counterText: '',
-                      border: InputBorder.none,
-                      hintText: "Check Availability"
-                  ),
-                ),
-              ),
-            ],
-          ),
           SizedBox(height: 16,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                height: 60,
+                height: 50,
                 decoration: BoxDecoration(
                     color: colors.whiteTemp,
                     borderRadius: BorderRadius.circular(10),
@@ -475,45 +636,17 @@ class _PromotionAddsState extends State<PromotionAdds> {
                 ),
                 width: MediaQuery.of(context).size.width/1.1,
                 child: TextFormField(
+                  readOnly: true,
                   style: const TextStyle(color: Colors.black),
-                  // controller: oldPriceController,
+                  controller: totalAmtCtr,
                   keyboardType: TextInputType.number,
                   maxLength: 10,
                   decoration: const InputDecoration(
-                    // suffixIcon: Icon(Icons.calendar_month),
-                    // contentPadding: EdgeInsets.only(top: 16),
-                      counterText: '',
-                      border: InputBorder.none,
-                      hintText: "Charges: "
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16,),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                height: 60,
-                decoration: BoxDecoration(
-                    color: colors.whiteTemp,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: colors.primary)
-                ),
-                width: MediaQuery.of(context).size.width/1.1,
-                child: TextFormField(
-                  style: const TextStyle(color: Colors.black),
-                  // controller: oldPriceController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 10,
-                  decoration: const InputDecoration(
-                      suffixIcon: Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text("0 Rs"),
-                      ),
-                      contentPadding: EdgeInsets.only(top: 16),
+                      // suffixIcon: Padding(
+                      //   padding: EdgeInsets.only(top: 16),
+                      //   child: Text("0 Rs"),
+                      // ),
+                      contentPadding: EdgeInsets.only(top: 6),
                       counterText: '',
                       border: InputBorder.none,
                       hintText: "Total Amount "
@@ -527,11 +660,11 @@ class _PromotionAddsState extends State<PromotionAdds> {
             child: Card(
               child: InkWell(
                 onTap: () {
-                  if (_image == null || startDateCtr.text == "" || startDateCtr.text == null || endDateCtr.text == "" || endDateCtr.text == ""
+                  if (_image == null || totalAmtCtr.text == "" || totalAmtCtr.text == null
                   ) {
                     Fluttertoast.showToast(msg: "Please Fill All Fields");
                   }
-                  // openCheckout(amount);
+                  addOffers();
                 },
                 child: Container(
                   child: Center(
@@ -551,7 +684,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

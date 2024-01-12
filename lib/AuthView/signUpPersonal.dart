@@ -385,7 +385,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
           return Theme(
             data: ThemeData.light().copyWith(
                 primaryColor: colors.primary,
-                accentColor: Colors.black,
+                // accentColor: Colors.black,
                 colorScheme: ColorScheme.light(primary: colors.primary),
                 buttonTheme:
                 ButtonThemeData(textTheme: ButtonTextTheme.accent)),
@@ -471,54 +471,54 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         style: TextStyle(fontSize: 12),
                       ),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8, bottom: 5),
-                      child: Text(
-                        "User Type",
-                        style: TextStyle(
-                            color: colors.secondary,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black)),
-                      child: Row(
-                        // mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // SizedBox(width: 5,),
-                          Radio<String>(
-                            value: 'user',
-                            activeColor: Colors.green,
-                            groupValue: _selectedOption2,
-                            onChanged: (String? value) {
-                              setState(() {
-                                _selectedOption2 = value!;
-                              });
-                            },
-                          ),
-                          Text("User"),
-                          SizedBox(
-                            width: 75,
-                          ),
-                          Radio<String>(
-                            value: 'merchant',
-                            activeColor: Colors.green,
-                            groupValue: _selectedOption2,
-                            onChanged: (String? value) {
-                              setState(() {
-                                i = 2;
-                                _selectedOption2 = value!;
-                              });
-                            },
-                          ),
-                          Text("Merchant")
-                        ],
-                      ),
-                    ),
+                    // const Padding(
+                    //   padding: EdgeInsets.only(top: 8, bottom: 5),
+                    //   child: Text(
+                    //     "User Type",
+                    //     style: TextStyle(
+                    //         color: colors.secondary,
+                    //         fontWeight: FontWeight.bold),
+                    //   ),
+                    // ),
+                    // Container(
+                    //   width: double.infinity,
+                    //   height: 40,
+                    //   decoration: BoxDecoration(
+                    //       borderRadius: BorderRadius.circular(10),
+                    //       border: Border.all(color: Colors.black)),
+                    //   child: Row(
+                    //     // mainAxisAlignment: MainAxisAlignment.center,
+                    //     children: [
+                    //       // SizedBox(width: 5,),
+                    //       Radio<String>(
+                    //         value: 'user',
+                    //         activeColor: Colors.green,
+                    //         groupValue: _selectedOption2,
+                    //         onChanged: (String? value) {
+                    //           setState(() {
+                    //             _selectedOption2 = value!;
+                    //           });
+                    //         },
+                    //       ),
+                    //       Text("User"),
+                    //       SizedBox(
+                    //         width: 75,
+                    //       ),
+                    //       Radio<String>(
+                    //         value: 'merchant',
+                    //         activeColor: Colors.green,
+                    //         groupValue: _selectedOption2,
+                    //         onChanged: (String? value) {
+                    //           setState(() {
+                    //             i = 2;
+                    //             _selectedOption2 = value!;
+                    //           });
+                    //         },
+                    //       ),
+                    //       Text("Merchant")
+                    //     ],
+                    //   ),
+                    // ),
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Container(
@@ -558,7 +558,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         ),
                       ),
                     ),
-                    if (i == 2)
+
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: Column(
@@ -673,6 +673,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         color: colors.lightgray),
                                     child: TextFormField(
                                       controller: yearController,
+                                      keyboardType: TextInputType.number,
                                       decoration: const InputDecoration(
                                           hintText: 'Year of Experience',
                                           enabledBorder: OutlineInputBorder(
@@ -757,22 +758,30 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 Card(
                                   child: Container(
                                     width: 220,
-                                    height: 50,
+
+                                  // height: 50,
                                     // color: Colors.black,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+
                                       controller: emailController,
                                       validator: _validateEmail,
                                       decoration: const InputDecoration(
+                                        isDense: true,
+                                        border: InputBorder.none,
                                           hintText: 'Email Address',
-                                          enabledBorder: OutlineInputBorder(
+
+                                          enabledBorder: const OutlineInputBorder(
                                               borderSide: BorderSide(
+
+
                                                   color: Colors.white)),
                                           focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                                  color: Colors.white))
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -833,7 +842,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                                   color: Colors.white)),
                                           focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                                  color: Colors.white))
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -988,49 +998,49 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 ),
                               ],
                             ),
-                            Row(
-                              children: [
-                                Card(
-                                  child: Container(
-                                      width: 50,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                          BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: Image.asset(
-                                          'assets/images/refferalcode.png')),
-                                ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: friendcodeController,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Enter Friend Code';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: 'Friend Code',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            // Row(
+                            //   children: [
+                            //     Card(
+                            //       child: Container(
+                            //           width: 50,
+                            //           height: 50,
+                            //           // color: Colors.black,
+                            //           decoration: BoxDecoration(
+                            //               borderRadius:
+                            //               BorderRadius.circular(10),
+                            //               color: colors.lightgray),
+                            //           child: Image.asset(
+                            //               'assets/images/refferalcode.png')),
+                            //     ),
+                                // Card(
+                                //   child: Container(
+                                //     width: 220,
+                                //     height: 50,
+                                //     // color: Colors.black,
+                                //     decoration: BoxDecoration(
+                                //         borderRadius: BorderRadius.circular(10),
+                                //         color: colors.lightgray),
+                                //     child: TextFormField(
+                                //       controller: friendcodeController,
+                                //       validator: (value) {
+                                //         if (value == null || value.isEmpty) {
+                                //           return 'Enter Friend Code';
+                                //         }
+                                //         return null;
+                                //       },
+                                //       decoration: InputDecoration(
+                                //           hintText: 'Friend Code',
+                                //           enabledBorder: OutlineInputBorder(
+                                //               borderSide: BorderSide(
+                                //                   color: Colors.white)),
+                                //           focusedBorder: OutlineInputBorder(
+                                //               borderSide: BorderSide(
+                                //                   color: Colors.white))),
+                                //     ),
+                                //   ),
+                                // ),
+                            //   ],
+                            // ),
                             Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: Card(
@@ -1228,31 +1238,34 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child:
-                                  DropdownButton(
-                                    isExpanded: true,
-                                    value: stateValue,
-                                    hint: const Text('State'),
-                                    // Down Arrow Icon
-                                    icon: const Icon(Icons.keyboard_arrow_down),
-                                    // Array list of items
-                                    items: stateList.map((items) {
-                                      return
-                                        DropdownMenuItem(
-                                          value: items,
-                                          child: Container(
-                                              child: Text(items.name.toString())),
-                                        );
-                                    }).toList(),
-                                    onChanged: (StataData? value) {
-                                      setState(() {
-                                        stateValue = value!;
-                                        getCity("${stateValue!.id}");
-                                        stateName = stateValue!.name;
-                                        stateId = stateValue!.id;
-                                        print("name herererb $stateName $stateId" );
-                                      });
-                                    },
-                                    underline: Container(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: DropdownButton(
+                                      isExpanded: true,
+                                      value: stateValue,
+                                      hint: const Text('State'),
+                                      // Down Arrow Icon
+                                      icon: const Icon(Icons.keyboard_arrow_down),
+                                      // Array list of items
+                                      items: stateList.map((items) {
+                                        return
+                                          DropdownMenuItem(
+                                            value: items,
+                                            child: Container(
+                                                child: Text(items.name.toString())),
+                                          );
+                                      }).toList(),
+                                      onChanged: (StataData? value) {
+                                        setState(() {
+                                          stateValue = value!;
+                                          getCity("${stateValue!.id}");
+                                          stateName = stateValue!.name;
+                                          stateId = stateValue!.id;
+                                          print("name herererb $stateName $stateId" );
+                                        });
+                                      },
+                                      underline: Container(),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1279,27 +1292,30 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(5),
                                   ),
-                                  child: DropdownButton(
-                                    isExpanded: true,
-                                    value: cityValue,
-                                    hint: const Text('City'),
-                                    // Down Arrow Icon
-                                    icon: const Icon(Icons.keyboard_arrow_down),
-                                    // Array list of items
-                                    items: cityList.map((items) {
-                                      return DropdownMenuItem(value: items, child: Container(child: Text(items.name.toString())),
-                                      );
-                                    }).toList(),
-                                    onChanged: (CityData? value) {
-                                      setState(() {
-                                        cityValue = value!;
-                                        getArea("${cityValue!.id}");
-                                        cityId = cityValue!.id;
-                                        // stateName = stateValue!.name;
-                                        print("name herererb $cityValue $cityId");
-                                      });
-                                    },
-                                    underline: Container(),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: DropdownButton(
+                                      isExpanded: true,
+                                      value: cityValue,
+                                      hint: const Text('City'),
+                                      // Down Arrow Icon
+                                      icon: const Icon(Icons.keyboard_arrow_down),
+                                      // Array list of items
+                                      items: cityList.map((items) {
+                                        return DropdownMenuItem(value: items, child: Container(child: Text(items.name.toString())),
+                                        );
+                                      }).toList(),
+                                      onChanged: (CityData? value) {
+                                        setState(() {
+                                          cityValue = value!;
+                                          getArea("${cityValue!.id}");
+                                          cityId = cityValue!.id;
+                                          // stateName = stateValue!.name;
+                                          print("name herererb $cityValue $cityId");
+                                        });
+                                      },
+                                      underline: Container(),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1326,34 +1342,37 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(5),
                                   ),
-                                  child: DropdownButton(
-                                    isExpanded: true,
-                                    value: countryValue,
-                                    hint: const Text('Region'),
-                                    // Down Arrow Icon
-                                    icon: const Icon(Icons.keyboard_arrow_down),
-                                    // Array list of items
-                                    items: countryList.map((items) {
-                                      return
-                                        DropdownMenuItem(
-                                          value: items,
-                                          child: Container(
-                                              child: Text(items.name.toString())),
-                                        );
-                                    }).toList(),
-                                    // After selecting the desired option,it will
-                                    // change button value to selected value
-                                    onChanged: (CountryData? value) {
-                                      setState(() {
-                                        countryValue = value!;
-                                        countryId = countryValue!.id;
-                                        // getstate("${countryValue!.id}");
-                                        // ("${stateValue!.id}");
-                                        // stateName = stateValue!.name;
-                                        print("name herererb $countryId");
-                                      });
-                                    },
-                                    underline: Container(),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: DropdownButton(
+                                      isExpanded: true,
+                                      value: countryValue,
+                                      hint: const Text('Region'),
+                                      // Down Arrow Icon
+                                      icon: const Icon(Icons.keyboard_arrow_down),
+                                      // Array list of items
+                                      items: countryList.map((items) {
+                                        return
+                                          DropdownMenuItem(
+                                            value: items,
+                                            child: Container(
+                                                child: Text(items.name.toString())),
+                                          );
+                                      }).toList(),
+                                      // After selecting the desired option,it will
+                                      // change button value to selected value
+                                      onChanged: (CountryData? value) {
+                                        setState(() {
+                                          countryValue = value!;
+                                          countryId = countryValue!.id;
+                                          // getstate("${countryValue!.id}");
+                                          // ("${stateValue!.id}");
+                                          // stateName = stateValue!.name;
+                                          print("name herererb $countryId");
+                                        });
+                                      },
+                                      underline: Container(),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1408,7 +1427,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               Card(
                                 child: Container(
                                     width: 50,
-                                    height: 50,
+                                    height: 75,
                                     // color: Colors.black,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
@@ -1428,6 +1447,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     height: 80,
                                     width: 220,
                                     decoration: BoxDecoration(
+                                      border: Border.all(color: colors.primary),
                                       borderRadius: BorderRadius.circular(5),
                                       color: Colors.white,
                                       // image: DecorationImage(image:FileImage(_image!.absolute) )
@@ -1438,8 +1458,10 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                             fit: BoxFit.fill,
                                           )
                                         : Icon(
+
                                             Icons.file_upload_outlined,
                                             color: colors.secondary,
+                                      size: 50,
                                           ),
                                   ),
                                 ),
@@ -1645,7 +1667,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                   ),
                                   Card(
                                     child: Container(
-                                      width: 220,
+                                     width: 220,
                                       height: 50,
                                       // color: Colors.black,
                                       decoration: BoxDecoration(
@@ -1749,9 +1771,10 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                   Card(
                                     child: Container(
                                         width: 50,
-                                        height: 50,
+                                        height: 75,
                                         // color: Colors.black,
                                         decoration: BoxDecoration(
+
                                             borderRadius:
                                                 BorderRadius.circular(10),
                                             color: colors.lightgray),
@@ -1769,6 +1792,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         height: 80,
                                         width: 220,
                                         decoration: BoxDecoration(
+                                          border: Border.all(color: colors.primary),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           color: Colors.white,
@@ -1782,6 +1806,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                             : const Icon(
                                                 Icons.file_upload_outlined,
                                                 color: colors.secondary,
+                                          size: 50,
                                               ),
                                       ),
                                     ),
@@ -1805,6 +1830,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     validateDropdown();
                     if (_formKey.currentState!.validate()) {
                       setState(() {
+
                         _selectedOption = '4';
                       });
                     }
@@ -1883,6 +1909,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           height: 120,
                           width: double.infinity,
                           decoration: BoxDecoration(
+                            border: Border.all(color: colors.primary),
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                             // image: DecorationImage(image:FileImage(_image!.absolute) )
@@ -1895,6 +1922,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               : Icon(
                                   Icons.file_upload_outlined,
                                   color: colors.secondary,
+                            size: 50,
                                 ),
                         ),
                       ),
@@ -1918,6 +1946,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           height: 120,
                           width: double.infinity,
                           decoration: BoxDecoration(
+                            border: Border.all(color: colors.primary),
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                             // image: DecorationImage(image:FileImage(_image!.absolute) )
@@ -1930,6 +1959,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               : Icon(
                                   Icons.file_upload_outlined,
                                   color: colors.secondary,
+                            size: 50,
                                 ),
                         ),
                       ),
@@ -1937,7 +1967,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     const Padding(
                       padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
-                        "Aadhar Card Front",
+                        "Aadhar Card (Front)",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: colors.text),
                       ),
@@ -1953,6 +1983,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           height: 120,
                           width: double.infinity,
                           decoration: BoxDecoration(
+                            border: Border.all(color: colors.primary),
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                             // image: DecorationImage(image:FileImage(_image!.absolute) )
@@ -1965,6 +1996,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               : Icon(
                                   Icons.file_upload_outlined,
                                   color: colors.secondary,
+                            size: 50,
                                 ),
                         ),
                       ),
@@ -1972,7 +2004,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     const Padding(
                       padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
-                        "Aadhar Card Back",
+                        "Aadhar Card (Back)",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: colors.text),
                       ),
@@ -1988,6 +2020,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           height: 120,
                           width: double.infinity,
                           decoration: BoxDecoration(
+                            border: Border.all(color: colors.primary),
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                             // image: DecorationImage(image:FileImage(_image!.absolute) )
@@ -2000,6 +2033,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               : const Icon(
                                   Icons.file_upload_outlined,
                                   color: colors.secondary,
+                            size: 50,
                                 ),
                         ),
                       ),
@@ -2018,6 +2052,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         height: 60,
                         // color: Colors.black,
                         decoration: BoxDecoration(
+
                             borderRadius: BorderRadius.circular(10),
                             color: colors.lightgray),
                         child: TextFormField(
@@ -2051,6 +2086,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           height: 120,
                           width: double.infinity,
                           decoration: BoxDecoration(
+                            border: Border.all(color: colors.primary),
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                             // image: DecorationImage(image:FileImage(_image!.absolute) )
@@ -2063,6 +2099,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               : Icon(
                                   Icons.file_upload_outlined,
                                   color: colors.secondary,
+                            size: 50,
                                 ),
                         ),
                       ),
@@ -2096,6 +2133,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           height: 120,
                           width: double.infinity,
                           decoration: BoxDecoration(
+                            border: Border.all(color: colors.primary),
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                             // image: DecorationImage(image:FileImage(_image!.absolute) )
@@ -2108,6 +2146,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               : Icon(
                                   Icons.file_upload_outlined,
                                   color: colors.secondary,
+                              size: 50,
+
                                 ),
                         ),
                       ),
@@ -2119,12 +2159,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       child: Card(
                         child: InkWell(
                           onTap: () {
-                            if (_image == null ||
-                                _image2 == null ||
-                                _image3 == null ||
-                                _image4 == null ||
-                                _image5 == null ||
-                                _image6 == null) {
+                            if (_image == null || _image2 == null || _image3 == null || _image4 == null || _image5 == null || _image6 == null) {
                               Fluttertoast.showToast(msg: "Select All Images");
                             }
                             vendorRegister();

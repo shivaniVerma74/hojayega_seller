@@ -576,24 +576,26 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                           SizedBox(height: 20,),
                           InkWell(
                             onTap: () {
-                              // if(roll_id == "1") {
-                              //   Navigator.push(
-                              //     context, MaterialPageRoute(
-                              //     builder: (context) => AllCategory(),
-                              //   ),
-                              //   );
-                              // } else {
-                              //   Navigator.push(
-                              //     context, MaterialPageRoute(
-                              //     builder: (context) => const CreatePortfolio(),
-                              //   ),
-                              //   );
-                              // }
-                              Navigator.push(
-                                context, MaterialPageRoute(
-                                builder: (context) =>  AllCategory(),
-                              ),
-                              );
+                              if(roll_id == 1) {
+                              //  print(getData());
+                                Navigator.push(
+                                  context, MaterialPageRoute(
+                                  builder: (context) => AllCategory(),
+                                ),
+                                );
+                              } else {
+                                print(getData());
+                                Navigator.push(
+                                  context, MaterialPageRoute(
+                                  builder: (context) => const CreatePortfolio(),
+                                ),
+                                );
+                              }
+                              // Navigator.push(
+                              //   context, MaterialPageRoute(
+                              //   builder: (context) =>  AllCategory(),
+                              // ),
+                              // );
                             },
                             child: Center(
                               child: Card(
@@ -613,7 +615,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                   //   width: MediaQuery.of(context),
                                   // decoration: BoxDecoration(borderRadius: ),
                                   height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                      MediaQuery.of(context).size.height * 0.07,
                                   width: MediaQuery.of(context).size.width * .6,
                                 ),
                               ),

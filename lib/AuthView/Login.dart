@@ -146,8 +146,9 @@ class _LoginPageState extends State<LoginPage> {
                                 elevation: 5,
                                 child: Container(
                                   width: 50,
-                                  height: 50,
-                                  color: Colors.grey.shade200,
+                                  height: 55,
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.grey.shade200),
+                                 // color: Colors.grey.shade200,
                                   child: const Icon(
                                     Icons.phone,
                                     size: 25,
@@ -200,8 +201,9 @@ class _LoginPageState extends State<LoginPage> {
                                 elevation: 5,
                                 child: Container(
                                   width: 50,
-                                  height: 50,
-                                  color: Colors.grey.shade200,
+                                  height: 55,
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.grey.shade200,),
+                                //  color: Colors.grey.shade200,
                                   child: const Icon(
                                     Icons.lock,
                                     size: 25,

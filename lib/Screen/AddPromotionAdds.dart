@@ -231,7 +231,7 @@ getSetting() async {
           return Theme(
             data: ThemeData.light().copyWith(
                 primaryColor: colors.primary,
-                accentColor: Colors.black,
+                // accentColor: Colors.black,
                 colorScheme: ColorScheme.light(primary: colors.primary),
                 buttonTheme:
                 ButtonThemeData(textTheme: ButtonTextTheme.accent)),
@@ -259,7 +259,7 @@ getSetting() async {
           return Theme(
             data: ThemeData.light().copyWith(
                 primaryColor: colors.primary,
-                accentColor: Colors.black,
+                // accentColor: Colors.black,
                 colorScheme: ColorScheme.light(primary: colors.primary),
                 buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.accent)),
             child: child!,
@@ -273,6 +273,17 @@ getSetting() async {
       });
     setState(() {
       endDateCtr = TextEditingController(text: _dateValue);
+      DateTime date1 = DateTime.parse(startDateCtr.text);
+      DateTime date2 = DateTime.parse(endDateCtr.text);
+      Duration difference = date2.difference(date1);
+      print("The difference in days is: ${difference.inDays}");
+      dayCtr.text=difference.inDays.toString();
+      totalamtCtr.text=(int.parse(dayCtr.text.toString()) * int.parse(banner_Charge.toString())).toString();
+      // setState(() {
+      //   // dayCtr.text=difference.inDays.toString();
+      //   dayCtr.text=y.toString();
+      // });
+
     });
   }
 
@@ -390,7 +401,20 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                             child: TextFormField(
                               onTap: () {
                                 _selectEndDate();
+                                DateTime date1 = DateTime.parse(startDateCtr.text);
+                                DateTime date2 = DateTime.parse(endDateCtr.text);
+                                Duration difference = date2.difference(date1);
+                                print("The difference in days is: ${difference.inDays}");
+                                int y=difference.inDays;
+                                dayCtr.text=difference.inDays.toString();
+                                // setState(() {
+                                //   // dayCtr.text=difference.inDays.toString();
+                                //   dayCtr.text=y.toString();
+                                // });
+
+
                               },
+
                               style: TextStyle(color: Colors.black),
                               keyboardType: TextInputType.number,
                               maxLength: 10,
@@ -482,12 +506,14 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                           padding: EdgeInsets.only(top: 0, left: 12, right: 8),
                           height: 60,
                           decoration: BoxDecoration(
+
                               color: colors.whiteTemp,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: colors.primary)
                           ),
                           width: MediaQuery.of(context).size.width/2-30,
                           child: TextFormField(
+                            readOnly: true,
                             onChanged:(value) => {
                               totalamtCtr.text = "${(int.parse(banner_Charge??""))* (int.parse(value))} RS",
                               print("===============${totalamtCtr.text}==========="),
@@ -504,6 +530,7 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                                 hintStyle: TextStyle(fontWeight: FontWeight.w400),
                                 hintText: "Enter Day"
                             ),
+
                           ),
                         ),
                       ],

@@ -124,7 +124,7 @@ class _OtpState extends State<VerifyOtp> {
                           }
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                        child: const Text('Verify'),
+                        child: const Text('Verify',style: TextStyle(color: colors.whiteTemp),),
                       ),
                     ),
                   ],

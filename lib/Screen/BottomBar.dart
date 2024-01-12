@@ -5,6 +5,7 @@ import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hojayega_seller/Screen/AllCategory.dart';
+import 'package:hojayega_seller/Screen/MyProfile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
@@ -182,10 +183,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   ),
                   InkWell(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => const  myprofile_screen()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MyProfile()  ),
+                      );
                       setState(() {
                         currentIndex = 1;
                       });

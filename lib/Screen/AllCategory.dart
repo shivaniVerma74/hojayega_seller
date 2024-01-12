@@ -487,7 +487,9 @@ import '../Model/ChildCategoryModel.dart';
 import '../Model/GetProductCatWise.dart';
 import '../Model/SubCategoryModel.dart';
 import 'AddProduct.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Congratutation.dart';
+
 
 class AllCategory extends StatefulWidget {
   String? ShopId;
@@ -505,6 +507,7 @@ class _AllCategoryState extends State<AllCategory> {
     getSubCat();
     getChildCat();
   }
+
 
   CategoryModel? categoryModel;
   List<CategoryData> categoryList1 = [];
@@ -636,7 +639,16 @@ class _AllCategoryState extends State<AllCategory> {
     return SafeArea(
       child: Scaffold(
         floatingActionButton: InkWell(
-        onTap: () {
+        onTap: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          // prefs.setString('category', Selectcat!);
+          // prefs.setString('sub',subcatid!);
+          // prefs.setString('child', chidcatId!);
+          print(prefs.get('category'));
+          print(prefs.get('sub'));
+          print(prefs.get('child'));
+        //  Selectcat = categoryList1[index].id;
+          //  String s1=emailController.toString();
           Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct()));
         },
         child: Padding(
@@ -674,9 +686,16 @@ class _AllCategoryState extends State<AllCategory> {
                   itemCount: categoryImageList.length,
                   itemBuilder: (context, index) {
                     return InkWell(
-                      onTap: () {
+                      onTap: () async {
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+
                         setState(() {
                           Selectcat = categoryList1[index].id;
+
+                          String? s1= categoryList1[index].cName;
+                          print(s1);
+                          prefs.setString('category',s1!);
+
                         });
                         getSubCat();
                       },
@@ -809,10 +828,20 @@ class _AllCategoryState extends State<AllCategory> {
                                       itemCount: subCatData?.data?.length ?? 0,
                                       itemBuilder: (context, index) {
                                         return InkWell(
-                                          onTap: () {
-                                            setState(() {
+                                          onTap: () async {
+                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                            setState(()  {
                                               subcatid =
                                                   subCatData?.data?[index].id;
+
+
+                                              // prefs.setString('category', Selectcat!);
+                                              String? s1=subCatData?.data?[index].cName;
+                                              print(s1);
+                                              prefs.setString('sub',s1!);
+                                              // prefs.setString('child', chidcatId!);
+
+
                                             });
                                             getChildCat();
                                           },
@@ -956,11 +985,19 @@ class _AllCategoryState extends State<AllCategory> {
                                                   0,
                                               itemBuilder: (context, index) {
                                                 return InkWell(
-                                                  onTap: () {
+                                                  onTap: () async {
+                                                    SharedPreferences prefs = await SharedPreferences.getInstance();
                                                     setState(() {
                                                       chidcatId =
                                                           childCategoryModel
                                                               ?.data?[index].id;
+
+                                                      String? s1=childCategoryModel
+                                                          ?.data?[index].cName;
+                                                      print(s1);
+                                                      print("1111111111SSSSSSSSSSS@@2222222222");
+                                                      prefs.setString('child',s1!);
+
                                                     });
 
                                                     getProduct();

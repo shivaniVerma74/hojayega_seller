@@ -32,6 +32,13 @@ String? broncherImageUrl1;
 String? category_id;
 var category;
 var subcat;
+int count=0;
+
+
+String? myCategory;
+String? mySub;
+String? myChild;
+
 
 int videoLinkindex = 0;
 int pressed = 0;
@@ -62,9 +69,14 @@ class _AddProductState extends State<AddProduct> {
   var stockList = ['In Stock', 'Out Of Stock'];
   var cat_id;
 
+  var category;
+  var sub;
+  var child;
+
   void initState() {
     // TODO: implement initState
     // fetchData();
+    count=0;
     getData();
     getCategory();
     // getSubCategory("");
@@ -95,13 +107,41 @@ class _AddProductState extends State<AddProduct> {
       var finalResponse = await response.stream.bytesToString();
       final jsonResponse = CategoryModel.fromJson(json.decode(finalResponse));
       print('____dsdsfds______${finalResponse}_________');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      print(prefs.get('category'));
+      print(prefs.get('sub'));
+      print(prefs.get('child'));
+
+    //  myCategory=prefs.get('category') as String?;
+      String? s1=prefs.get('category') as String?;
+      myCategory = s1==null?"":s1;
+
+      String? s2=prefs.get('sub') as String?;
+      mySub=s2==null?"":s2;
+
+      String? s3=prefs.get('child') as String?;
+      myChild=s3==null?"":s3;
+
       for (int i = 0; i < jsonResponse.data!.length; i++) {
         print("${jsonResponse.data?[i].id}");
         category_id = jsonResponse.data?[i].id ?? "";
+
+
       }
       setState(() {
         getCatModel = jsonResponse;
       });
+     //  SharedPreferences prefs = await SharedPreferences.getInstance();
+     // Object? s1=prefs.get('category');
+     //
+     //  SharedPreferences prefs = await SharedPreferences.getInstance();
+     //  String? id = prefs.getString('id');
+     //  int i=int.parse(id!);
+     //
+     //  print(prefs.get('category'));
+     //  print(prefs.get('sub'));
+     //  print(prefs.get('child'));
+
     } else {
       print(response.reasonPhrase);
     }
@@ -130,8 +170,26 @@ class _AddProductState extends State<AddProduct> {
       var finalResponse = await response.stream.bytesToString();
       final jsonResponse =
           SubCategoryModel.fromJson(json.decode(finalResponse));
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? idSub = prefs.getString('sub');
+      int kk=int.parse(idSub!);
       for (int i = 0; i < jsonResponse.data!.length; i++) {
         print("sub cat:${jsonResponse.data?[i].id}");
+        subCatId = jsonResponse.data?[i].id?? "";
+
+        print(subCatId);
+        print("aaaaaaaaaa111");
+        print(idSub);
+        if(subCatId==idSub)
+        {setState(() {
+         sub =jsonResponse.data?[i].cName;
+        });
+
+        print("------mm-------pp-------");
+        print(sub);
+        }
+
       }
       setState(() {
         getSubCatModel = jsonResponse;
@@ -348,92 +406,101 @@ class _AddProductState extends State<AddProduct> {
                   const SizedBox(
                     height: 10,
                   ),
-                  getCatModel == null
-                      ? const Center(child: CircularProgressIndicator())
-                      : SizedBox(
-                          height: 50,
-                          // decoration: BoxDecoration(
-                          //     borderRadius: BorderRadius.circular(10),
-                          //     border: Border.all(color: colors.black)
-                          // ),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            hint: const Text(
-                              'Select Category',
-                              style: TextStyle(
-                                  color: colors.black54,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15),
-                            ),
-                            // dropdownColor: colors.primary,
-                            value: selectedState,
-                            icon: const Padding(
-                              padding: EdgeInsets.only(left: 10.0, top: 10),
-                              child: Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                color: Colors.grey,
-                                size: 25,
-                              ),
-                            ),
-                            // elevation: 16,
-                            style: const TextStyle(
-                                color: colors.secondary,
-                                fontWeight: FontWeight.bold),
-                            underline: Padding(
-                              padding: const EdgeInsets.only(left: 0, right: 0),
-                              child: Container(
-                                // height: 2,
-                                color: Colors.white,
-                              ),
-                            ),
-                            onChanged: (String? value) {
-                              // This is called when the user selects an item.
-                              setState(() {
-                                selectedState = value!;
-                                getCatModel!.data!.forEach((element) {
-                                  if (element.cName == value) {
-                                    selectedSateIndex = getCatModel!.data!.indexOf(element);
-                                    category_Id = element.id;
-                                    serviceId = element.serviceType;
-                                    print("select category id is $category_Id");
-                                    getSubCategory(category_Id!, serviceId);
-                                  }
-                                });
-                              });
-                            },
-                            items: getCatModel!.data!.map((items) {
-                              return DropdownMenuItem(
-                                value: items.cName.toString(),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                1.42,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            items.cName.toString(),
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                color: colors.text),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+
+                  Container(
+                    child:Text(myCategory!) ,
+                  ),
+
+
+                  // const SizedBox(
+                  //   height: 10,
+                  // ),
+                  // getCatModel == null
+                  //     ? const Center(child: CircularProgressIndicator())
+                  //     : SizedBox(
+                  //         height: 50,
+                  //         // decoration: BoxDecoration(
+                  //         //     borderRadius: BorderRadius.circular(10),
+                  //         //     border: Border.all(color: colors.black)
+                  //         // ),
+                  //         child: DropdownButton<String>(
+                  //           isExpanded: true,
+                  //           hint: const Text(
+                  //             'Select Category',
+                  //             style: TextStyle(
+                  //                 color: colors.black54,
+                  //                 fontWeight: FontWeight.w500,
+                  //                 fontSize: 15),
+                  //           ),
+                  //           // dropdownColor: colors.primary,
+                  //           value: category,
+                  //           icon: const Padding(
+                  //             padding: EdgeInsets.only(left: 10.0, top: 10),
+                  //             child: Icon(
+                  //               Icons.keyboard_arrow_down_rounded,
+                  //               color: Colors.grey,
+                  //               size: 25,
+                  //             ),
+                  //           ),
+                  //           // elevation: 16,
+                  //           style: const TextStyle(
+                  //               color: colors.secondary,
+                  //               fontWeight: FontWeight.bold),
+                  //           underline: Padding(
+                  //             padding: const EdgeInsets.only(left: 0, right: 0),
+                  //             child: Container(
+                  //               // height: 2,
+                  //               color: Colors.white,
+                  //             ),
+                  //           ),
+                  //           onChanged: (String? value) {
+                  //             // This is called when the user selects an item.
+                  //             setState(() {
+                  //               selectedState = value!;
+                  //               getCatModel!.data!.forEach((element) {
+                  //                 if (element.cName == value) {
+                  //                   selectedSateIndex = getCatModel!.data!.indexOf(element);
+                  //                   category_Id = element.id;
+                  //                   serviceId = element.serviceType;
+                  //                   print("select category id is $category_Id");
+                  //                   getSubCategory(category_Id!, serviceId);
+                  //                 }
+                  //               });
+                  //             });
+                  //           },
+                  //           items: getCatModel!.data!.map((items) {
+                  //             return DropdownMenuItem(
+                  //               value: items.cName.toString(),
+                  //               child: Column(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 mainAxisAlignment: MainAxisAlignment.center,
+                  //                 children: [
+                  //                   Padding(
+                  //                     padding: const EdgeInsets.only(top: 5),
+                  //                     child: Container(
+                  //                       width:
+                  //                           MediaQuery.of(context).size.width /
+                  //                               1.42,
+                  //                       child: Padding(
+                  //                         padding:
+                  //                             const EdgeInsets.only(top: 10),
+                  //                         child: Text(
+                  //                           items.cName.toString(),
+                  //                           overflow: TextOverflow.ellipsis,
+                  //                           style: const TextStyle(
+                  //                               color: colors.text),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //             );
+                  //           }).toList(),
+                  //         ),
+                  //       ),
                   Divider(
-                    color: colors.text,
+                    color: Colors.grey,
                   ),
                   SizedBox(
                     height: 20,
@@ -445,86 +512,90 @@ class _AddProductState extends State<AddProduct> {
                   SizedBox(
                     height: 10,
                   ),
-                  getSubCatModel == null
-                      ? SizedBox.shrink()
-                      : Container(
-                          height: 50,
-                          child:
-                          DropdownButton<String>(
-                            isExpanded: true,
-                            hint: const Text(
-                              'Select Subcategory',
-                              style: TextStyle(
-                                  color: colors.text,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15),
-                            ),
-                            // dropdownColor: colors.primary,
-                            value: selectedSub,
-                            icon: const Padding(
-                              padding: EdgeInsets.only(left: 10.0, top: 10),
-                              child: Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                color: Colors.grey,
-                                size: 25,
-                              ),
-                            ),
-                            // elevation: 16,
-                            style: const TextStyle(
-                                color: colors.secondary,
-                                fontWeight: FontWeight.bold),
-                            underline: Padding(
-                              padding: const EdgeInsets.only(left: 0, right: 0),
-                              child: Container(
-                                // height: 2,
-                                color: Colors.white,
-                              ),
-                            ),
-                            onChanged: (String? value) {
-                              // This is called when the user selects an item.
-                              setState(() {
-                                selectedSub = value;
-                                getSubCatModel?.data?.forEach((element) {
-                                  if (element.cName == value) {
-                                    selectedSateIndex = getSubCatModel!.data!.indexOf(element);
-                                    subCatId = element.id;
-                                    getChildCat(subCatId);
-                                    //getStateApi();
-                                  }
-                                });
-                              });
-                            },
-                            items: getSubCatModel!.data!.map((items) {
-                              return DropdownMenuItem(
-                                value: items.cName.toString(),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                1.42,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            items.cName.toString(),
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                color: colors.text),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                  Container(
+                    child:Text(mySub!) ,
+                  ),
+
+                  // getSubCatModel == null
+                  //     ? SizedBox.shrink()
+                  //     : Container(
+                  //         height: 50,
+                  //         child:
+                  //         DropdownButton<String>(
+                  //           isExpanded: true,
+                  //           hint: const Text(
+                  //             'Select Subcategory',
+                  //             style: TextStyle(
+                  //                 color: colors.text,
+                  //                 fontWeight: FontWeight.w500,
+                  //                 fontSize: 15),
+                  //           ),
+                  //           // dropdownColor: colors.primary,
+                  //           value: selectedSub,
+                  //           icon: const Padding(
+                  //             padding: EdgeInsets.only(left: 10.0, top: 10),
+                  //             child: Icon(
+                  //               Icons.keyboard_arrow_down_rounded,
+                  //               color: Colors.grey,
+                  //               size: 25,
+                  //             ),
+                  //           ),
+                  //           // elevation: 16,
+                  //           style: const TextStyle(
+                  //               color: colors.secondary,
+                  //               fontWeight: FontWeight.bold),
+                  //           underline: Padding(
+                  //             padding: const EdgeInsets.only(left: 0, right: 0),
+                  //             child: Container(
+                  //               // height: 2,
+                  //               color: Colors.white,
+                  //             ),
+                  //           ),
+                  //           onChanged: (String? value) {
+                  //             // This is called when the user selects an item.
+                  //             setState(() {
+                  //               selectedSub = value;
+                  //               getSubCatModel?.data?.forEach((element) {
+                  //                 if (element.cName == value) {
+                  //                   selectedSateIndex = getSubCatModel!.data!.indexOf(element);
+                  //                   subCatId = element.id;
+                  //                   getChildCat(subCatId);
+                  //                   //getStateApi();
+                  //                 }
+                  //               });
+                  //             });
+                  //           },
+                  //           items: getSubCatModel!.data!.map((items) {
+                  //             return DropdownMenuItem(
+                  //               value: items.cName.toString(),
+                  //               child: Column(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 mainAxisAlignment: MainAxisAlignment.center,
+                  //                 children: [
+                  //                   Padding(
+                  //                     padding: const EdgeInsets.only(top: 5),
+                  //                     child: Container(
+                  //                       width:
+                  //                           MediaQuery.of(context).size.width /
+                  //                               1.42,
+                  //                       child: Padding(
+                  //                         padding:
+                  //                             const EdgeInsets.only(top: 10),
+                  //                         child: Text(
+                  //                           items.cName.toString(),
+                  //                           overflow: TextOverflow.ellipsis,
+                  //                           style: const TextStyle(
+                  //                               color: colors.text),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //             );
+                  //           }).toList(),
+                  //         ),
+                  //       ),
                   const Divider(
                     color: Colors.grey,
                   ),
@@ -538,85 +609,89 @@ class _AddProductState extends State<AddProduct> {
                   SizedBox(
                     height: 10,
                   ),
-                  getSubCatModel == null
-                      ? SizedBox.shrink()
-                      : Container(
-                          height: 50,
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            hint: const Text(
-                              'Select ChildCategory',
-                              style: TextStyle(
-                                  color: colors.text,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15),
-                            ),
-                            // dropdownColor: colors.primary,
-                            value: selectedChild,
-                            icon: const Padding(
-                              padding: EdgeInsets.only(left: 10.0, top: 10),
-                              child: Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                color: Colors.grey,
-                                size: 25,
-                              ),
-                            ),
-                            // elevation: 16,
-                            style: const TextStyle(
-                                color: colors.secondary,
-                                fontWeight: FontWeight.bold),
-                            underline: Padding(
-                              padding: const EdgeInsets.only(left: 0, right: 0),
-                              child: Container(
-                                // height: 2,
-                                color: Colors.white,
-                              ),
-                            ),
-                            onChanged: (String? value) {
-                              // This is called when the user selects an item.
-                              setState(() {
-                                selectedChild = value;
-                                childCategoryModel!.data!.forEach((element) {
-                                  if (element.cName == value) {
-                                    selectedchildCatIndex =
-                                        childCategoryModel!.data!.indexOf(element);
-                                    childCatId = element.id;
-                                    //getStateApi();
-                                  }
-                                });
-                              });
-                            },
-                            items: childCategoryModel?.data?.map((items) {
-                              return DropdownMenuItem(
-                                value: items.cName.toString(),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                1.42,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            items.cName.toString(),
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                color: colors.text),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                  Container(
+                    child:Text(myChild!) ,
+                  ),
+
+                  // getSubCatModel == null
+                  //     ? SizedBox.shrink()
+                  //     : Container(
+                  //         height: 50,
+                  //         child: DropdownButton<String>(
+                  //           isExpanded: true,
+                  //           hint: const Text(
+                  //             'Select ChildCategory',
+                  //             style: TextStyle(
+                  //                 color: colors.text,
+                  //                 fontWeight: FontWeight.w500,
+                  //                 fontSize: 15),
+                  //           ),
+                  //           // dropdownColor: colors.primary,
+                  //           value: selectedChild,
+                  //           icon: const Padding(
+                  //             padding: EdgeInsets.only(left: 10.0, top: 10),
+                  //             child: Icon(
+                  //               Icons.keyboard_arrow_down_rounded,
+                  //               color: Colors.grey,
+                  //               size: 25,
+                  //             ),
+                  //           ),
+                  //           // elevation: 16,
+                  //           style: const TextStyle(
+                  //               color: colors.secondary,
+                  //               fontWeight: FontWeight.bold),
+                  //           underline: Padding(
+                  //             padding: const EdgeInsets.only(left: 0, right: 0),
+                  //             child: Container(
+                  //               // height: 2,
+                  //               color: Colors.white,
+                  //             ),
+                  //           ),
+                  //           onChanged: (String? value) {
+                  //             // This is called when the user selects an item.
+                  //             setState(() {
+                  //               selectedChild = value;
+                  //               childCategoryModel!.data!.forEach((element) {
+                  //                 if (element.cName == value) {
+                  //                   selectedchildCatIndex =
+                  //                       childCategoryModel!.data!.indexOf(element);
+                  //                   childCatId = element.id;
+                  //                   //getStateApi();
+                  //                 }
+                  //               });
+                  //             });
+                  //           },
+                  //           items: childCategoryModel?.data?.map((items) {
+                  //             return DropdownMenuItem(
+                  //               value: items.cName.toString(),
+                  //               child: Column(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 mainAxisAlignment: MainAxisAlignment.center,
+                  //                 children: [
+                  //                   Padding(
+                  //                     padding: const EdgeInsets.only(top: 5),
+                  //                     child: Container(
+                  //                       width:
+                  //                           MediaQuery.of(context).size.width /
+                  //                               1.42,
+                  //                       child: Padding(
+                  //                         padding:
+                  //                             const EdgeInsets.only(top: 10),
+                  //                         child: Text(
+                  //                           items.cName.toString(),
+                  //                           overflow: TextOverflow.ellipsis,
+                  //                           style: const TextStyle(
+                  //                               color: colors.text),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //             );
+                  //           }).toList(),
+                  //         ),
+                  //       ),
                   Divider(
                     color: Colors.grey,
                   ),
@@ -1067,7 +1142,14 @@ class _AddProductState extends State<AddProduct> {
                   //     )
                   //   ],
                   // ),
+
+
+                  SizedBox(height: 10,),
+
                   uploadMultiImmage(),
+
+
+
                   SizedBox(
                     height: 30,
                   ),
@@ -1101,7 +1183,9 @@ class _AddProductState extends State<AddProduct> {
         ),
         InkWell(
           onTap: () async {
-            pickImageDialog(context, 1);
+            if(count<=3) {
+              pickImageDialog(context, 1);
+            }
             // await pickImages();
           },
           child: Container(
@@ -1158,6 +1242,7 @@ class _AddProductState extends State<AddProduct> {
                   onTap: () {
                     setState(() {
                       imagePathList.remove(imagePathList[index]);
+                      count--;
                     });
                   },
                   child: Icon(
@@ -1237,6 +1322,7 @@ class _AddProductState extends State<AddProduct> {
     );
     if (pickedFile != null) {
       setState(() {
+        count++;
         _imageFile = File(pickedFile.path);
         imagePathList.add(_imageFile?.path ?? "");
         isImages = true;
@@ -1252,6 +1338,7 @@ class _AddProductState extends State<AddProduct> {
     );
     if (pickedFile != null) {
       setState(() {
+        count++;
         _imageFile = File(pickedFile.path);
         imagePathList.add(_imageFile?.path ?? "");
         isImages = true;
@@ -1436,7 +1523,7 @@ class _AddProductState extends State<AddProduct> {
   // }
 
   @override
-  void dispose() {
+  Future<void> dispose() async {
     // TODO: implement dispose
     super.dispose();
     _nameCtr.dispose();
@@ -1444,5 +1531,17 @@ class _AddProductState extends State<AddProduct> {
     _fullDesCtr.dispose();
     _extraDesCtr.dispose();
     _videoLink.dispose();
+    print("---66---77---88---99");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // myCategory=prefs.get('category') as String?;
+    // mySub=prefs.get('sub') as String?;
+    // myChild=prefs.get('child') as String?;
+
+
+
+    prefs.remove('category'); //only
+    prefs.remove('sub'); //only
+    prefs.remove('child'); //only
   }
 }

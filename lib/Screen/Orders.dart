@@ -211,7 +211,7 @@ class _OrdersState extends State<Orders> {
         vendorOrderModel?.orders?.isNotEmpty ?? false ?
         vendorOrderModel?.orders?.length == "" || vendorOrderModel?.orders?.length == null ? const Center(child: CircularProgressIndicator(color: colors.primary,)):
         ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: vendorOrderModel?.orders?.length ?? 0,
             itemBuilder: (c,i) {
@@ -246,7 +246,7 @@ class _OrdersState extends State<Orders> {
                            Text(
                             "${vendorOrderModel?.orders?[i].username}",
                             style: const TextStyle(color: colors.primary),
-                          ),
+                          ),const SizedBox(width: 5,),
                           Container(
                             width: 20,
                             height: 20,
@@ -255,21 +255,9 @@ class _OrdersState extends State<Orders> {
                                 color: colors.primary),
                             child: Image.asset("assets/images/calenders.png"),
                           ),
-                          const Text(
-                            "Date",
-                            style: TextStyle(color: colors.primary),
-                          ),
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5,),
-                                color: colors.primary),
-                            child: Image.asset("assets/images/time.png"),
-                          ),
-                          const Text(
-                            "Time",
-                            style: TextStyle(color: colors.primary),
+                           Text(
+                            "${vendorOrderModel?.orders?[i].date}",
+                            style: const TextStyle(color: colors.primary),
                           ),
                           Container(
                             width: 20,
@@ -277,12 +265,24 @@ class _OrdersState extends State<Orders> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5),
                                 color: colors.primary),
-                            child: Image.asset("assets/images/noofitem.png"),
+                            child: Image.asset("assets/images/time.png"),
                           ),
-                          const Text(
-                            "No. of item",
-                            style: TextStyle(color: colors.primary),
+                           Text(
+                            "${vendorOrderModel?.orders?[i].time}".replaceAll("From", ""),
+                            style: const TextStyle(color: colors.primary),
                           ),
+                          // Container(
+                          //   width: 20,
+                          //   height: 20,
+                          //   decoration: BoxDecoration(
+                          //       borderRadius: BorderRadius.circular(5),
+                          //       color: colors.primary),
+                          //   child: Image.asset("assets/images/noofitem.png"),
+                          // ),
+                          // const Text(
+                          //   "No. of item",
+                          //   style: TextStyle(color: colors.primary),
+                          // ),
                         ],
                       ),
                     ),
@@ -308,7 +308,7 @@ class _OrdersState extends State<Orders> {
                           ),
                           Text(
                             "${vendorOrderModel?.orders?[i].address}",
-                            style: TextStyle(fontSize: 15, color: colors.primary),
+                            style: const TextStyle(fontSize: 15, color: colors.primary),
                           ),
                         ],
                       ),
@@ -346,7 +346,8 @@ class _OrdersState extends State<Orders> {
                     ListView.builder(
                       shrinkWrap: true,
                       itemCount: vendorOrderModel?.orders?[i].orderItems?.length??0,
-                        itemBuilder: (c,i) {
+                        itemBuilder: (c,j) {
+                        var item = vendorOrderModel?.orders?[i].orderItems?[j];
                       return Padding(
                         padding: const EdgeInsets.only(left: 5, right: 2),
                         child: Column(
@@ -360,28 +361,28 @@ class _OrdersState extends State<Orders> {
                                       width: 25,
                                       height: 25,
                                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,), color: Colors.white),
-                                      child: Image.network(vendorOrderModel?.orders?[i].orderItems?[i].productImage??"", color: Colors.red,)),
+                                      child: Image.network(vendorOrderModel?.orders?[i].orderItems?[0].productImage??"", color: Colors.red,)),
                                 ),
-                                const SizedBox(width: 5,),
-                                vendorOrderModel?.orders?[i].orderItems?[i].productName == "" || vendorOrderModel?.orders?[i].orderItems?[i].productName == null ?
-                                const Text("Foods", style: TextStyle(color: colors.primary),):
+                                const SizedBox(width: 5),
+                                item?.productName == "" || item?.productName == null ?
+                                const Text("Foods", style: TextStyle(color: colors.primary)):
                                  SizedBox(
                                    width: 49,
-                                     child: Text("${vendorOrderModel?.orders?[i].orderItems?[i].productName}", style: const TextStyle(color: colors.primary, overflow: TextOverflow.ellipsis),)),
+                                     child: Text("${item?.productName}", style: const TextStyle(color: colors.primary, overflow: TextOverflow.ellipsis),)),
                                 const SizedBox(
                                   width: 75,
                                 ),
-                                vendorOrderModel?.orders?[i].orderItems?[i].unit == "" || vendorOrderModel?.orders?[i].orderItems?[i].unit == null ?
+                                item?.unit == "" || item?.unit == null ?
                                 const Text("-", style: TextStyle(color: colors.primary)) :
-                                 Text("${vendorOrderModel?.orders?[i].orderItems?[i].qty}", style: TextStyle(color: colors.primary),),
+                                 Text("${item?.qty}", style: const TextStyle(color: colors.primary),),
                                 const SizedBox(
                                   width: 40,
                                 ),
-                                 Text("${vendorOrderModel?.orders?[i].orderItems?[i].productPrice}",style: TextStyle(color: colors.primary),),
+                                 Text("${item?.productPrice}",style: const TextStyle(color: colors.primary),),
                                 const SizedBox(
                                   width: 40,
                                 ),
-                                Text("${vendorOrderModel?.orders?[i].orderItems?[i].sellingPrice}rs", style: const TextStyle(color: colors.primary),)
+                                Text("${item?.sellingPrice}rs", style: const TextStyle(color: colors.primary),)
                               ],
                             )
                           ],
@@ -404,7 +405,7 @@ class _OrdersState extends State<Orders> {
                               child: const Center(child: Text("Reject", style: TextStyle(fontSize: 15, color: colors.whiteTemp),)),
                             ),
                           ),
-                          SizedBox(width: 6,),
+                          const SizedBox(width: 6,),
                           InkWell(
                             onTap: () {
                               acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
@@ -415,13 +416,13 @@ class _OrdersState extends State<Orders> {
                               height: 35,
                               width: 80,
                               decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.secondary),
-                              child: const Center(child: Text("Accept", style: TextStyle(fontSize: 15, color: colors.whiteTemp),)),
+                              child: const Center(child: Text("Accept", style: TextStyle(fontSize: 15, color: colors.whiteTemp))),
                             ),
                           )
                         ],
                       ),
                     ),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10),
                   ],
                 ),
               ),

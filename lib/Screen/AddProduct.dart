@@ -1196,7 +1196,7 @@ class _AddProductState extends State<AddProduct> {
                 color: colors.primary),
             child: Center(
               child: Text(
-                "Upload Product Images",
+                "Upload Images",
                 style: TextStyle(color: colors.whiteTemp, fontWeight: FontWeight.bold, fontSize: 12),
               ),
             ),

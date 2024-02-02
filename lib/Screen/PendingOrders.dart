@@ -64,15 +64,14 @@ class _PendingOrdersState extends State<PendingOrders> {
         children: [
           // Text("Pending Orders", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: colors.primary),),
           SizedBox(height: 10,),
-         ListView.builder(
-           shrinkWrap: true,
-           physics: NeverScrollableScrollPhysics(),
-           itemCount: vendorOrderModel?.orders?.length??0,
-           itemBuilder: (context, index) {
-
-           return getPendingOrders(context,index);
-         },)
-
+         // ListView.builder(
+         //   shrinkWrap: true,
+         //   physics: NeverScrollableScrollPhysics(),
+         //   itemCount: vendorOrderModel?.orders?.length??0,
+         //   itemBuilder: (context, index) {
+         //   return getPendingOrders(context,index);
+         // },)
+          getPendingOrders(context),
         ],
       ),
     ),
@@ -96,60 +95,70 @@ class _PendingOrdersState extends State<PendingOrders> {
     Order('10:00 to 12:00 pm', 'Ujjain', 'Approved'),
   ];
 
- Widget  getPendingOrders(BuildContext context,int index) {
+ Widget  getPendingOrders(BuildContext context,) {
     return Column(
       children: [
         vendorOrderModel?.orders?.isNotEmpty ?? false ?
         Center(
-          child: Table(
-            border: TableBorder.all(borderRadius: BorderRadius.circular(5)),
-            columnWidths: const <int, TableColumnWidth>{
-              0: FixedColumnWidth(63.0),
-              1: FixedColumnWidth(115.0),
-              2: FixedColumnWidth(80.0),
-            },
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            children: [
-              // Header Row
-              TableRow(
-                children: [
-                  headerCell('Order No.'),
-                  headerCell('Time Slot'),
-                  headerCell('Region'),
-                  headerCell('Order Status'),
-                ],
-              ),
-              // Data Rows
-              ...?vendorOrderModel?.orders?.map((order) {
-                return TableRow(
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Table(
+              border: TableBorder.all(borderRadius: BorderRadius.circular(5)),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FixedColumnWidth(60.0),
+                1: FixedColumnWidth(110.0),
+                2: FixedColumnWidth(90.0),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                // Header Row
+                TableRow(
                   children: [
-                    Container(
-                      height: 50,
-                      child:  Center(child: Text("${vendorOrderModel?.orders?[index].orderId.toString()}")),
-                    ),
-                    Container(
-                        height: 50,
-                        child: Center(child: Text("${vendorOrderModel?.orders?[index].time.toString()}")),),
-                    Container(
-                      height: 50,
-                      child: Center(child: Text("${vendorOrderModel?.orders?[index].address.toString()}")),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4, right: 4),
-                      child: Container(
-                        height: 30,
-                        width: 60,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: const Color(0xffE5CB24)) ,
-                        child: const Center(
-                            child: Text("Completed", style: TextStyle(color: colors.whiteTemp,))),
-                      ),
-                    ),
+                    headerCell('Order No'),
+                    headerCell('Time Slot'),
+                    headerCell('Region'),
+                    headerCell('Order Status'),
                   ],
-                );
-              }).toList(),
-            ],
+                ),
+                // Data Rows
+                ...?vendorOrderModel?.orders?.map((order) {
+                  return TableRow(
+                    children: [
+                      Container(
+                        height: 50,
+                        child:  Center(child: Text("${order.orderId.toString()}")),
+                      ),
+                      Container(
+                          height: 50,
+                          child: Center(
+                              child: Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Text("${order.time.toString().replaceAll("From", "")}"),
+                            ),
+                          ),
+                      ),
+                      Container(
+                        height: 50,
+                        child: Center(
+                            child: Text("${order.address.toString()}")),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, right: 4),
+                        child: Container(
+                          height: 30,
+                          width: 60,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: const Color(0xffE5CB24)) ,
+                          child: const Center(
+                              child: Text("Completed", style: TextStyle(color: colors.primary, fontWeight:FontWeight.bold))),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ],
+            ),
           ),
-        ) : Container(
+        ): Container(
           height:
           MediaQuery.of(context).size.height/2.5,
           child: const Center(

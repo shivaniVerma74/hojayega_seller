@@ -99,7 +99,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Padding(
@@ -122,7 +122,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Card(

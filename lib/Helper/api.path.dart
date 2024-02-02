@@ -21,6 +21,7 @@ class ApiServicves{
   static const String typeofShops = baseUrl+'type_shops';
   static const String addProducts = baseUrl+'add_product';
   static const String vendorOrders = baseUrl+'get_vendor_orders';
+  static const String timeSlots = baseUrl+'get_time_slot';
   static const String acceptRejectOrder = baseUrl+'accept_reject_order';
   static const String notifications = baseUrl+'notifications';
   static const String clearNotification = baseUrl+'clear_all';

@@ -33,18 +33,17 @@ class _HomePageState extends State<HomeScreen> {
 
   int _pageIndex = 0;
 
-
   Future<void> getBanner() async {
     var response = await http.get(Uri.parse(ApiServicves.getBanners));
     if (response.statusCode == 200) {
       setState(() {
-        homepageimagemodel = Homepageimagemodel.fromJson(json.decode(response.body));
+        homepageimagemodel =
+            Homepageimagemodel.fromJson(json.decode(response.body));
       });
     } else {
-     print('image not found');
+      print('image not found');
     }
   }
-
 
   var arrNames = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop', 'Track \nOrder'];
   var iconsNames = [
@@ -60,7 +59,6 @@ class _HomePageState extends State<HomeScreen> {
     // Add more orders as needed
   ];
 
-
   List<Map<String, String>> imageList = [
     {"id": "1", "image_path": 'assets/images/c1.jpg'},
     {"id": "2", "image_path": 'assets/images/c2.jpg'},
@@ -69,7 +67,6 @@ class _HomePageState extends State<HomeScreen> {
 
   // final CarouselController carouselController = CarouselController();
   int currentIndex = 0;
-
 
   Widget headerCell(String text) {
     return Container(
@@ -86,7 +83,6 @@ class _HomePageState extends State<HomeScreen> {
   Widget dataCell(String text) {
     return Container(
       height: 50,
-
       child: Center(child: Text(text)),
     );
   }
@@ -100,7 +96,7 @@ class _HomePageState extends State<HomeScreen> {
     }
     return Container(
       height: 50,
-     // width: 0,
+      // width: 0,
       child: Center(
         child: Text(
           status,
@@ -111,31 +107,33 @@ class _HomePageState extends State<HomeScreen> {
   }
 
   String? card_limit;
-getSetting() async {
+  getSetting() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-  var headers = {
-    'Cookie': 'ci_session=bfa970b6e13a45a52775a4cd4995efa6026d6895'
-  };
-  var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getSettings));
-  request.headers.addAll(headers);
-  http.StreamedResponse response = await request.send();
-  if (response.statusCode == 200) {
-    var result = await response.stream.bytesToString();
-    var finaResult = jsonDecode(result);
-    print("responseee $finaResult");
-    if (finaResult['status'] == 1) {
-      card_limit = finaResult['setting']['cart_limit'];
-      await prefs.setString('card_limit', finaResult['setting']['cart_limit'].toString());
-      print('____credit data limit is$card_limit ___');
-      setState(() {});
-      // Fluttertoast.showToast(msg: '${finaResult['message']}');
+    var headers = {
+      'Cookie': 'ci_session=bfa970b6e13a45a52775a4cd4995efa6026d6895'
+    };
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getSettings));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      var finaResult = jsonDecode(result);
+      print("responseee $finaResult");
+      if (finaResult['status'] == 1) {
+        card_limit = finaResult['setting']['cart_limit'];
+        await prefs.setString(
+            'card_limit', finaResult['setting']['cart_limit'].toString());
+        print('____credit data limit is$card_limit ___');
+        setState(() {});
+        // Fluttertoast.showToast(msg: '${finaResult['message']}');
+      } else {
+        // Fluttertoast.showToast(msg: "${finaResult['message']}");
+      }
     } else {
-      // Fluttertoast.showToast(msg: "${finaResult['message']}");
+      print(response.reasonPhrase);
     }
-  } else {
-    print(response.reasonPhrase);
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -572,13 +570,16 @@ getSetting() async {
                     itemCount: arrNames.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: const EdgeInsets.only(left: 20),
+                        padding: const EdgeInsets.only(left: 20, right: 8),
                         child: Column(
                           children: [
                             Container(
                               width: 40,
                               height: 40,
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ),
                                   color: colors.primary),
                               child: Image.asset(iconsNames[index]),
                             ),
@@ -596,35 +597,46 @@ getSetting() async {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Calender()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Calender()));
                 },
-                child: Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,),
-                              color: colors.whiteTemp),
-                          child: Image.asset('assets/images/calender.png')),
-                      const Text("Calender")
-                    ],
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Expanded(
+                    child: Column(
+                      children: [
+                        Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: colors.whiteTemp),
+                            child: Image.asset('assets/images/calender.png')),
+                        const Text("Calender")
+                      ],
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 30,bottom: 10,top: 10),
-            child: Text("Today's Order Status",style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold,fontSize: 20),),
+          const Padding(
+            padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
+            child: Text(
+              "Today's Order Status",
+              style: TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20),
+            ),
           ),
           Center(
             child: Table(
               border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
               columnWidths: const <int, TableColumnWidth>{
-                 0: FixedColumnWidth(125.0),
-                 1: FixedColumnWidth(125.0),
-                 2: FixedColumnWidth(90.0),
+                0: FixedColumnWidth(125.0),
+                1: FixedColumnWidth(125.0),
+                2: FixedColumnWidth(90.0),
               },
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
@@ -709,14 +721,16 @@ getSetting() async {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (index) => Container(
+              children: List.generate(
+                3,
+                (index) => Container(
                   width: 8.0,
                   height: 8.0,
                   margin: EdgeInsets.symmetric(horizontal: 4.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color:
-                    currentIndex == index ? Color(0xff6EE2F5) : Colors.grey,
+                        currentIndex == index ? Color(0xff6EE2F5) : Colors.grey,
                   ),
                 ),
               ),
@@ -729,24 +743,36 @@ getSetting() async {
               children: [
                 InkWell(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryCard()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DeliveryCard()));
                   },
                   child: Container(
                     height: 100,
                     width: 170,
                     decoration: BoxDecoration(
-                      image: const DecorationImage(
-                        image: AssetImage("assets/images/homered.png"),
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.circular(20)
-                    ),
+                        image: const DecorationImage(
+                          image: AssetImage("assets/images/homered.png"),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(20)),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 25),
                       child: Column(
-                        children:  [
-                          Text("Delivery Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 ),),
-                          Text("$card_limit", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18 )),
+                        children: [
+                          Text(
+                            "Delivery Card",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: colors.whiteTemp,
+                                fontSize: 18),
+                          ),
+                          Text("$card_limit",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.whiteTemp,
+                                  fontSize: 18)),
                         ],
                       ),
                     ),
@@ -754,23 +780,34 @@ getSetting() async {
                 ),
                 InkWell(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => BusinessCard()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BusinessCard()));
                   },
                   child: Container(
                     height: 100,
                     width: 170,
                     decoration: BoxDecoration(
-                      image: const DecorationImage(
-                        image: AssetImage("assets/images/homeblue.png"),
-                        fit: BoxFit.cover,
-                      ),borderRadius: BorderRadius.circular(20)
-                    ),
+                        image: const DecorationImage(
+                          image: AssetImage("assets/images/homeblue.png"),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(20)),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 25),
                       child: Column(
                         children: [
-                          const Text("Busines Card", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18)),
-                          Text("$card_limit", style: const TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 18))
+                          const Text("Busines Card",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.whiteTemp,
+                                  fontSize: 18)),
+                          Text("$card_limit",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.whiteTemp,
+                                  fontSize: 18))
                         ],
                       ),
                     ),
@@ -830,7 +867,6 @@ logout(context) async {
       });
 }
 
-
 class Order {
   String timeSlot;
   String region;
@@ -842,7 +878,8 @@ class Homepageimagemodel {
   Homepageimagemodel({
     bool? error,
     String? message,
-    List<Data>? data,}){
+    List<Data>? data,
+  }) {
     _error = error;
     _message = message;
     _data = data;
@@ -861,13 +898,16 @@ class Homepageimagemodel {
   bool? _error;
   String? _message;
   List<Data>? _data;
-  Homepageimagemodel copyWith({  bool? error,
+  Homepageimagemodel copyWith({
+    bool? error,
     String? message,
     List<Data>? data,
-  }) => Homepageimagemodel(  error: error ?? _error,
-    message: message ?? _message,
-    data: data ?? _data,
-  );
+  }) =>
+      Homepageimagemodel(
+        error: error ?? _error,
+        message: message ?? _message,
+        data: data ?? _data,
+      );
   bool? get error => _error;
   String? get message => _message;
   List<Data>? get data => _data;
@@ -881,7 +921,6 @@ class Homepageimagemodel {
     }
     return map;
   }
-
 }
 
 /// id : "29"
@@ -896,7 +935,8 @@ class Data {
     String? bannersName,
     String? image,
     String? roleType,
-    String? bannerType,}){
+    String? bannerType,
+  }) {
     _id = id;
     _bannersName = bannersName;
     _image = image;
@@ -916,17 +956,20 @@ class Data {
   String? _image;
   String? _roleType;
   String? _bannerType;
-  Data copyWith({  String? id,
+  Data copyWith({
+    String? id,
     String? bannersName,
     String? image,
     String? roleType,
     String? bannerType,
-  }) => Data(  id: id ?? _id,
-    bannersName: bannersName ?? _bannersName,
-    image: image ?? _image,
-    roleType: roleType ?? _roleType,
-    bannerType: bannerType ?? _bannerType,
-  );
+  }) =>
+      Data(
+        id: id ?? _id,
+        bannersName: bannersName ?? _bannersName,
+        image: image ?? _image,
+        roleType: roleType ?? _roleType,
+        bannerType: bannerType ?? _bannerType,
+      );
   String? get id => _id;
   String? get bannersName => _bannersName;
   String? get image => _image;
@@ -942,5 +985,4 @@ class Data {
     map['banner_type'] = _bannerType;
     return map;
   }
-
 }

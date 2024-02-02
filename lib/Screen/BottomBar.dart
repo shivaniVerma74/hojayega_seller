@@ -32,17 +32,32 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final GlobalKey<ScaffoldState> _key = GlobalKey(); // Create a key
   @override
   void initState() {
-    getData();
-    if (widget.dIndex != null) {
-      selectedIndex = widget.dIndex!;
-      _child = widget.dIndex == 1
-          ? Container()
-          : widget.dIndex == 3
-          ? Container()
-          : Container();
+    int? index=0;
+
+    if (index ==0) {
+
+      setState(() {
+        selectedIndex =0;
+      });
+      _child =  selectedIndex== 0
+          ? HomeScreen():
+      Container();
     } else {
       _child = Container();
     }
+    super.initState();
+
+    getData();
+    // if (widget.dIndex != null) {
+    //   selectedIndex = widget.dIndex!;
+    //   _child = widget.dIndex == 1
+    //       ? Container()
+    //       : widget.dIndex == 3
+    //       ? Container()
+    //       : Container();
+    // } else {
+    //   _child = Container();
+    // }
     super.initState();
   }
 
@@ -54,7 +69,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     vendorEmail = preferences.getString('vendor_email');
     print("===============$vendorEmail $vendorName===========");
   }
-  var onOf = false;
+  var onOf = true ;
   String? vendorId;
 
   Future<void> shopStatus() async {
@@ -67,6 +82,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     http.MultipartRequest('POST', Uri.parse(ApiServicves.onOffStatus));
     request.fields.addAll(
         {'user_id': '$vendorId', 'online_status': onOf ? '1' : '0'});
+    print("=======online========${request.fields}======offline=====");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -86,7 +102,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           key: _key,
           backgroundColor: colors.appbarColor,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(selectedIndex == 4 ? 0 : 80),
+            preferredSize: Size.fromHeight(selectedIndex == 4||selectedIndex == 2 ? 0 : 80),
             child: selectedIndex == 0
                 ? homeAppBar(
               context,
@@ -102,7 +118,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   text: selectedIndex == 0
                       ? "Home"
                       : selectedIndex == 3
-                      ? "Pending Orders"
+                      ? "Pending Order"
                       : selectedIndex == 4
                       ? "Pick & Drop"
                       : "My Orders"),
@@ -505,7 +521,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   backgroundColor: colors.primary,
                   unselectedForegroundColor: Colors.white,
                   //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "Pending History"}),
+                  extras: {"label": "Pending "}),
               // FluidNavBarIcon(
               //     icon: Icons.wheelchair_pickup,
               //     // unselectedForegroundColor: Colors.grey,

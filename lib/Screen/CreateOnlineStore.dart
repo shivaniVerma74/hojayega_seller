@@ -181,7 +181,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                           ),
                           shopModel?.data?.length == null ||
                                   shopModel?.data?.length == ""
-                              ? Center(
+                              ? const Center(
                                   child: CircularProgressIndicator(
                                   color: colors.primary,
                                 ))
@@ -233,13 +233,14 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                           Row(
                             children: const [
                               CircleAvatar(
+                                  backgroundColor: colors.primary,
+                                  maxRadius: 8,
                                   child: Text(
                                     '2',
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 10),
                                   ),
-                                  backgroundColor: colors.primary,
-                                  maxRadius: 8),
+                              ),
                               SizedBox(
                                 width: 5,
                               ),
@@ -255,13 +256,12 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                           const SizedBox(
                             height: 10,
                           ),
-                          categoryModel?.data?.length == null ||
-                                  categoryModel?.data?.length == ""
-                              ? Center(
+                          categoryModel?.data?.length == null || categoryModel?.data?.length == ""
+                              ? const Center(
                                   child: CircularProgressIndicator(
                                   color: colors.primary,
-                                ))
-                              :
+                                ),
+                          ):
                           // Container(
                           //         margin:
                           //             const EdgeInsets.only(left: 2, right: 2),
@@ -356,7 +356,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                               width: double.infinity, // adjust width if needed
                               height: 400, // adjust height if needed
                               child: GridView.builder(
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 3,
                                     mainAxisSpacing: 3,
                                     childAspectRatio: 2 / 2.4
@@ -412,13 +412,13 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                crossAxisAlignment: CrossAxisAlignment.start,
                                children: const [
                                  CircleAvatar(
+                                   backgroundColor: colors.primary,
+                                   maxRadius: 8,
                                    child: Text(
                                      '5',
                                      style: TextStyle(
                                          color: Colors.white, fontSize: 10),
                                    ),
-                                   backgroundColor: colors.primary,
-                                   maxRadius: 8,
                                  ),
                                  SizedBox(
                                    width: 5,
@@ -431,7 +431,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                  ),
                                ],
                              ),
-                             SizedBox(height: 10,),
+                             const SizedBox(height: 10,),
                              Container(
                                decoration: BoxDecoration(border: Border.all(color: colors.primary),borderRadius: BorderRadius.circular(10)),
                                child: TextFormField(
@@ -441,7 +441,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                    }
                                    return null;
                                  },
-                                 decoration: InputDecoration(
+                                 decoration: const InputDecoration(
                                    border: InputBorder.none,
                                  ),
                                ),
@@ -566,7 +566,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                    }
                                    return null;
                                  },
-                                 decoration: InputDecoration(
+                                 decoration: const InputDecoration(
                                    border: InputBorder.none,
                                  ),
                                ),
@@ -591,23 +591,10 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 ),
                                 );
                               }
-                              // Navigator.push(
-                              //   context, MaterialPageRoute(
-                              //   builder: (context) =>  AllCategory(),
-                              // ),
-                              // );
                             },
                             child: Center(
                               child: Card(
                                 child: Container(
-                                  child: Center(
-                                    child: Text(
-                                      'Next',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
                                   decoration: BoxDecoration(
                                     color: colors.secondary,
                                     borderRadius: BorderRadius.circular(5),
@@ -617,6 +604,14 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                   height:
                                       MediaQuery.of(context).size.height * 0.07,
                                   width: MediaQuery.of(context).size.width * .6,
+                                  child: const Center(
+                                    child: Text(
+                                      'Next',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),

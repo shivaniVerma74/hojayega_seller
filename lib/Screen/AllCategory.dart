@@ -508,7 +508,6 @@ class _AllCategoryState extends State<AllCategory> {
     getChildCat();
   }
 
-
   CategoryModel? categoryModel;
   List<CategoryData> categoryList1 = [];
   List<String> categoryImageList = [];
@@ -671,7 +670,7 @@ class _AllCategoryState extends State<AllCategory> {
                 bottomRight: Radius.circular(25),
               ),
             ),
-            title: const Text('Sub-Category'),
+            title: const Text('Sub-Categorsy'),
             backgroundColor: colors.primary),
         backgroundColor: colors.appbarColor,
         body: SingleChildScrollView(

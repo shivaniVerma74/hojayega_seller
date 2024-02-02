@@ -21,7 +21,11 @@ class _CreatePortfolioState extends State<CreatePortfolio> {
           decoration: BoxDecoration(
               color: Colors.white, borderRadius: BorderRadius.circular(5)),
           margin: EdgeInsets.all(8),
-          child: Icon(Icons.arrow_back),
+          child: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+              child: const Icon(Icons.arrow_back, color: colors.primary,)),
         ),
         centerTitle: true,
         backgroundColor: colors.primary,

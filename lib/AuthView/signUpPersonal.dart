@@ -435,12 +435,12 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     switch (step) {
       case '1':
         return Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black, width: 2)),
+                border: Border.all(color: Colors.black, width: 2),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Form(
@@ -541,7 +541,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 });
                               },
                             ),
-                            Text("Service Provider"),
+                            const Text("Service Provider"),
                             //  SizedBox(width: 5,),
                             Radio<String>(
                               value: 'shop',
@@ -553,12 +553,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 });
                               },
                             ),
-                            Text("Shopkeeper")
+                            const Text("Shopkeeper")
                           ],
                         ),
                       ),
                     ),
-
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: Column(

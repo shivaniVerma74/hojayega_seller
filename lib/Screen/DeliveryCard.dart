@@ -20,7 +20,6 @@ class _DeliveryCardState extends State<DeliveryCard> {
   @override
   void initState() {
     super.initState();
-    super.initState();
     getData();
     // addWallet();
     _razorpay = Razorpay();
@@ -30,6 +29,9 @@ class _DeliveryCardState extends State<DeliveryCard> {
   }
 
   TextEditingController addMoneyCtr = TextEditingController();
+
+  var arrPrice=[500,1000,1500,2000];
+  int addMoney=0;
 
   addWallet() async {
     var headers = {
@@ -72,7 +74,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse(ApiServicves.walletTransaction));
-    request.fields.addAll({'user_id': vendorId.toString()});
+    request.fields.addAll({'user_id': '141'});
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -135,6 +137,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
     return Scaffold(
       backgroundColor: colors.appbarColor,
       appBar: AppBar(
+          foregroundColor: colors.whiteTemp,
           elevation: 0,
           centerTitle: true,
           shape: const RoundedRectangleBorder(
@@ -204,86 +207,137 @@ class _DeliveryCardState extends State<DeliveryCard> {
             // ),
             Form(
               key: _formkey,
-              child: Container(
-                height: MediaQuery.of(context).size.height / 4.5,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: colors.whiteTemp),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(top: 15, left: 30, right: 30),
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        controller: addMoneyCtr,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Fill This Field';
-                          }
-                          return null;
-                        },
-                        // keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          hintText: "Add Money",
-                          hintStyle: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          isDense: true,
-                          filled: true,
-                          fillColor: Colors.grey.shade200,
-                          focusedBorder: OutlineInputBorder(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: MediaQuery.of(context).size.height / 3.7,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),border: Border.all(color: colors.primary,width: 2),
+                      color: colors.whiteTemp),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(top: 15, left: 30, right: 30),
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          controller: addMoneyCtr,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Fill This Field';
+                            }
+                            return null;
+                          },
+
+                          // keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            hintText: "Add Money",
+                            hintStyle: const TextStyle(
+
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                            isDense: true,
+                            filled: true,
+                            fillColor: Colors.grey.shade200,
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade200)),
+                            enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide:
-                                  BorderSide(color: Colors.grey.shade200)),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey.shade200),
+                              borderSide: BorderSide(color: Colors.grey.shade200),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    InkWell(
-                      onTap: () {
-                        final form = _formkey.currentState!;
-                        if (form.validate() && addMoneyCtr.text != '0') {
-                          form.save();
-                          double amount =
-                              double.parse(addMoneyCtr.text.toString());
-                          openCheckout((amount));
-                        }
-                      },
-                      child: Container(
-                          height: 45,
-                          width: MediaQuery.of(context).size.width / 1.3,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: colors.primary),
-                          child: const Center(
-                              child: Text(
-                            "Add Money",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: colors.whiteTemp,
-                                fontSize: 19),
-                          ))),
-                    )
-                  ],
+                      const SizedBox(height: 30),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: Container(
+                          height: 30,
+                          child: ListView.builder(
+
+                            scrollDirection:
+                            Axis.horizontal,
+                            // Set the direction to horizontal
+
+                            itemCount: arrPrice.length,
+
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                child: InkWell(
+                                  onTap: (){
+                                   // print("11");
+                                    addMoney=addMoney+arrPrice[index];
+                                    setState(() {
+                                      addMoneyCtr.text=addMoney.toString();
+
+                                    });
+
+                                  },
+                                  child: Container(
+                                    width:  60,
+                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),color: colors.primary),
+                                    child: Center(
+                                      child: Text(
+                                        arrPrice[index].toString(),
+                                        style: TextStyle(color: colors.whiteTemp),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20,),
+                      InkWell(
+                        onTap: () {
+                          final form = _formkey.currentState!;
+                          if (form.validate() && addMoneyCtr.text != '0') {
+                            form.save();
+                            double amount =
+                                double.parse(addMoneyCtr.text.toString());
+                            openCheckout((amount));
+                          }
+                        },
+                        child: Container(
+                            height: 45,
+                            width: MediaQuery.of(context).size.width / 1.3,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: colors.primary),
+                            child: const Center(
+                                child: Text(
+                              "Add Money",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: colors.whiteTemp,
+                                  fontSize: 19),
+                            ))),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
             const SizedBox(
               height: 10,
             ),
-            const Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                "Wallet Transaction",
-                style: TextStyle(
-                    fontSize: 15,
-                    color: colors.blackTemp,
-                    fontWeight: FontWeight.w500),
+            Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Row(
+                children: [
+                  Text(
+                    "Wallet Transaction",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: colors.blackTemp,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ],
               ),
             ),
             SizedBox(

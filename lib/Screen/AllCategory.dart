@@ -476,9 +476,11 @@
 // }
 
 import 'dart:convert';
+import 'dart:developer';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
@@ -493,7 +495,7 @@ import 'Congratutation.dart';
 
 class AllCategory extends StatefulWidget {
   String? ShopId;
-  AllCategory({super.key, this.ShopId});
+  AllCategory({super.key, this.ShopId,});
 
   @override
   State<AllCategory> createState() => _AllCategoryState();
@@ -503,17 +505,34 @@ class _AllCategoryState extends State<AllCategory> {
   @override
   void initState() {
     super.initState();
-    getShopCategory();
-    getSubCat();
-    getChildCat();
+   getAll();
   }
+
+   List? selectedCategoryIndex;
 
   CategoryModel? categoryModel;
   List<CategoryData> categoryList1 = [];
   List<String> categoryImageList = [];
   List<String> categoryNameList = [];
 
-  String? Selectcat = "0";
+  String? Selectcat ;
+  String? parent_id = "0";
+
+  getAll() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? value = prefs.getString("selectedCategoryIndex");
+    selectedCategoryIndex = value != null?value.replaceAll('[', '') .replaceAll(']', '').split(',') .map<int>((e) { return int.parse(e); }).toList():null;
+    await getShopCategory();
+    Selectcat = selectedCategoryIndex != null ? categoryList1[selectedCategoryIndex!.first].id.toString(): "0";
+    await getSubCat();
+    await getChildCat();
+    String? s1 = selectedCategoryIndex != null ? categoryList1[selectedCategoryIndex!.first].cName : null;
+
+    prefs.setString('category', s1!);
+    prefs.setString("catId", Selectcat!);
+
+  }
+
   getShopCategory() async {
     var headers = {
       'Cookie': 'ci_session=70c618f5670ba3cd3a735fde130cab16e002a8af'
@@ -545,7 +564,7 @@ class _AllCategoryState extends State<AllCategory> {
     }
   }
 
-  String? subcatid = "0";
+  String? subcatid;
   SubCategoryModel? subCatData;
   getSubCat() async {
     var headers = {
@@ -554,9 +573,9 @@ class _AllCategoryState extends State<AllCategory> {
     var request =
         http.MultipartRequest('POST', Uri.parse(ApiServicves.getSubCategories));
     request.fields.addAll({
-      'parent_id': '2',
+      'parent_id': parent_id.toString(),
       'roll': '1',
-      'cat_id': Selectcat.toString()
+      'cat_id': Selectcat != null ?Selectcat.toString() :"0"
     });
     // request.fields.addAll({'cat_id': Selectcat.toString()});
     print("seb category parameteer ${request.fields}");
@@ -577,14 +596,14 @@ class _AllCategoryState extends State<AllCategory> {
     }
   }
 
-  String? chidcatId = "0";
+  String? chidcatId ;
   ChildCategoryModel? childCategoryModel;
   getChildCat() async {
     var headers = {
       'Cookie': 'ci_session=e456fb4275aab002e5eb6c860cc3811ebb3a9fa7'
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.productchildCategories));
-    request.fields.addAll({'sub_cat_id': subcatid.toString()});
+    request.fields.addAll({'sub_cat_id': subcatid != null?subcatid.toString(): "0"});
     request.headers.addAll(headers);
     print("===my technic=======${request.fields}===============");
     print("===my technic=======${request.url}===============");
@@ -605,6 +624,8 @@ class _AllCategoryState extends State<AllCategory> {
   GetProductCatWise? gerProductcatWise;
   List<ProductsData> productList = [];
   getProduct() async {
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? vendor_id = sharedPreferences.getString('vendor_id');
     var headers = {
       'Cookie': 'ci_session=e456fb4275aab002e5eb6c860cc3811ebb3a9fa7'
     };
@@ -613,24 +634,27 @@ class _AllCategoryState extends State<AllCategory> {
     request.fields.addAll({
       'cat_id': Selectcat.toString(),
       'sub_id': subcatid.toString(),
-      'child_id': chidcatId.toString(),
-      'vid': widget.ShopId.toString()
+      'child_id':chidcatId != null? chidcatId.toString(): "0",
+      'vid': vendor_id.toString()
     });
 
     request.headers.addAll(headers);
-    print("===my technic=======${request.fields}===============");
+    log("===my technic=======${request.fields}===============");
     print("===my technic=======${request.url}===============");
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
+      log("===my technic=======${response.statusCode}===============");
       var finalResponse = await response.stream.bytesToString();
-      productList = GetProductCatWise.fromJson(json.decode(finalResponse)).products ?? [];
+      gerProductcatWise = GetProductCatWise.fromJson(json.decode(finalResponse)) ;
+      productList = gerProductcatWise?.products ?? [];
       setState(() {});
     } else {
-      print(response.reasonPhrase);
+      print("response"+response.toString());
     }
   }
 
   int currentIndex = 0;
+
 
   @override
   Widget build(BuildContext context) {
@@ -640,16 +664,20 @@ class _AllCategoryState extends State<AllCategory> {
         floatingActionButton: InkWell(
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          // prefs.setString('category', Selectcat!);
-          // prefs.setString('sub',subcatid!);
-          // prefs.setString('child', chidcatId!);
-          print(prefs.get('category'));
+          log(prefs.get('category').toString());
+          log(prefs.get('catId').toString());
+          log(prefs.get('sunCatId').toString());
+          log("subid"+subcatid.toString());
           print(prefs.get('sub'));
           print(prefs.get('child'));
-        //  Selectcat = categoryList1[index].id;
-          //  String s1=emailController.toString();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct()));
-        },
+
+          if(Selectcat != null || Selectcat != "" || subcatid != null|| subcatid!.isNotEmpty || chidcatId != null||chidcatId!.isNotEmpty ){
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddProduct()));
+            }else{
+            Fluttertoast.showToast(msg: "Please select Categories ");
+          }
+          },
         child: Padding(
           padding: const EdgeInsets.only(bottom: 40,),
           child: Container(
@@ -676,83 +704,189 @@ class _AllCategoryState extends State<AllCategory> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Container(
-                height: 110,
+                height: 120,
                 width: MediaQuery.of(context).size.width,
-                child: ListView.builder(
+                child:
+                ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: categoryImageList.length,
                   itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () async {
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                    if (selectedCategoryIndex != null || selectedCategoryIndex!.isNotEmpty) {
+                      if (selectedCategoryIndex!.contains(index)) {
+                        return InkWell(
+                          onTap: () async {
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
 
-                        setState(() {
-                          Selectcat = categoryList1[index].id;
+                            setState(() {
+                              Selectcat = categoryList1[index].id;
 
-                          String? s1= categoryList1[index].cName;
-                          print(s1);
-                          prefs.setString('category',s1!);
+                              String? s1 = categoryList1[index].cName;
 
-                        });
-                        getSubCat();
-                      },
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  //width: MediaQuery.of(context).size.width,
-                                  width: 90,
-                                  height: 90,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: colors.primary),
-                                    image: DecorationImage(
-                                        image: NetworkImage("${ApiServicves.imageUrl}${categoryImageList[index]}"),
-                                        fit: BoxFit.fill),
-                                  ),
-                                ),
-                                Selectcat == categoryList1[index].id
-                                    ? Positioned(
-                                        top: 6,
-                                        left: 6,
-                                        child: Container(
-                                          //width: MediaQuery.of(context).size.width,
-                                          width: 20,
-                                          height: 20,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: colors.secondary,
-                                          ),
-                                          child: const Center(
-                                            child: Padding(
-                                              padding: EdgeInsets.all(2),
-                                              child: Icon(
-                                                Icons.check,
-                                                color: Colors.white,
-                                                size: 15,
+                              parent_id = categoryList1[index].serviceType;
+                              print(s1);
+                              // log(Selectcat!);
+                              prefs.setString('category', s1!);
+                              prefs.setString("catId", Selectcat!);
+                            });
+                            getSubCat();
+                          },
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: Stack(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 2),
+                                      child: Container(
+                                        //width: MediaQuery.of(context).size.width,
+                                        width: 90,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border:
+                                              Border.all(color: colors.primary),
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                  "${ApiServicves.imageUrl}${categoryImageList[index]}"),
+                                              fit: BoxFit.fill),
+                                        ),
+                                      ),
+                                    ),
+                                    Selectcat == categoryList1[index].id
+                                        ? Positioned(
+                                            top: 6,
+                                            left: 6,
+                                            child: Container(
+                                              //width: MediaQuery.of(context).size.width,
+                                              width: 20,
+                                              height: 30,
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: colors.secondary,
+                                              ),
+                                              child: const Center(
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(2),
+                                                  child: Icon(
+                                                    Icons.check,
+                                                    color: Colors.white,
+                                                    size: 15,
+                                                  ),
+                                                ),
                                               ),
                                             ),
+                                          )
+                                        : SizedBox.shrink(),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 50,
+                                child: Text(
+                                  categoryNameList[index],
+                                  style: const TextStyle(
+                                      fontSize: 14, color: colors.black54),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      } else {
+                        return SizedBox.shrink();
+                      }
+                    }
+                    else{
+                     return InkWell(
+                        onTap: () async {
+                          SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+
+                          setState(() {
+                            Selectcat = categoryList1[index].id;
+
+                            String? s1 = categoryList1[index].cName;
+
+                            parent_id = categoryList1[index].serviceType;
+                            print(s1);
+                            // log(Selectcat!);
+                            prefs.setString('category', s1!);
+                            prefs.setString("catId", Selectcat!);
+                          });
+                          getSubCat();
+                        },
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: Stack(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 2),
+                                    child: Container(
+                                      //width: MediaQuery.of(context).size.width,
+                                      width: 90,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(8),
+                                        border:
+                                        Border.all(color: colors.primary),
+                                        image: DecorationImage(
+                                            image: NetworkImage(
+                                                "${ApiServicves.imageUrl}${categoryImageList[index]}"),
+                                            fit: BoxFit.fill),
+                                      ),
+                                    ),
+                                  ),
+                                  Selectcat == categoryList1[index].id
+                                      ? Positioned(
+                                    top: 6,
+                                    left: 6,
+                                    child: Container(
+                                      //width: MediaQuery.of(context).size.width,
+                                      width: 20,
+                                      height: 30,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: colors.secondary,
+                                      ),
+                                      child: const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(2),
+                                          child: Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 15,
                                           ),
                                         ),
-                                      )
-                                    : SizedBox.shrink(),
-                              ],
+                                      ),
+                                    ),
+                                  )
+                                      : SizedBox.shrink(),
+                                ],
+                              ),
                             ),
-                          ),
-                          Text(
-                            categoryNameList[index],
-                            style: TextStyle(fontSize: 14, color: colors.black54),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        ],
-                      ),
-                    );
+                            Container(
+                              width: 50,
+                              child: Text(
+                                categoryNameList[index],
+                                style: const TextStyle(
+                                    fontSize: 14, color: colors.black54),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }
                   },
                 ),
               ),
@@ -830,17 +964,12 @@ class _AllCategoryState extends State<AllCategory> {
                                           onTap: () async {
                                             SharedPreferences prefs = await SharedPreferences.getInstance();
                                             setState(()  {
-                                              subcatid =
-                                                  subCatData?.data?[index].id;
-
-
-                                              // prefs.setString('category', Selectcat!);
-                                              String? s1=subCatData?.data?[index].cName;
+                                              subcatid = subCatData?.data?[index].id;
+                                              prefs.setString('subCatId', subcatid!);
+                                              String? s1 = subCatData?.data?[index].cName;
                                               print(s1);
                                               prefs.setString('sub',s1!);
                                               // prefs.setString('child', chidcatId!);
-
-
                                             });
                                             getChildCat();
                                           },
@@ -906,13 +1035,13 @@ class _AllCategoryState extends State<AllCategory> {
                                                                     ),
                                                                   ),
                                                                 )
-                                                              : SizedBox
+                                                              : const SizedBox
                                                                   .shrink(),
                                                         ],
                                                       ),
                                                 Text(
                                                   "${subCatData?.data?[index].cName}",
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.w500),
                                                 ),
@@ -920,13 +1049,11 @@ class _AllCategoryState extends State<AllCategory> {
                                             ),
                                           ),
                                         );
-                                      })
-                                  : Container(
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              2.5,
-                                      child: Center(
-                                          child: Text("Data Not Found"))),
+                                      }):Container(
+                                      height: MediaQuery.of(context).size.height /2.5,
+                                      child: const Center(child: Text("Data Not Found"),
+                                      ),
+                              ),
                             ),
                             Container(
                               width: 100,
@@ -934,7 +1061,7 @@ class _AllCategoryState extends State<AllCategory> {
                                   borderRadius: BorderRadius.circular(5)),
                               child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0XFF112c48),
+                                    backgroundColor: const Color(0XFF112c48),
                                     // shape: RoundedRectangleBorder(),
                                   ),
                                   onPressed: () {},
@@ -958,10 +1085,10 @@ class _AllCategoryState extends State<AllCategory> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    children: [
+                                    children: const [
                                       Padding(
-                                        padding: const EdgeInsets.all(5),
-                                        child: const Text(
+                                        padding: EdgeInsets.all(5),
+                                        child: Text(
                                           'Child category',
                                           style: TextStyle(
                                               fontSize: 15,
@@ -979,26 +1106,19 @@ class _AllCategoryState extends State<AllCategory> {
                                           ? ListView.builder(
                                               shrinkWrap: true,
                                               scrollDirection: Axis.horizontal,
-                                              itemCount: childCategoryModel
-                                                      ?.data?.length ??
-                                                  0,
+                                              itemCount: childCategoryModel?.data?.length ?? 0,
                                               itemBuilder: (context, index) {
                                                 return InkWell(
                                                   onTap: () async {
                                                     SharedPreferences prefs = await SharedPreferences.getInstance();
                                                     setState(() {
-                                                      chidcatId =
-                                                          childCategoryModel
-                                                              ?.data?[index].id;
-
-                                                      String? s1=childCategoryModel
-                                                          ?.data?[index].cName;
+                                                      chidcatId = childCategoryModel?.data?[index].id;
+                                                      String? s1 = childCategoryModel?.data?[index].cName;
+                                                      prefs.setString("childCatId", chidcatId!);
                                                       print(s1);
                                                       print("1111111111SSSSSSSSSSS@@2222222222");
                                                       prefs.setString('child',s1!);
-
                                                     });
-
                                                     getProduct();
                                                   },
                                                   child: Padding(
@@ -1106,12 +1226,12 @@ class _AllCategoryState extends State<AllCategory> {
                                                                 });
                                                               },
                                                             ),
-                                                            items: productList.map((item) => Padding(
+                                                            items: productList[index].otherImage!.map((item) => Padding(
                                                                     padding: const EdgeInsets.only(left: 5, right: 5),
                                                                     child: Container(
                                                                       width: MediaQuery.of(context).size.width,
                                                                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),
-                                                                          image: DecorationImage(image: NetworkImage("$item"), fit: BoxFit.fill),
+                                                                          image: DecorationImage(image: NetworkImage("${item}"), fit: BoxFit.fill),
                                                                       ),
                                                                     ),
                                                                   ),
@@ -1128,7 +1248,7 @@ class _AllCategoryState extends State<AllCategory> {
                                                             child: Center(
                                                               child: ListView.separated(
                                                                 shrinkWrap: true,
-                                                                itemCount: productList[index].productImage?.length ?? 0,
+                                                                itemCount: productList[index].otherImage?.length ?? 0,
                                                                 scrollDirection: Axis.horizontal,
                                                                 itemBuilder:(context, index) {
                                                                   return Container(

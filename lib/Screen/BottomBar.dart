@@ -46,7 +46,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
       _child = Container();
     }
     super.initState();
-
     getData();
     // if (widget.dIndex != null) {
     //   selectedIndex = widget.dIndex!;

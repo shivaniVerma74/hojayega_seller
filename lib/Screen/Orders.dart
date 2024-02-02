@@ -32,21 +32,23 @@ class _OrdersState extends State<Orders> {
     return getVendorOrder();
   }
 
+
+
   GetVendorOrderModel? vendorOrderModel;
   getVendorOrder() async {
-    print("wokirngggg");
     var headers = {
       'Cookie': 'ci_session=6430902524c1703efd1eeb4c66d3537c73dbe375'
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorOrders));
     request.fields.addAll({'user_id': vendorId.toString(), 'status': selected == 1 ? "3" : ""});
-    print("parameterr ${request.fields}");
+    print("get orderss parameterr ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = GetVendorOrderModel.fromJson(json.decode(finalResponse));
       print("get vendor order responsee $finalResult $finalResponse");
+
       setState(() {
         vendorOrderModel = finalResult;
         setState(() {});
@@ -78,6 +80,7 @@ class _OrdersState extends State<Orders> {
         Fluttertoast.showToast(msg: "status updated successfully");
         setState(() {
         });
+        getVendorOrder();
       } else {
         Fluttertoast.showToast(msg: jsonresponse["message"]);
       }
@@ -361,7 +364,7 @@ class _OrdersState extends State<Orders> {
                                       width: 25,
                                       height: 25,
                                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,), color: Colors.white),
-                                      child: Image.network(vendorOrderModel?.orders?[i].orderItems?[0].productImage??"", color: Colors.red,)),
+                                      child: Image.network(vendorOrderModel?.orders?[i].orderItems?[0].productImage??"", fit: BoxFit.fill,)),
                                 ),
                                 const SizedBox(width: 5),
                                 item?.productName == "" || item?.productName == null ?
@@ -382,7 +385,7 @@ class _OrdersState extends State<Orders> {
                                 const SizedBox(
                                   width: 40,
                                 ),
-                                Text("${item?.sellingPrice}rs", style: const TextStyle(color: colors.primary),)
+                                Text("${int.parse(item?.qty.toString() ?? "0")* double.parse(item?.productPrice.toString()??"0.0")}rs", style: const TextStyle(color: colors.primary),)
                               ],
                             )
                           ],
@@ -432,7 +435,7 @@ class _OrdersState extends State<Orders> {
             height:
             MediaQuery.of(context).size.height/2.5,
             child: const Center(
-                child: Text("Data Not Found"),
+                child: Text("Orders Not Found", style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700,),),
             ),
         ),
       ],
@@ -541,7 +544,7 @@ class _OrdersState extends State<Orders> {
           height:
           MediaQuery.of(context).size.height/2.5,
           child: const Center(
-            child: Text("Data Not Found"),
+            child: Text("Data Not Found", style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700,),),
           ),
         ),
       ],

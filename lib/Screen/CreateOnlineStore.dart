@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Helper/api.path.dart';
 import 'package:hojayega_seller/Screen/createPortfolio.dart';
 import 'dart:io';
@@ -35,10 +37,11 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
   getData() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
      roll_id = preferences.getString('roll');
-     print("===============$roll_id===========");
+     print("===========hhh====$roll_id===========");
   }
   ShopModel? shopModel;
   List checkboxlist = [];
+  List categoriesSelectedValues = [];
   shopType() async {
     var headers = {
       'Cookie': 'ci_session=33ec14b9ed18ebb12220d713f637bbb770e99aaa'
@@ -83,8 +86,12 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = CategoryModel.fromJson(json.decode(finalResponse));
       print("categoryyyy responsee $finalResult");
+      print("categoryyyy responsee $finalResponse");
       setState(() {
         categoryModel = finalResult;
+        for(var i=0;i< (categoryModel?.data?.length ??0);i++){
+          categoriesSelectedValues.add(false);
+        }
       });
     } else {
       print(response.reasonPhrase);
@@ -359,7 +366,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 3,
                                     mainAxisSpacing: 3,
-                                    childAspectRatio: 2 / 2.4
+                                    childAspectRatio: 2 / 2.67
                                 ),
                                 itemCount: categoryModel!.data!.length,
                                 itemBuilder: (BuildContext context, int index) {
@@ -369,7 +376,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                       GestureDetector(
                                         onTap: () {
                                           setState(() {
-                                            selectedItems[index] = !selectedItems[index];
+                                            categoriesSelectedValues[index] = !categoriesSelectedValues[index];
                                           });
                                         },
                                         child: Column(
@@ -379,14 +386,15 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                 child: Image.asset("assets/images/placeholder.png")
                                             ):
                                             Container(
+                                              margin: const EdgeInsets.all(4),
                                                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),),
                                                 child: Image.network("https://developmentalphawizz.com/hojayega/${categoryModel!.data![index].img.toString()}")
                                             ),
-                                            Text(categoryModel!.data![index].cName.toString(),)
+                                            Flexible(child: Text(categoryModel!.data![index].cName.toString(),softWrap: true,))
                                           ],
                                         ),
                                       ),
-                                      if (selectedItems[index])
+                                      if (categoriesSelectedValues[index])
                                         Container(
                                           margin: const EdgeInsets.all(10),
                                           //  padding: EdgeInsets.all(2),
@@ -405,7 +413,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 },
                               )
                           ),
-                         roll_id == 2 ?
+                         roll_id == "2" ?
                          Column(
                            children: [
                              Row(
@@ -575,22 +583,51 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                          ): SizedBox.shrink(),
                           SizedBox(height: 20,),
                           InkWell(
-                            onTap: () {
-                              if(roll_id == 1) {
-                              //  print(getData());
-                                Navigator.push(
-                                  context, MaterialPageRoute(
-                                  builder: (context) => AllCategory(),
-                                ),
-                                );
-                              } else {
-                                print(getData());
-                                Navigator.push(
-                                  context, MaterialPageRoute(
-                                  builder: (context) => const CreatePortfolio(),
-                                ),
-                                );
+                            onTap: ()  async {
+                              List selectedCategoryIndex = [];
+                              // selectedCategoryIndex.add(
+                              //     categoriesSelectedValues.where((element) => element==true)
+                              // );
+                             //
+                             SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                             if(checkboxlist.contains(true)) {
+                               if(categoriesSelectedValues.contains(true)){
+                                 for(var i =0; i< categoriesSelectedValues.length;i++){
+                                   if(categoriesSelectedValues[i] == true){
+                                     selectedCategoryIndex.add(i);
+                                   }
+
+                                 }
+                                 prefs.setString("selectedCategoryIndex", selectedCategoryIndex.toString());
+                                 log("selectedindex $selectedCategoryIndex");
+
+                                  if (roll_id == "1") {
+                                     // print(getData());
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AllCategory(),
+                                      ),
+                                    );
+                                  } else {
+                                    print(getData());
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CreatePortfolio(),
+                                      ),
+                                    );
+                                  }
+                                }
+                               else{
+                                 Fluttertoast.showToast(msg: "Please Select Category");
+                               }
                               }
+                             else{
+                               Fluttertoast.showToast(msg: "Please Select Shop Type");
+                             }
                             },
                             child: Center(
                               child: Card(

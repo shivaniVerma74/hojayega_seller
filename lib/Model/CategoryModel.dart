@@ -93,7 +93,7 @@ class CategoryData {
     _icon = json['icon'];
     _subTitle = json['sub_title'];
     _description = json['description'];
-    _img = json['img'];
+    _img = json['image'];
     _otherImg = json['other_img'];
     _type = json['type'];
     _pId = json['p_id'];
@@ -153,7 +153,7 @@ class CategoryData {
     map['icon'] = _icon;
     map['sub_title'] = _subTitle;
     map['description'] = _description;
-    map['img'] = _img;
+    map['image'] = _img;
     map['other_img'] = _otherImg;
     map['type'] = _type;
     map['p_id'] = _pId;

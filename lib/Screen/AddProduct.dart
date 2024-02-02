@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -92,7 +93,7 @@ class _AddProductState extends State<AddProduct> {
 
   CategoryModel? getCatModel;
   getCategory() async {
-    // SharedPreferences preferences = await SharedPreferences.getInstance();
+    //SharedPreferences preferences = await SharedPreferences.getInstance();
     var headers = {
       'Cookie': 'ci_session=ea5681bb95a83750e0ee17de5e4aa2dca97184ef'
     };
@@ -125,8 +126,6 @@ class _AddProductState extends State<AddProduct> {
       for (int i = 0; i < jsonResponse.data!.length; i++) {
         print("${jsonResponse.data?[i].id}");
         category_id = jsonResponse.data?[i].id ?? "";
-
-
       }
       setState(() {
         getCatModel = jsonResponse;
@@ -248,6 +247,13 @@ class _AddProductState extends State<AddProduct> {
   }
 
   addProductApi() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    category_Id = prefs.getString("catId");
+    subCatId = prefs.getString("subCatId");
+    childCatId = prefs.getString("childCatId");
+    print("catid $category_Id");
+    print("subcatid $subCatId");
+    print("childcatid $childCatId");
     var headers = {
       'Cookie': 'ci_session=2844e71eb13a14bad7faba0b8d00d5626590d23e'
     };
@@ -287,7 +293,7 @@ class _AddProductState extends State<AddProduct> {
       setState(() {
         isLodding = false;
       });
-      print(response.reasonPhrase);
+      print("rasponse"+response.reasonPhrase.toString());
     }
   }
 

@@ -22,6 +22,9 @@ class _OrderDetailsState extends State<OrderDetails> {
     // TODO: implement initState
     super.initState();
     getTimeSlot();
+    deliverychargesController.text = widget.model?.deliveryCharge ?? "";
+    disController.text = widget.model?.discount ?? "";
+    totalController.text = "${int.parse(widget.model?.orderItems.first.qty.toString() ?? "0") * double.parse(widget.model?.orderItems.first.productPrice.toString() ?? "0.0") ?? ""}";
   }
 
   String? vendorId;
@@ -60,11 +63,12 @@ class _OrderDetailsState extends State<OrderDetails> {
     request.fields.addAll({
       'user_id': vendorId.toString(),
       'type': '1',
-      'product_id': '',
-      'qty': '',
-      'price': '',
+      'product_id': widget.model?.orderItems.join(",")?? "",
+      'qty': widget.model?.orderItems.first.qty.toString() ?? "",
+      'price': widget.model?.orderItems.first.productPrice.toString() ?? "",
       'sub_total': ''
     });
+    print('update order itemsss para ${request.fields}');
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -84,14 +88,15 @@ class _OrderDetailsState extends State<OrderDetails> {
         http.MultipartRequest('POST', Uri.parse(ApiServicves.updateOrders));
     request.fields.addAll({
       'user_id': vendorId.toString(),
-      'order_id': '330',
+      'order_id': widget.model?.orderId.toString() ?? "",
       'sub_total': '1',
-      'discount': '1',
+      'discount': disController.text,
       'promo_code': '',
       'final_total': '10',
-      'vehicle_type': '1',
-      'total': '100'
+      'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
+      'total': widget.model?.total.toString() ?? ""
     });
+    print('update order para ${request.fields}');
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -154,7 +159,24 @@ class _OrderDetailsState extends State<OrderDetails> {
     }
   }
 
+  var vehicleItem = [
+    'Bike',
+    'Electric',
+    'Car',
+    'Taxi',
+    'Truck',
+  ];
+  var selectBikeType;
+  var bikeType = [
+    'Electric',
+    'Non-Electric',
+  ];
+
+  String? selectwhehicle;
+  String? selectedVehicle;
+
   getCurrentOrders() {
+    print("==nwennenenen=============${widget.model?.orderItems?.first.productImage}===========");
     return Column(
       children: [
         // ListView.builder(
@@ -340,10 +362,9 @@ class _OrderDetailsState extends State<OrderDetails> {
 
                 ListView.builder(
                   shrinkWrap: true,
-                  itemCount: 3,
+                  itemCount:widget.model?.orderItems.length ?? 0,
                   itemBuilder: (c, i) {
-                    print(
-                        "======${rows[i][0].toString()}=======u_R${i + 1}=======");
+                    print("======${rows[i][0].toString()}=======u_R${i + 1}=======");
                     return Padding(
                       padding: const EdgeInsets.only(left: 5, right: 2),
                       child: Column(
@@ -365,7 +386,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                             ),
                                             color: Colors.white),
                                         child: Image.network(
-                                            "${widget.model?.orderItems?.first.productImage}")),
+                                            "${widget.model?.orderItems[i].productImage}", fit: BoxFit.fill,)),
                                   ),
                                   const SizedBox(
                                     width: 5,
@@ -373,7 +394,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                   Container(
                                     width: 60,
                                     child: Text(
-                                      "${widget.model?.orderItems?.first.productName}",
+                                      "${widget.model?.orderItems[i].productName}",
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -384,8 +405,8 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                               Text(
                                 rows[i][0].toString() == 'u_R${i + 1}'
-                                    ? "1"
-                                    : "${rows[i][0]}rs",
+                                    ? "${widget.model?.orderItems[i].qty}"
+                                    : rows[i][0],
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(color: colors.primary),
                               ),
@@ -395,7 +416,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                               Text(
                                 rows[i][1].toString() == 'p_R${i + 1}'
-                                    ? "2"
+                                    ? "${widget.model?.orderItems[i].productPrice}"
                                     : "${rows[i][1]}rs",
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(color: colors.primary),
@@ -405,7 +426,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                               Text(
                                 rows[i][2].toString() == 's_R${i + 1}'
-                                    ? "3"
+                                    ? "${int.parse(widget.model?.orderItems[i].qty.toString() ?? "0") *double.parse(widget.model?.orderItems[i].productPrice.toString() ?? "0.0")}"
                                     : "${rows[i][2]}rs",
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(color: colors.primary),
@@ -583,8 +604,8 @@ class _OrderDetailsState extends State<OrderDetails> {
                         child: Image.asset("assets/images/edit.png"),
                       ),
                       Text(
-                        "Dis = ${disController.text}rs",
-                        style: TextStyle(color: colors.primary),
+                        "Discount = ${disController.text}rs",
+                        style: const TextStyle(color: colors.primary),
                       ),
                     ],
                   ),
@@ -626,7 +647,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       ),
                       Text(
                         "Delivery Charge as per Km = ${deliverychargesController.text}rs",
-                        style: TextStyle(color: colors.primary),
+                        style: const TextStyle(color: colors.primary),
                       ),
                     ],
                   ),
@@ -645,8 +666,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                 //     ],
                 //   ),
                 // ),
-
-                SizedBox(
+                const SizedBox(
                   height: 7,
                 ),
                 Row(
@@ -661,12 +681,11 @@ class _OrderDetailsState extends State<OrderDetails> {
                         width: 110,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(0),
-                            color: Color(0xffE5CB24)),
-                        child: const Center(
+                            color: const Color(0xffE5CB24)),
+                        child:  Center(
                           child: Text(
-                            "Total = 103rs",
-                            style:
-                                TextStyle(fontSize: 15, color: colors.primary),
+                            "Total = ${widget.model?.total}rs",
+                            style: const TextStyle(fontSize: 15, color: colors.primary),
                           ),
                         ),
                       ),
@@ -676,238 +695,310 @@ class _OrderDetailsState extends State<OrderDetails> {
                 const SizedBox(
                   height: 10,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: colors.primary),
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        child: Card(
-                          color: colors.primary,
-                          elevation: 2,
-                          child: DropdownButtonFormField<dynamic>(
-                            value: selectTimeslot,
-                            // icon:  Icon(Icons.keyboard_arrow_down_sharp, color: colors.whiteTemp,),
-                            onChanged: (dynamic newValue) {
-                              setState(() {
-                                selectTimeslot = newValue;
-                                timefrom =
-                                    "From ${newValue.fromTime.toString()} To ${newValue.toTime.toString()}";
-                                print(
-                                    "===my technic=======$timefrom===============");
-                              });
-                            },
-                            items: timeSlot.map((dynamic orderitem) {
-                              return DropdownMenuItem(
-                                value: orderitem,
-                                child: SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width / 1.5,
-                                    child: Text(
-                                      "${orderitem.fromTime.toString()} To ${orderitem.toTime.toString()}",
-                                      style: const TextStyle(
-                                          color: colors.secondary),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    ),
-                                ),
-                              );
-                            }).toList(),
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Select Time Slot',
-                              hintStyle: TextStyle(color: Colors.white, fontSize: 14),
-                              filled: true,
-                            ),
-                          ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Container(
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+                    width: MediaQuery.of(context).size.width/1.2,
+                    child: Card(
+                      color: colors.primary,
+                      elevation: 2,
+                      child: DropdownButtonFormField<dynamic>(
+                        value: selectTimeslot,
+                        icon:  const Icon(Icons.keyboard_arrow_down_sharp, color: colors.whiteTemp,),
+                        onChanged: (dynamic newValue) {
+                          setState(() {
+                            selectTimeslot = newValue;
+                            timefrom="From ${newValue.fromTime.toString()} To ${newValue.toTime.toString()}";
+                            print("===my technic=======$timefrom===============");
+                          });
+                        },
+                        items: timeSlot.map((dynamic orderitem) {
+                          return DropdownMenuItem(
+                            value:orderitem,
+                            child: SizedBox(
+                                width: MediaQuery.of(context).size.width/1.5,
+                                child: Text("From ${orderitem.fromTime.toString()} To ${orderitem.toTime.toString()}", style: TextStyle(color: colors.secondary),overflow: TextOverflow.ellipsis,maxLines: 1,)),
+                          );
+                        }).toList(),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Select Time Slot',
+                          hintStyle: TextStyle(color: Colors.white),
+                          filled: true,
                         ),
                       ),
-                      // Row(
-                      //   children: [
-                      //     Column(
-                      //       crossAxisAlignment: CrossAxisAlignment.start,
-                      //       children: const [
-                      //         Text("Time", style: TextStyle(
-                      //             fontSize: 15,
-                      //             color: colors.primary,
-                      //             fontWeight: FontWeight.w600)),
-                      //         Text("Vehicle Type", style: TextStyle(
-                      //             fontSize: 15,
-                      //             color: colors.primary,
-                      //             fontWeight: FontWeight.w600)),
-                      //       ],
-                      //     ),
-                      //     SizedBox(width: 176,),
-                      //     // InkWell(
-                      //     //   onTap: () {
-                      //     //     // rejectOrders(context);
-                      //     //   },
-                      //     //   child: Container(
-                      //     //     height: 25,
-                      //     //     width: 60,
-                      //     //     decoration: BoxDecoration(
-                      //     //         borderRadius: BorderRadius.circular(5),
-                      //     //         color: colors.primary),
-                      //     //     child: const Center(
-                      //     //       child: Text(
-                      //     //         "Edit",
-                      //     //         style: TextStyle(
-                      //     //             fontSize: 15, color: colors.whiteTemp),
-                      //     //       ),
-                      //     //     ),
-                      //     //   ),
-                      //     // ),
-                      //     // const SizedBox(
-                      //     //   width: 6,
-                      //     // ),
-                      //     InkWell(
-                      //       onTap: () {
-                      //         // acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
-                      //         setState(() {});
-                      //         Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails()),
-                      //         );
-                      //       },
-                      //       child: Container(
-                      //         height: 25,
-                      //         width: 60,
-                      //         decoration: BoxDecoration(
-                      //             borderRadius: BorderRadius.circular(5),
-                      //             color: colors.secondary),
-                      //         child: const Center(
-                      //           child: Text(
-                      //             "Send", style: TextStyle(
-                      //               fontSize: 15, color: colors.whiteTemp),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: colors.primary),
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        child: Card(
-                          color: colors.primary,
-                          elevation: 2,
-                          child: DropdownButtonFormField<dynamic>(
-                            value: selectTimeslot,
-                            // icon:  Icon(Icons.keyboard_arrow_down_sharp, color: colors.whiteTemp,),
-                            onChanged: (dynamic newValue) {
-                              setState(() {
-                                selectTimeslot = newValue;
-                                timefrom =
-                                "From ${newValue.fromTime.toString()} To ${newValue.toTime.toString()}";
-                                print(
-                                    "===my technic=======$timefrom===============");
-                              });
-                            },
-                            items: timeSlot.map((dynamic orderitem) {
-                              return DropdownMenuItem(
-                                value: orderitem,
-                                child: SizedBox(
-                                    width:
-                                    MediaQuery.of(context).size.width / 1.5,
-                                    child: Text(
-                                      "${orderitem.fromTime.toString()} To ${orderitem.toTime.toString()}",
-                                      style: const TextStyle(
-                                          color: colors.secondary),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    )),
-                              );
-                            }).toList(),
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Select Vehicle',
-                              hintStyle: TextStyle(color: Colors.white, fontSize: 14),
-                              filled: true,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Row(
-                      //   children: [
-                      //     Column(
-                      //       crossAxisAlignment: CrossAxisAlignment.start,
-                      //       children: const [
-                      //         Text("Time", style: TextStyle(
-                      //             fontSize: 15,
-                      //             color: colors.primary,
-                      //             fontWeight: FontWeight.w600)),
-                      //         Text("Vehicle Type", style: TextStyle(
-                      //             fontSize: 15,
-                      //             color: colors.primary,
-                      //             fontWeight: FontWeight.w600)),
-                      //       ],
-                      //     ),
-                      //     SizedBox(width: 176,),
-                      //     // InkWell(
-                      //     //   onTap: () {
-                      //     //     // rejectOrders(context);
-                      //     //   },
-                      //     //   child: Container(
-                      //     //     height: 25,
-                      //     //     width: 60,
-                      //     //     decoration: BoxDecoration(
-                      //     //         borderRadius: BorderRadius.circular(5),
-                      //     //         color: colors.primary),
-                      //     //     child: const Center(
-                      //     //       child: Text(
-                      //     //         "Edit",
-                      //     //         style: TextStyle(
-                      //     //             fontSize: 15, color: colors.whiteTemp),
-                      //     //       ),
-                      //     //     ),
-                      //     //   ),
-                      //     // ),
-                      //     // const SizedBox(
-                      //     //   width: 6,
-                      //     // ),
-                      //     InkWell(
-                      //       onTap: () {
-                      //         // acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
-                      //         setState(() {});
-                      //         Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails()),
-                      //         );
-                      //       },
-                      //       child: Container(
-                      //         height: 25,
-                      //         width: 60,
-                      //         decoration: BoxDecoration(
-                      //             borderRadius: BorderRadius.circular(5),
-                      //             color: colors.secondary),
-                      //         child: const Center(
-                      //           child: Text(
-                      //             "Send", style: TextStyle(
-                      //               fontSize: 15, color: colors.whiteTemp),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                    ),
-                  ],
+                  ),
                 ),
+                SizedBox(height: 5,),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: colors.primary),
+                    width: MediaQuery.of(context).size.width / 1.2,
+                    child: Card(
+                      color: colors.primary,
+                      elevation: 2,
+                      child: DropdownButtonFormField<String>(
+                        value: selectedVehicle,
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down_sharp,
+                          color: colors.whiteTemp,
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedVehicle = newValue!;
+                          });
+                        },
+                        items: vehicleItem.map((String orderitem) {
+                          return DropdownMenuItem(
+                            value: orderitem,
+                            child: Text(
+                              orderitem.toString(),
+                              style: TextStyle(color: colors.secondary),
+                            ),
+                          );
+                        }).toList(),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Select Vehicle Type',
+                          hintStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     Padding(
+                //       padding: const EdgeInsets.only(left: 5),
+                //       child: Container(
+                //         height: 49,
+                //         decoration: BoxDecoration(
+                //             borderRadius: BorderRadius.circular(10),
+                //             color: colors.primary),
+                //         width: MediaQuery.of(context).size.width / 2.5,
+                //         child: Card(
+                //           color: colors.primary,
+                //           elevation: 2,
+                //           child: DropdownButtonFormField<dynamic>(
+                //             value: selectTimeslot,
+                //             // icon:  Icon(Icons.keyboard_arrow_down_sharp, color: colors.whiteTemp,),
+                //             onChanged: (dynamic newValue) {
+                //               setState(() {
+                //                 selectTimeslot = newValue;
+                //                 timefrom = "From ${newValue.fromTime.toString()} To ${newValue.toTime.toString()}";
+                //               });
+                //             },
+                //             items: timeSlot.map((dynamic orderitem) {
+                //               return DropdownMenuItem(
+                //                 value: orderitem,
+                //                 child: SizedBox(
+                //                     width: MediaQuery.of(context).size.width / 1.5,
+                //                     child: Text("${orderitem.fromTime.toString()} To ${orderitem.toTime.toString()}",
+                //                       style: const TextStyle(
+                //                           color: colors.secondary),
+                //                       overflow: TextOverflow.ellipsis,
+                //                       maxLines: 1,
+                //                     ),
+                //                 ),
+                //               );
+                //             }).toList(),
+                //             decoration: const InputDecoration(
+                //               border: InputBorder.none,
+                //               hintText: 'Select Time Slot',
+                //               hintStyle: TextStyle(color: Colors.white, fontSize: 14),
+                //               filled: true,
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //       // Row(
+                //       //   children: [
+                //       //     Column(
+                //       //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       //       children: const [
+                //       //         Text("Time", style: TextStyle(
+                //       //             fontSize: 15,
+                //       //             color: colors.primary,
+                //       //             fontWeight: FontWeight.w600)),
+                //       //         Text("Vehicle Type", style: TextStyle(
+                //       //             fontSize: 15,
+                //       //             color: colors.primary,
+                //       //             fontWeight: FontWeight.w600)),
+                //       //       ],
+                //       //     ),
+                //       //     SizedBox(width: 176,),
+                //       //     // InkWell(
+                //       //     //   onTap: () {
+                //       //     //     // rejectOrders(context);
+                //       //     //   },
+                //       //     //   child: Container(
+                //       //     //     height: 25,
+                //       //     //     width: 60,
+                //       //     //     decoration: BoxDecoration(
+                //       //     //         borderRadius: BorderRadius.circular(5),
+                //       //     //         color: colors.primary),
+                //       //     //     child: const Center(
+                //       //     //       child: Text(
+                //       //     //         "Edit",
+                //       //     //         style: TextStyle(
+                //       //     //             fontSize: 15, color: colors.whiteTemp),
+                //       //     //       ),
+                //       //     //     ),
+                //       //     //   ),
+                //       //     // ),
+                //       //     // const SizedBox(
+                //       //     //   width: 6,
+                //       //     // ),
+                //       //     InkWell(
+                //       //       onTap: () {
+                //       //         // acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
+                //       //         setState(() {});
+                //       //         Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails()),
+                //       //         );
+                //       //       },
+                //       //       child: Container(
+                //       //         height: 25,
+                //       //         width: 60,
+                //       //         decoration: BoxDecoration(
+                //       //             borderRadius: BorderRadius.circular(5),
+                //       //             color: colors.secondary),
+                //       //         child: const Center(
+                //       //           child: Text(
+                //       //             "Send", style: TextStyle(
+                //       //               fontSize: 15, color: colors.whiteTemp),
+                //       //           ),
+                //       //         ),
+                //       //       ),
+                //       //     ),
+                //       //   ],
+                //       // ),
+                //     ),
+                //     Padding(
+                //       padding: const EdgeInsets.only(left: 5),
+                //       child: Container(
+                //         height: 40,
+                //         decoration: BoxDecoration(
+                //             borderRadius: BorderRadius.circular(10),
+                //             color: colors.primary),
+                //         width: MediaQuery.of(context).size.width / 2.5,
+                //         child: Card(
+                //           color: colors.primary,
+                //           elevation: 2,
+                //           child: DropdownButtonFormField<dynamic>(
+                //             value: selectTimeslot,
+                //             // icon:  Icon(Icons.keyboard_arrow_down_sharp, color: colors.whiteTemp,),
+                //             onChanged: (dynamic newValue) {
+                //               setState(() {
+                //                 selectTimeslot = newValue;
+                //                 timefrom =
+                //                 "From ${newValue.fromTime.toString()} To ${newValue.toTime.toString()}";
+                //                 print(
+                //                     "===my technic=======$timefrom===============");
+                //               });
+                //             },
+                //             items: timeSlot.map((dynamic orderitem) {
+                //               return DropdownMenuItem(
+                //                 value: orderitem,
+                //                 child: SizedBox(
+                //                     width:
+                //                     MediaQuery.of(context).size.width / 1.5,
+                //                     child: Text(
+                //                       "${orderitem.fromTime.toString()} To ${orderitem.toTime.toString()}",
+                //                       style: const TextStyle(
+                //                           color: colors.secondary),
+                //                       overflow: TextOverflow.ellipsis,
+                //                       maxLines: 1,
+                //                     )),
+                //               );
+                //             }).toList(),
+                //             decoration: const InputDecoration(
+                //               border: InputBorder.none,
+                //               hintText: 'Select Vehicle',
+                //               hintStyle: TextStyle(color: Colors.white, fontSize: 14),
+                //               filled: true,
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //       // Row(
+                //       //   children: [
+                //       //     Column(
+                //       //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       //       children: const [
+                //       //         Text("Time", style: TextStyle(
+                //       //             fontSize: 15,
+                //       //             color: colors.primary,
+                //       //             fontWeight: FontWeight.w600)),
+                //       //         Text("Vehicle Type", style: TextStyle(
+                //       //             fontSize: 15,
+                //       //             color: colors.primary,
+                //       //             fontWeight: FontWeight.w600)),
+                //       //       ],
+                //       //     ),
+                //       //     SizedBox(width: 176,),
+                //       //     // InkWell(
+                //       //     //   onTap: () {
+                //       //     //     // rejectOrders(context);
+                //       //     //   },
+                //       //     //   child: Container(
+                //       //     //     height: 25,
+                //       //     //     width: 60,
+                //       //     //     decoration: BoxDecoration(
+                //       //     //         borderRadius: BorderRadius.circular(5),
+                //       //     //         color: colors.primary),
+                //       //     //     child: const Center(
+                //       //     //       child: Text(
+                //       //     //         "Edit",
+                //       //     //         style: TextStyle(
+                //       //     //             fontSize: 15, color: colors.whiteTemp),
+                //       //     //       ),
+                //       //     //     ),
+                //       //     //   ),
+                //       //     // ),
+                //       //     // const SizedBox(
+                //       //     //   width: 6,
+                //       //     // ),
+                //       //     InkWell(
+                //       //       onTap: () {
+                //       //         // acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
+                //       //         setState(() {});
+                //       //         Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails()),
+                //       //         );
+                //       //       },
+                //       //       child: Container(
+                //       //         height: 25,
+                //       //         width: 60,
+                //       //         decoration: BoxDecoration(
+                //       //             borderRadius: BorderRadius.circular(5),
+                //       //             color: colors.secondary),
+                //       //         child: const Center(
+                //       //           child: Text(
+                //       //             "Send", style: TextStyle(
+                //       //               fontSize: 15, color: colors.whiteTemp),
+                //       //           ),
+                //       //         ),
+                //       //       ),
+                //       //     ),
+                //       //   ],
+                //       // ),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 20,),
                 Center(
                   child: InkWell(
                         onTap: () {
                           // acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
                           setState(() {});
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails()),
-                          );
+                         updateOrder();
                         },
                         child: Container(
                           height: 40,
@@ -940,7 +1031,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Edit $fieldName"),
+          title: Text(fieldName),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
@@ -962,7 +1053,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                 });
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -988,17 +1079,17 @@ class _OrderDetailsState extends State<OrderDetails> {
                 TextField(
                   controller: unitController,
                   keyboardType: TextInputType.text,
-                  decoration: InputDecoration(labelText: "Unit"),
+                  decoration: const InputDecoration(labelText: "Unit"),
                 ),
                 TextField(
                   controller: productPriceController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: "Product Price"),
+                  decoration: const InputDecoration(labelText: "Product Price"),
                 ),
                 TextField(
                   controller: sellingPriceController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: "Selling Price"),
+                  decoration: const InputDecoration(labelText: "Selling Price"),
                 ),
               ],
             ),
@@ -1008,7 +1099,7 @@ class _OrderDetailsState extends State<OrderDetails> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -1022,10 +1113,11 @@ class _OrderDetailsState extends State<OrderDetails> {
                   // widget.model?.orderItems?[i].unit = unitController.text;
                   // widget.model?.orderItems?[i].productPrice = productPriceController.text;
                   // widget.model?.orderItems?[i].sellingPrice = sellingPriceController.text;
+                  updateOrderItem();
                 });
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );

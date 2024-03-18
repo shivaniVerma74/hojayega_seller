@@ -11,7 +11,9 @@ import '../Model/TransactionModel.dart';
 import 'package:http/http.dart' as http;
 
 class BusinessCard extends StatefulWidget {
-  const BusinessCard({Key? key}) : super(key: key);
+
+  final String walletAmount;
+  const BusinessCard({Key? key, required this.walletAmount}) : super(key: key);
 
   @override
   State<BusinessCard> createState() => _BusinessCardState();
@@ -63,6 +65,7 @@ class _BusinessCardState extends State<BusinessCard> {
   int addMoney=0;
 
   addWallet() async {
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
     var headers = {
       'Cookie': 'ci_session=b5700f932d8b03efe164db4d2f6eccb8c428fdfa'
     };
@@ -83,8 +86,9 @@ class _BusinessCardState extends State<BusinessCard> {
         print("workinggg}");
         wallet_balance_added = jsonresponse["data"].toString();
         print("wallet balance is $wallet_balance_added");
-        setState(() {
-        });
+        // if(wallet_balance_added != null){
+          // await prefs.setString("business_card_wallet", wallet_balance_added!);
+        // }
       } else {
         Fluttertoast.showToast(msg: jsonresponse["message"]);
       }
@@ -102,8 +106,8 @@ class _BusinessCardState extends State<BusinessCard> {
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.walletTransaction));
     request.fields.addAll({
-      'user_id': '141',
-      // 'user_id': vendorId.toString(),
+      'user_id': vendorId.toString(),
+      'type': 'b_card',
     });
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -176,13 +180,13 @@ class _BusinessCardState extends State<BusinessCard> {
                         children: [
                           const Text("Business Card Balance ", style: TextStyle(fontWeight: FontWeight.w600, color: colors.whiteTemp,fontSize: 19 ),),
                           const SizedBox(height: 10,),
-                          wallet_balance_added == null ? Text("₹ 500",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.whiteTemp,
-                                  fontSize: 23)):
-                          Text("₹ $wallet_balance_added",
-                              style: TextStyle(
+                          // wallet_balance_added == null ? Text("₹ 500",
+                          //     style: TextStyle(
+                          //         fontWeight: FontWeight.w600,
+                          //         color: colors.whiteTemp,
+                          //         fontSize: 23)):
+                          Text("₹ ${widget.walletAmount}",
+                              style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,
                                   fontSize: 23)),
@@ -386,7 +390,7 @@ class _BusinessCardState extends State<BusinessCard> {
                   const SizedBox(width: 10),
                   Text(
                     "₹ ${transactionModel?.data?[index].amount}",
-                    style: const TextStyle(color: colors.black54, fontWeight: FontWeight.bold, fontSize: 20),
+                    style: const TextStyle(color: colors.black54, fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                 ],
               ),

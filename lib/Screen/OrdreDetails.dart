@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
@@ -9,7 +10,7 @@ import '../Model/GetTimeSlotModel.dart';
 import '../Model/GetVendorOrderModel.dart';
 
 class OrderDetails extends StatefulWidget {
-  final VendorOrders? model;
+  final VendorOrder? model;
   OrderDetails({Key? key, this.model}) : super(key: key);
 
   @override
@@ -21,7 +22,14 @@ class _OrderDetailsState extends State<OrderDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    addToRow();
     getTimeSlot();
+
+    for (var i = 0; i< (widget.model?.orderItems.length ?? 0);i++){
+      rows[i][0] = widget.model?.orderItems[i].qty ??"0";
+      rows[i][1] = widget.model?.orderItems[i].productPrice ?? "0";
+
+    }
     deliverychargesController.text = widget.model?.deliveryCharge ?? "";
     disController.text = widget.model?.discount ?? "";
     totalController.text = "${int.parse(widget.model?.orderItems.first.qty.toString() ?? "0") * double.parse(widget.model?.orderItems.first.productPrice.toString() ?? "0.0") ?? ""}";
@@ -36,22 +44,29 @@ class _OrderDetailsState extends State<OrderDetails> {
   TextEditingController unitController = TextEditingController();
   TextEditingController productPriceController = TextEditingController();
   TextEditingController sellingPriceController = TextEditingController();
+  // String? totalPrice ;
+  // String? discount ;
+  // String? deliveryChargePerKM ;
   int? selectedIndex;
 
   var s1;
   var s2;
   var s3;
-
   final List<List<String>> rows = [
-    ["u_R1", "p_R1", "s_R1"],
-    ["u_R2", "p_R2", "s_R2"],
-    ["u_R3", "p_R3", "s_R3"],
     // ["unitController_Row2", "productPriceController_Row2", "sellingPriceController_Row2"],
     // ["unitController_Row3", "productPriceController_Row2", "sellingPriceController_Row3"],
     // ... more rows
   ];
 
-  updateOrderItem() async {
+   addToRow(){
+     for(var i = 0; i < (widget.model?.orderItems.length??0); i++){
+       rows.add(["u_R${i+1}","p_R${i+1}", "s_R${i+1}"]);
+     }
+     debugPrint("rows_____ $rows");
+   }
+
+  updateOrderItem(i) async {
+    debugPrint("rowssssss ${rows[i]}");
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     vendorId = preferences.getString('vendor_id');
     print("vendor id ordre details product screen $vendorId");
@@ -63,16 +78,19 @@ class _OrderDetailsState extends State<OrderDetails> {
     request.fields.addAll({
       'user_id': vendorId.toString(),
       'type': '1',
-      'product_id': widget.model?.orderItems.join(",")?? "",
-      'qty': widget.model?.orderItems.first.qty.toString() ?? "",
-      'price': widget.model?.orderItems.first.productPrice.toString() ?? "",
-      'sub_total': ''
+      'product_id': widget.model?.orderItems[i].productId.toString()?? "",
+      'qty': rows[i][0],
+      'price': rows[i][1],
+      'sub_total': rows[i][2],
+      "order_id": widget.model?.orderId.toString()?? "",
     });
     print('update order itemsss para ${request.fields}');
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
+      var result = await response.stream.bytesToString();
+      var finalresult = jsonDecode(result);
+      Fluttertoast.showToast(msg: finalresult["msg"]);
     } else {
       print(response.reasonPhrase);
     }
@@ -91,6 +109,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       'order_id': widget.model?.orderId.toString() ?? "",
       'sub_total': '1',
       'discount': disController.text,
+      'time': timefrom,
       'promo_code': '',
       'final_total': '10',
       'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
@@ -100,7 +119,11 @@ class _OrderDetailsState extends State<OrderDetails> {
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
+      // print(await response.stream.bytesToString());
+      var result = await response.stream.bytesToString();
+      var finalresult = jsonDecode(result.toString());
+      print("finalresult  ${finalresult["msg"]}");
+      Fluttertoast.showToast(msg: finalresult['msg']);
     } else {
       print(response.reasonPhrase);
     }
@@ -121,13 +144,15 @@ class _OrderDetailsState extends State<OrderDetails> {
           ),
           title: const Text('Details'),
           backgroundColor: colors.primary),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 20,
-          ),
-          getCurrentOrders(),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            getCurrentOrders(),
+          ],
+        ),
       ),
     );
   }
@@ -176,7 +201,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   String? selectedVehicle;
 
   getCurrentOrders() {
-    print("==nwennenenen=============${widget.model?.orderItems?.first.productImage}===========");
+    print("==nwennenenen=============${widget.model?.orderItems.first.productImage}===========");
     return Column(
       children: [
         // ListView.builder(
@@ -212,28 +237,24 @@ class _OrderDetailsState extends State<OrderDetails> {
                       Container(
                         width: 20,
                         height: 20,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: colors.primary),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.primary),
                         child: Image.asset("assets/images/nmae.png"),
                       ),
                       Text(
                         "${widget.model?.username}",
                         style: const TextStyle(color: colors.primary),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       Container(
                         width: 20,
                         height: 20,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: colors.primary),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.primary),
                         child: Image.asset("assets/images/calenders.png"),
                       ),
                       Text(
-                        "${widget.model?.date}",
+                        "${widget.model?.date}".replaceAll("00:00:00.000", ""),
                         style: const TextStyle(color: colors.primary),
                       ),
                       Container(
@@ -417,29 +438,32 @@ class _OrderDetailsState extends State<OrderDetails> {
                               Text(
                                 rows[i][1].toString() == 'p_R${i + 1}'
                                     ? "${widget.model?.orderItems[i].productPrice}"
-                                    : "${rows[i][1]}rs",
+                                    : rows[i][1],
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(color: colors.primary),
                               ),
                               const SizedBox(
                                 width: 30,
                               ),
-                              Text(
-                                rows[i][2].toString() == 's_R${i + 1}'
-                                    ? "${int.parse(widget.model?.orderItems[i].qty.toString() ?? "0") *double.parse(widget.model?.orderItems[i].productPrice.toString() ?? "0.0")}"
-                                    : "${rows[i][2]}rs",
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: colors.primary),
+                              Flexible(
+                                child: Text(
+                                  rows[i][2].toString() == 's_R${i + 1}'
+                                      ? "${int.parse(widget.model?.orderItems[i].qty.toString() ?? "0") *double.parse(widget.model?.orderItems[i].productPrice.toString() ?? "0.0")}"
+                                      : rows[i][2],
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: true,
+                                  style: const TextStyle(color: colors.primary),
+                                ),
                               ),
                               const SizedBox(
                                 width: 10,
                               ),
                               InkWell(
                                 onTap: () {
+                                   var sellingPrice = int.parse(widget.model?.orderItems[i].qty.toString() ?? "0") * double.parse(widget.model?.orderItems[i].productPrice.toString() ??"0");
                                   print(i.toString());
-                                  unitController.text = rows[i][0];
-                                  productPriceController.text = rows[i][1];
-                                  sellingPriceController.text = rows[i][2];
+                                  unitController.text = rows[i][0].toString()  ?? "";
+                                  productPriceController.text =  rows[i][1].toString();
                                   // unitController.clear();
                                   // productPriceController.clear();
                                   // sellingPriceController.clear();
@@ -450,7 +474,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                   _showEditDialog12(
                                     unitController,
                                     productPriceController,
-                                    sellingPriceController, i,
+                                     i,
                                   );
                                   // unitController.text="";
                                   // unitController.text="";
@@ -583,7 +607,8 @@ class _OrderDetailsState extends State<OrderDetails> {
                         child: Image.asset("assets/images/edit.png"),
                       ),
                       Text(
-                        "Total = ${totalController.text}rs",
+                        // "Total = ${rows[0][2]}",
+                        "Total = ${int.parse(widget.model?.orderItems[0].qty.toString() ?? "0") *double.parse(widget.model?.orderItems[0].productPrice.toString() ?? "0.0")}",
                         style: const TextStyle(color: colors.primary),
                       ),
                     ],
@@ -599,7 +624,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     children: [
                       InkWell(
                         onTap: () {
-                          _showEditDialog(disController, "Dis");
+                          _showEditDialog(disController, "Discount");
                         },
                         child: Image.asset("assets/images/edit.png"),
                       ),
@@ -709,7 +734,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                         onChanged: (dynamic newValue) {
                           setState(() {
                             selectTimeslot = newValue;
-                            timefrom="From ${newValue.fromTime.toString()} To ${newValue.toTime.toString()}";
+                            timefrom ="From ${newValue.fromTime.toString()} To ${newValue.toTime.toString()}";
                             print("===my technic=======$timefrom===============");
                           });
                         },
@@ -772,7 +797,6 @@ class _OrderDetailsState extends State<OrderDetails> {
                     ),
                   ),
                 ),
-
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 //   children: [
@@ -997,8 +1021,17 @@ class _OrderDetailsState extends State<OrderDetails> {
                   child: InkWell(
                         onTap: () {
                           // acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
-                          setState(() {});
-                         updateOrder();
+                          if(timefrom == null || selectTimeslot == null){
+                            Fluttertoast.showToast(msg: "Please Select Time Slot");
+                          }
+                          else if (selectedVehicle == null){
+                            Fluttertoast.showToast(msg: "Please Select Vehicle Type");
+                          }
+                          else{
+                            setState(() {
+                              updateOrder();
+                            });
+                          }
                         },
                         child: Container(
                           height: 40,
@@ -1047,10 +1080,27 @@ class _OrderDetailsState extends State<OrderDetails> {
             TextButton(
               onPressed: () {
                 // Update the corresponding field and close the dialog
-                setState(() {
+
                   // You may want to add validation here before updating the controller text
-                  controller.text = controller.text;
-                });
+                  setState(() {
+                    // controller.text = controller.text;
+                  });
+                  // switch(fieldName){
+                  //   case "Total":
+                  //     setState(() {
+                  //       totalPrice = controller.text;
+                  //     });
+                  //     break;
+                  //   case "Discount":
+                  //     setState(() {
+                  //       discount = controller.text;
+                  //     });
+                  //     break;
+                  //   default :
+                  //     setState(() {
+                  //       deliveryChargePerKM = controller.text;
+                  //     });
+                  // }
                 Navigator.of(context).pop();
               },
               child: const Text('Save'),
@@ -1064,7 +1114,8 @@ class _OrderDetailsState extends State<OrderDetails> {
   void _showEditDialog12(
     TextEditingController unitController,
     TextEditingController productPriceController,
-    TextEditingController sellingPriceController,
+    // TextEditingController sellingPriceController,
+    //   totalPrice,
     int i,
   ) {
     showDialog(
@@ -1073,7 +1124,7 @@ class _OrderDetailsState extends State<OrderDetails> {
         return AlertDialog(
           title: Text("Edit Product Details"),
           content: Container(
-            height: 200,
+            height: 150,
             child: Column(
               children: [
                 TextField(
@@ -1086,11 +1137,13 @@ class _OrderDetailsState extends State<OrderDetails> {
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: "Product Price"),
                 ),
-                TextField(
-                  controller: sellingPriceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: "Selling Price"),
-                ),
+
+                // TextField(
+                //   controller: sellingPriceController,
+                //   readOnly: true,
+                //   keyboardType: TextInputType.number,
+                //   decoration: const InputDecoration(labelText: "Total Price"),
+                // ),
               ],
             ),
           ),
@@ -1107,13 +1160,15 @@ class _OrderDetailsState extends State<OrderDetails> {
                   // unitController.text=unitController.text;
                   rows[i][0] = unitController.text;
                   rows[i][1] = productPriceController.text;
-                  rows[i][2] = sellingPriceController.text;
+                  rows[i][2] = (double.parse(unitController.text) * double.parse(productPriceController.text) ).toString();
                   // productPriceController.text=productPriceController.text;
                   // sellingPriceController.text=sellingPriceController.text;
                   // widget.model?.orderItems?[i].unit = unitController.text;
                   // widget.model?.orderItems?[i].productPrice = productPriceController.text;
                   // widget.model?.orderItems?[i].sellingPrice = sellingPriceController.text;
-                  updateOrderItem();
+                  updateOrderItem(i).then((val){setState(() {
+
+                  });});
                 });
                 Navigator.of(context).pop();
               },

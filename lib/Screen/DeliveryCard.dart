@@ -10,7 +10,8 @@ import '../Helper/color.dart';
 import '../Model/TransactionModel.dart';
 
 class DeliveryCard extends StatefulWidget {
-  const DeliveryCard({Key? key}) : super(key: key);
+  final String walletAmount;
+  const DeliveryCard({Key? key, required this.walletAmount}) : super(key: key);
 
   @override
   State<DeliveryCard> createState() => _DeliveryCardState();
@@ -34,6 +35,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
   int addMoney=0;
 
   addWallet() async {
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+
     var headers = {
       'Cookie': 'ci_session=b5700f932d8b03efe164db4d2f6eccb8c428fdfa'
     };
@@ -55,8 +58,11 @@ class _DeliveryCardState extends State<DeliveryCard> {
         print("workinggg}");
         wallet_balance_added = jsonresponse["data"].toString();
         print("wallet balance is $wallet_balance_added");
-        // Fluttertoast.showToast(msg: "Wallet updated success");
-        setState(() {});
+
+        // await prefs.setString("delivery_card_wallet", wallet_balance_added!);
+
+        Fluttertoast.showToast(msg: jsonresponse['msg']);
+        // setState(() {});
       } else {
         // Fluttertoast.showToast(msg: jsonresponse["message"]);
       }
@@ -74,7 +80,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse(ApiServicves.walletTransaction));
-    request.fields.addAll({'user_id': '141'});
+    request.fields.addAll({'user_id': vendorId.toString(), 'type': 'd_card'});
+    print("get wallet${request.fields}===========");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -91,8 +98,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
 
   Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
     Fluttertoast.showToast(msg: "Payment successfully");
-    addWallet();
-    Navigator.pop(context);
+     addWallet();
+     Navigator.pop(context);
     // Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
   }
 
@@ -169,7 +176,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
                       padding: const EdgeInsets.only(top: 25),
                       child: Column(
                         children:  [
-                          Text(
+                          const Text(
                             "Delivery Card Balance ",
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -179,13 +186,13 @@ class _DeliveryCardState extends State<DeliveryCard> {
                           SizedBox(
                             height: 10,
                           ),
-                          wallet_balance_added == null ? Text("₹ 500",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.whiteTemp,
-                                  fontSize: 23)):
-                          Text("₹ $wallet_balance_added",
-                              style: TextStyle(
+                          // wallet_balance_added == null ? Text("₹ 0",
+                          //     style: TextStyle(
+                          //         fontWeight: FontWeight.w600,
+                          //         color: colors.whiteTemp,
+                          //         fontSize: 23)):
+                          Text("₹ ${wallet_balance_added ?? widget.walletAmount}",
+                              style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,
                                   fontSize: 23)),
@@ -215,110 +222,112 @@ class _DeliveryCardState extends State<DeliveryCard> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),border: Border.all(color: colors.primary,width: 2),
                       color: colors.whiteTemp),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(top: 15, left: 30, right: 30),
-                        child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          controller: addMoneyCtr,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Fill This Field';
-                            }
-                            return null;
-                          },
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(top: 15, left: 30, right: 30),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: addMoneyCtr,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Fill This Field';
+                              }
+                              return null;
+                            },
 
-                          // keyboardType: TextInputType.phone,
-                          decoration: InputDecoration(
-                            hintText: "Add Money",
-                            hintStyle: const TextStyle(
+                            // keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                              hintText: "Add Money",
+                              hintStyle: const TextStyle(
 
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                            isDense: true,
-                            filled: true,
-                            fillColor: Colors.grey.shade200,
-                            focusedBorder: OutlineInputBorder(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                              isDense: true,
+                              filled: true,
+                              fillColor: Colors.grey.shade200,
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade200)),
+                              enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade200)),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: Colors.grey.shade200),
+                                borderSide: BorderSide(color: Colors.grey.shade200),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 30),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: Container(
-                          height: 30,
-                          child: ListView.builder(
+                        const SizedBox(height: 30),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30),
+                          child: Container(
+                            height: 30,
+                            child: ListView.builder(
 
-                            scrollDirection:
-                            Axis.horizontal,
-                            // Set the direction to horizontal
+                              scrollDirection:
+                              Axis.horizontal,
+                              // Set the direction to horizontal
 
-                            itemCount: arrPrice.length,
+                              itemCount: arrPrice.length,
 
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
-                                child: InkWell(
-                                  onTap: (){
-                                   // print("11");
-                                    addMoney=addMoney+arrPrice[index];
-                                    setState(() {
-                                      addMoneyCtr.text=addMoney.toString();
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                                  child: InkWell(
+                                    onTap: (){
+                                     // print("11");
+                                      addMoney=addMoney+arrPrice[index];
+                                      setState(() {
+                                        addMoneyCtr.text=addMoney.toString();
 
-                                    });
+                                      });
 
-                                  },
-                                  child: Container(
-                                    width:  60,
-                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),color: colors.primary),
-                                    child: Center(
-                                      child: Text(
-                                        arrPrice[index].toString(),
-                                        style: TextStyle(color: colors.whiteTemp),
+                                    },
+                                    child: Container(
+                                      width:  60,
+                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),color: colors.primary),
+                                      child: Center(
+                                        child: Text(
+                                          arrPrice[index].toString(),
+                                          style: TextStyle(color: colors.whiteTemp),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 20,),
-                      InkWell(
-                        onTap: () {
-                          final form = _formkey.currentState!;
-                          if (form.validate() && addMoneyCtr.text != '0') {
-                            form.save();
-                            double amount =
-                                double.parse(addMoneyCtr.text.toString());
-                            openCheckout((amount));
-                          }
-                        },
-                        child: Container(
-                            height: 45,
-                            width: MediaQuery.of(context).size.width / 1.3,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: colors.primary),
-                            child: const Center(
-                                child: Text(
-                              "Add Money",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: colors.whiteTemp,
-                                  fontSize: 19),
-                            ))),
-                      )
-                    ],
+                        SizedBox(height: 20,),
+                        InkWell(
+                          onTap: () {
+                            final form = _formkey.currentState!;
+                            if (form.validate() && addMoneyCtr.text != '0') {
+                              form.save();
+                              double amount =
+                                  double.parse(addMoneyCtr.text.toString());
+                              openCheckout((amount));
+                            }
+                          },
+                          child: Container(
+                              height: 45,
+                              width: MediaQuery.of(context).size.width / 1.3,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: colors.primary),
+                              child: const Center(
+                                  child: Text(
+                                "Add Money",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: colors.whiteTemp,
+                                    fontSize: 19),
+                              ))),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -329,7 +338,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
             Padding(
               padding: const EdgeInsets.only(left: 12),
               child: Row(
-                children: [
+                children: const [
                   Text(
                     "Wallet Transaction",
                     style: TextStyle(
@@ -340,7 +349,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             transactionModel?.responseCode == "0"
@@ -432,7 +441,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
                     style: const TextStyle(
                         color: colors.black54,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20),
+                        fontSize: 18),
                   ),
                 ],
               ),

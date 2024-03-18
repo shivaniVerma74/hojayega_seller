@@ -94,7 +94,7 @@ class ProductsData {
       String? sellingPrice, 
       String? productCreateDate, 
       String? vendorId, 
-      List<String>? otherImage, 
+      List<dynamic>? otherImage,
       String? productStatus, 
       String? variantName, 
       String? productType, 
@@ -107,7 +107,7 @@ class ProductsData {
       dynamic subTitle, 
       dynamic description, 
       dynamic img, 
-      dynamic otherImg, 
+      List<dynamic>? otherImg,
       dynamic type, 
       dynamic pId, 
       dynamic serviceType,}){
@@ -169,8 +169,8 @@ class ProductsData {
     _icon = json['icon'];
     _subTitle = json['sub_title'];
     _description = json['description'];
-    _img = json['img'];
-    _otherImg = json['other_img'];
+    _img = json['product_image'];
+    _otherImg = json['other_image'];
     _type = json['type'];
     _pId = json['p_id'];
     _serviceType = json['service_type'];
@@ -188,7 +188,7 @@ class ProductsData {
   String? _sellingPrice;
   String? _productCreateDate;
   String? _vendorId;
-  List<String>? _otherImage;
+  List<dynamic>? _otherImage;
   String? _productStatus;
   String? _variantName;
   String? _productType;
@@ -201,7 +201,7 @@ class ProductsData {
   dynamic _subTitle;
   dynamic _description;
   dynamic _img;
-  dynamic _otherImg;
+  List<dynamic>? _otherImg;
   dynamic _type;
   dynamic _pId;
   dynamic _serviceType;
@@ -231,7 +231,7 @@ class ProductsData {
   dynamic subTitle,
   dynamic description,
   dynamic img,
-  dynamic otherImg,
+  List<dynamic>? otherImg,
   dynamic type,
   dynamic pId,
   dynamic serviceType,
@@ -279,7 +279,7 @@ class ProductsData {
   String? get sellingPrice => _sellingPrice;
   String? get productCreateDate => _productCreateDate;
   String? get vendorId => _vendorId;
-  List<String>? get otherImage => _otherImage;
+  List<dynamic>? get otherImage => _otherImage;
   String? get productStatus => _productStatus;
   String? get variantName => _variantName;
   String? get productType => _productType;
@@ -324,8 +324,8 @@ class ProductsData {
     map['icon'] = _icon;
     map['sub_title'] = _subTitle;
     map['description'] = _description;
-    map['img'] = _img;
-    map['other_img'] = _otherImg;
+    map['product_image'] = _img;
+    map['other_image'] = _otherImg;
     map['type'] = _type;
     map['p_id'] = _pId;
     map['service_type'] = _serviceType;

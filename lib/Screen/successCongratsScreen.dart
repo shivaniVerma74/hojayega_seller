@@ -1,15 +1,14 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import '../Helper/color.dart';
 import 'CreateOnlineStore.dart';
-class ThankYou extends StatefulWidget {
-  const ThankYou({Key? key}) : super(key: key);
+class CongratsScreen extends StatefulWidget {
+  const CongratsScreen({Key? key}) : super(key: key);
 
   @override
-  State<ThankYou> createState() => _SuccessfullyState();
+  State<CongratsScreen> createState() => _SuccessfullyState();
 }
 
-class _SuccessfullyState extends State<ThankYou> {
+class _SuccessfullyState extends State<CongratsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,12 +20,12 @@ class _SuccessfullyState extends State<ThankYou> {
             const SizedBox(height: 150),
             Image.asset("assets/images/done.png"),
             const SizedBox(height: 15),
-            const AutoSizeText("Thanks for signing up!", style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600, color: Colors.black), textAlign: TextAlign.center,),
+            const Text("Thanks for signing up!", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black),),
             const SizedBox(height: 15),
             const Padding(
               padding: EdgeInsets.only(left: 20, right: 20),
-              child: AutoSizeText(" Your Verification Will Be Done In 3 Working Days, So You Can Go Live On Our Platform. While You Wait, Take A Moment To Set Up Your Store Or Portfolio.",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black), textAlign: TextAlign.center),
+              child: Text(" Your Verification Will Be Done In 3 Working Days, So You Can Go Live On Our Platform. While You Wait, Take A Moment To Set Up Your Store Or Portfolio.",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black),),
             ),
             const SizedBox(height: 20),
             InkWell(

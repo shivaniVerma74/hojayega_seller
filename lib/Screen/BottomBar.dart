@@ -5,6 +5,7 @@ import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hojayega_seller/Screen/AllCategory.dart';
+import 'package:hojayega_seller/Screen/Calender.dart';
 import 'package:hojayega_seller/Screen/MyProfile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthView/Login.dart';
@@ -46,6 +47,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       _child = Container();
     }
     super.initState();
+
     getData();
     // if (widget.dIndex != null) {
     //   selectedIndex = widget.dIndex!;
@@ -57,16 +59,17 @@ class _BottomNavBarState extends State<BottomNavBar> {
     // } else {
     //   _child = Container();
     // }
-    super.initState();
   }
 
   String? vendorName;
   String? vendorEmail;
+  String? roll;
   getData() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     vendorName = preferences.getString('vendor_name');
     vendorEmail = preferences.getString('vendor_email');
-    print("===============$vendorEmail $vendorName===========");
+    roll=  preferences.getString('roll');
+    print("===============$vendorEmail $vendorName $roll===========");
   }
   var onOf = true ;
   String? vendorId;
@@ -101,7 +104,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           key: _key,
           backgroundColor: colors.appbarColor,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(selectedIndex == 4||selectedIndex == 2 ? 0 : 80),
+            preferredSize: Size.fromHeight(selectedIndex == 4||selectedIndex == 2 ? roll=="2"?80:0 : 80),
             child: selectedIndex == 0
                 ? homeAppBar(
               context,
@@ -116,11 +119,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
               child: commonAppBar(context,
                   text: selectedIndex == 0
                       ? "Home"
-                      : selectedIndex == 3
+                      :
+                  selectedIndex == 3
                       ? "Pending Order"
                       : selectedIndex == 4
-                      ? "Pick & Drop"
-                      : "My Orders"),
+                      ? "Pick & Drop":
+                  roll == "2"? selectedIndex==2? "Pending Orders":
+                       "My Orders":"My Orders"),
             ),
           ),
           body: _child,
@@ -487,7 +492,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 ]),
           ),
           bottomNavigationBar: FluidNavBar(
-            icons: [
+            icons: roll == "2"?[
               FluidNavBarIcon(
                   icon: Icons.home,
                   // unselectedForegroundColor: Colors.grey,
@@ -498,13 +503,39 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   //  selectedIndex == 1 ? colors.primary : colors.white10,
                   extras: {"label": "Home"}),
               FluidNavBarIcon(
-                // unselectedForegroundColor: Colors.grey,
+                  icon: Icons.list_alt_sharp,
+                  // unselectedForegroundColor: Colors.grey,
                   selectedForegroundColor: Colors.white,
-                  icon: Icons.shopping_cart,
+                  unselectedForegroundColor: Colors.white,
+                  backgroundColor: colors.primary,
+                  //  selectedIndex == 1 ? colors.primary : colors.white10,
+                  extras: {"label": "My Bookings"}),
+              FluidNavBarIcon(
+                  icon: Icons.calendar_month,
+                  // unselectedForegroundColor: Colors.grey,
+                  selectedForegroundColor: Colors.white,
                   backgroundColor: colors.primary,
                   unselectedForegroundColor: Colors.white,
                   //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "My Cart"}),
+                  extras: {"label": "Pending "}),
+            ]:[
+              FluidNavBarIcon(
+                  icon: Icons.home,
+                  // unselectedForegroundColor: Colors.grey,
+                  selectedForegroundColor: Colors.white,
+                  //  svgPath: "assets/home.svg",
+                  backgroundColor: colors.primary,
+                  unselectedForegroundColor: Colors.white,
+                  //  selectedIndex == 1 ? colors.primary : colors.white10,
+                  extras: {"label": "Home"}),
+              FluidNavBarIcon(
+                  // unselectedForegroundColor: Colors.grey,
+                    selectedForegroundColor: Colors.white,
+                    icon: Icons.shopping_cart,
+                    backgroundColor: colors.primary,
+                    unselectedForegroundColor: Colors.white,
+                    //  selectedIndex == 1 ? colors.primary : colors.white10,
+                    extras: {"label": "My Cart"}),
               FluidNavBarIcon(
                   icon: Icons.list_alt_sharp,
                   // unselectedForegroundColor: Colors.grey,
@@ -588,8 +619,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   // setState(() {
                   //   removesession();
                   // });
-                  Navigator.pop(context);
+                  // Navigator.pop(context);
                   // SystemNavigator.pop();
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  prefs.setBool("isLogIn", false);
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -617,10 +650,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
           _child = HomeScreen();
           break;
         case 1:
-          _child = Orders();
+          _child = roll=="2"? Calender(isFromBottom: true,):Orders();
           break;
         case 2:
-          _child = AllCategory();
+          _child =roll=="2"? PendingOrders(): AllCategory();
           break;
         case 3:
           _child = PendingOrders();

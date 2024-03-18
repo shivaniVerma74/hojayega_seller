@@ -1,4 +1,4 @@
-package com.hojayega.seller.hojayega_seller
+package com.hojayega.seller
 
 import io.flutter.embedding.android.FlutterActivity
 

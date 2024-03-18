@@ -25,15 +25,17 @@ class _SplashScreenState extends State<SplashScreen> {
   Future getValidation() async {
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? vendor_id = sharedPreferences.getString('vendor_id');
+    bool? isLogIn = sharedPreferences.getBool("isLogIn");
+    bool? isFirstTime = sharedPreferences.getBool("isFirstTime");
     print("vendor id in splash screen $vendor_id");
     finalOtp = vendor_id;
-    _navigateToHome();
+    _navigateToHome(isLogIn?? false, isFirstTime??true);
   }
 
-  _navigateToHome() {
-    Future.delayed(const Duration(milliseconds: 35),() {
-      if (finalOtp == null || finalOtp ==  '') {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const LoginPage()));
+  _navigateToHome(bool isLogIn, bool isFirstTime) {
+    Future.delayed(const Duration(milliseconds: 350),() {
+      if (finalOtp == null || finalOtp ==  '' || !isLogIn) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> isFirstTime ?const IntroScreen():LoginPage()));
       } else {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>  BottomNavBar()));
       }

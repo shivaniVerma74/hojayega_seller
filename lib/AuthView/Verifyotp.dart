@@ -6,7 +6,9 @@ import 'SignUpPersonal.dart';
 
 class VerifyOtp extends StatefulWidget {
   final OTP;
-  const VerifyOtp({super.key, this.OTP});
+  final isMobile;
+  final mobileEmail;
+  const VerifyOtp({super.key, this.OTP, this.isMobile,this.mobileEmail});
 
   @override
   State<VerifyOtp> createState() => _OtpState();
@@ -49,7 +51,7 @@ class _OtpState extends State<VerifyOtp> {
                     child: FittedBox(
                       fit: BoxFit.fill,
                       child: Image.asset(
-                        'assets/images/otp verification – 3.png',),)),
+                        'assets/images/otp verification3.png',),)),
               ],
             ),
             const Form(
@@ -60,12 +62,12 @@ class _OtpState extends State<VerifyOtp> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white))),
             ),
-            const Positioned(
+             Positioned(
                 top: 80,
                 left: 20,
                 right: 20,
                 child: Text(
-                    'Please enter received VerifyOtp on your mobile number to continue.',
+                    'Please enter received VerifyOtp on your ${widget.isMobile?? true ?'mobile number':'email'} to continue.',
                     style: TextStyle(fontSize: 14,
                         fontWeight: FontWeight.bold, color: Colors.white))),
             Positioned(
@@ -120,7 +122,7 @@ class _OtpState extends State<VerifyOtp> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            Navigator.push(context, MaterialPageRoute(builder:(context)=> SignUpPersonal()));
+                            Navigator.push(context, MaterialPageRoute(builder:(context)=>  SignUpPersonal(mobileOrEmail: widget.mobileEmail)));
                           }
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green),

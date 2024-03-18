@@ -1,19 +1,4 @@
-// To parse this JSON data, do
-//
-//     final getVendorOrderModel = getVendorOrderModelFromJson(jsonString);
-
-import 'dart:convert';
-
-GetVendorOrderModel getVendorOrderModelFromJson(String str) => GetVendorOrderModel.fromJson(json.decode(str));
-
-String getVendorOrderModelToJson(GetVendorOrderModel data) => json.encode(data.toJson());
-
 class GetVendorOrderModel {
-  String responseCode;
-  String message;
-  List<VendorOrders> orders;
-  String status;
-
   GetVendorOrderModel({
     required this.responseCode,
     required this.message,
@@ -21,43 +6,24 @@ class GetVendorOrderModel {
     required this.status,
   });
 
-  factory GetVendorOrderModel.fromJson(Map<String, dynamic> json) => GetVendorOrderModel(
-    responseCode: json["response_code"],
-    message: json["message"],
-    orders: List<VendorOrders>.from(json["orders"].map((x) => VendorOrders.fromJson(x))),
-    status: json["status"],
-  );
+  final String? responseCode;
+  final String? message;
+  final List<VendorOrder> orders;
+  final String? status;
 
-  Map<String, dynamic> toJson() => {
-    "response_code": responseCode,
-    "message": message,
-    "orders": List<dynamic>.from(orders.map((x) => x.toJson())),
-    "status": status,
-  };
+  factory GetVendorOrderModel.fromJson(Map<String, dynamic> json){
+    return GetVendorOrderModel(
+      responseCode: json["response_code"],
+      message: json["message"],
+      orders: json["orders"] == null ? [] : List<VendorOrder>.from(json["orders"]!.map((x) => VendorOrder.fromJson(x))),
+      status: json["status"],
+    );
+  }
+
 }
 
-class VendorOrders {
-  DriverData driverData;
-  String orderId;
-  String total;
-  DateTime date;
-  String username;
-  String mobile;
-  String paymentMode;
-  String address;
-  String ordersType;
-  String vehicleType;
-  String time;
-  String orderStatus;
-  String paymentStatus;
-  String acceptRejectVendor;
-  String deliveryCharge;
-  String discount;
-  String region;
-  List<OrderItem> orderItems;
-  int count;
-
-  VendorOrders({
+class VendorOrder {
+  VendorOrder({
     required this.driverData,
     required this.orderId,
     required this.total,
@@ -79,98 +45,74 @@ class VendorOrders {
     required this.count,
   });
 
-  factory VendorOrders.fromJson(Map<String, dynamic> json) => VendorOrders(
-    driverData: DriverData.fromJson(json["driver_data"]),
-    orderId: json["order_id"],
-    total: json["total"],
-    date: DateTime.parse(json["date"]),
-    username: json["username"],
-    mobile: json["mobile"],
-    paymentMode: json["payment_mode"],
-    address: json["address"],
-    ordersType: json["orders_type"],
-    vehicleType: json["vehicle_type"],
-    time: json["time"],
-    orderStatus: json["order_status"],
-    paymentStatus: json["payment_status"],
-    acceptRejectVendor: json["accept_reject_vendor"],
-    deliveryCharge: json["delivery_charge"],
-    discount: json["discount"],
-    region: json["region"],
-    orderItems: List<OrderItem>.from(json["order_items"].map((x) => OrderItem.fromJson(x))),
-    count: json["count"],
-  );
+  final List<DriverDatum> driverData;
+  final String? orderId;
+  final String? total;
+  final DateTime? date;
+  final String? username;
+  final String? mobile;
+  final String? paymentMode;
+  final String? address;
+  final String? ordersType;
+  final String? vehicleType;
+  final String? time;
+  final String? orderStatus;
+  final String? paymentStatus;
+  final String? acceptRejectVendor;
+  final String? deliveryCharge;
+  final String? discount;
+  final String? region;
+  final List<OrderItem> orderItems;
+  final int? count;
 
-  Map<String, dynamic> toJson() => {
-    "driver_data": driverData.toJson(),
-    "order_id": orderId,
-    "total": total,
-    "date": "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
-    "username": username,
-    "mobile": mobile,
-    "payment_mode": paymentMode,
-    "address": address,
-    "orders_type": ordersType,
-    "vehicle_type": vehicleType,
-    "time": time,
-    "order_status": orderStatus,
-    "payment_status": paymentStatus,
-    "accept_reject_vendor": acceptRejectVendor,
-    "delivery_charge": deliveryCharge,
-    "discount": discount,
-    "region": region,
-    "order_items": List<dynamic>.from(orderItems.map((x) => x.toJson())),
-    "count": count,
-  };
+  factory VendorOrder.fromJson(Map<String, dynamic> json){
+    return VendorOrder(
+      driverData: json["driver_data"] == null ? [] : List<DriverDatum>.from(json["driver_data"]!.map((x) => DriverDatum.fromJson(x))),
+      orderId: json["order_id"],
+      total: json["total"],
+      date: DateTime.tryParse(json["date"] ?? ""),
+      username: json["username"],
+      mobile: json["mobile"],
+      paymentMode: json["payment_mode"],
+      address: json["address"],
+      ordersType: json["orders_type"],
+      vehicleType: json["vehicle_type"],
+      time: json["time"],
+      orderStatus: json["order_status"],
+      paymentStatus: json["payment_status"],
+      acceptRejectVendor: json["accept_reject_vendor"],
+      deliveryCharge: json["delivery_charge"],
+      discount: json["discount"],
+      region: json["region"],
+      orderItems: json["order_items"] == null ? [] : List<OrderItem>.from(json["order_items"]!.map((x) => OrderItem.fromJson(x))),
+      count: json["count"],
+    );
+  }
+
 }
 
-class DriverData {
-  String name;
-  String mobile;
-  String email;
-
-  DriverData({
+class DriverDatum {
+  DriverDatum({
     required this.name,
     required this.mobile,
     required this.email,
   });
 
-  factory DriverData.fromJson(Map<String, dynamic> json) => DriverData(
-    name: json["name"],
-    mobile: json["mobile"],
-    email: json["email"],
-  );
+  final String? name;
+  final String? mobile;
+  final String? email;
 
-  Map<String, dynamic> toJson() => {
-    "name": name,
-    "mobile": mobile,
-    "email": email,
-  };
+  factory DriverDatum.fromJson(Map<String, dynamic> json){
+    return DriverDatum(
+      name: json["name"],
+      mobile: json["mobile"],
+      email: json["email"],
+    );
+  }
+
 }
 
 class OrderItem {
-  String productId;
-  String catId;
-  String subcatId;
-  String childCategory;
-  String productName;
-  String productDescription;
-  String productPrice;
-  String productImage;
-  String proRatings;
-  String roleId;
-  String sellingPrice;
-  DateTime productCreateDate;
-  String vendorId;
-  String otherImage;
-  String productStatus;
-  String variantName;
-  String productType;
-  String tax;
-  String unit;
-  String unitType;
-  String qty;
-
   OrderItem({
     required this.productId,
     required this.catId,
@@ -195,51 +137,52 @@ class OrderItem {
     required this.qty,
   });
 
-  factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
-    productId: json["product_id"],
-    catId: json["cat_id"],
-    subcatId: json["subcat_id"],
-    childCategory: json["child_category"],
-    productName: json["product_name"],
-    productDescription: json["product_description"],
-    productPrice: json["product_price"],
-    productImage: json["product_image"],
-    proRatings: json["pro_ratings"],
-    roleId: json["role_id"],
-    sellingPrice: json["selling_price"],
-    productCreateDate: DateTime.parse(json["product_create_date"]),
-    vendorId: json["vendor_id"],
-    otherImage: json["other_image"],
-    productStatus: json["product_status"],
-    variantName: json["variant_name"],
-    productType: json["product_type"],
-    tax: json["tax"],
-    unit: json["unit"],
-    unitType: json["unit_type"],
-    qty: json["qty"],
-  );
+  final String? productId;
+  final String? catId;
+  final String? subcatId;
+  final String? childCategory;
+  final String? productName;
+  final String? productDescription;
+  final String? productPrice;
+  final String? productImage;
+  final String? proRatings;
+  final String? roleId;
+  final String? sellingPrice;
+  final DateTime? productCreateDate;
+  final String? vendorId;
+  final String? otherImage;
+  final String? productStatus;
+  final String? variantName;
+  final String? productType;
+  final String? tax;
+  final String? unit;
+  final String? unitType;
+  final String? qty;
 
-  Map<String, dynamic> toJson() => {
-    "product_id": productId,
-    "cat_id": catId,
-    "subcat_id": subcatId,
-    "child_category": childCategory,
-    "product_name": productName,
-    "product_description": productDescription,
-    "product_price": productPrice,
-    "product_image": productImage,
-    "pro_ratings": proRatings,
-    "role_id": roleId,
-    "selling_price": sellingPrice,
-    "product_create_date": productCreateDate.toIso8601String(),
-    "vendor_id": vendorId,
-    "other_image": otherImage,
-    "product_status": productStatus,
-    "variant_name": variantName,
-    "product_type": productType,
-    "tax": tax,
-    "unit": unit,
-    "unit_type": unitType,
-    "qty": qty,
-  };
+  factory OrderItem.fromJson(Map<String, dynamic> json){
+    return OrderItem(
+      productId: json["product_id"],
+      catId: json["cat_id"],
+      subcatId: json["subcat_id"],
+      childCategory: json["child_category"],
+      productName: json["product_name"],
+      productDescription: json["product_description"],
+      productPrice: json["product_price"],
+      productImage: json["product_image"],
+      proRatings: json["pro_ratings"],
+      roleId: json["role_id"],
+      sellingPrice: json["selling_price"],
+      productCreateDate: DateTime.tryParse(json["product_create_date"] ?? ""),
+      vendorId: json["vendor_id"],
+      otherImage: json["other_image"],
+      productStatus: json["product_status"],
+      variantName: json["variant_name"],
+      productType: json["product_type"],
+      tax: json["tax"],
+      unit: json["unit"],
+      unitType: json["unit_type"],
+      qty: json["qty"],
+    );
+  }
+
 }

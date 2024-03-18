@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hojayega_seller/Helper/color.dart';
 
 import 'SplashScreen.dart';
 
@@ -18,8 +19,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'HoJayega User',
-      theme: ThemeData(
+      title: 'HoJayega Seller',
+      theme: ThemeData(textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: colors.primary,
+      ),
+        // focusColor: colors.primary,
         primarySwatch: Colors.blue,
       ),
       home: const SplashScreen(),

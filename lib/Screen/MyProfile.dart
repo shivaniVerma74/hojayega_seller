@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:ho_jayega_seller/AuthView/signUpPersonal.dart';
-// import 'package:ho_jayega_seller/helper/color.dart';
 import 'package:hojayega_seller/Helper/color.dart';
+import 'package:hojayega_seller/Model/GetAreaModel.dart';
+import 'package:hojayega_seller/Model/GetCityModel.dart';
+import 'package:hojayega_seller/Model/StateModel.dart';
 // import 'package:ho_jayega_seller/screen/Calender.dart';
 import 'package:http/http.dart';
 import 'dart:io';
@@ -9,7 +10,10 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Helper/api.path.dart';
+import '../Model/GetProfileModel.dart';
 import 'Calender.dart';
 
 // import '../utils/utils.dart';
@@ -29,8 +33,6 @@ class _MyProfileState extends State<MyProfile> {
   var yearController =TextEditingController();
   var phoneController =TextEditingController();
   var emailController =TextEditingController();
-  var passwordController =TextEditingController();
-  var confirmPasswordController =TextEditingController();
   var dobController =TextEditingController();
   var refferalcodeController =TextEditingController();
   var addressController =TextEditingController();
@@ -57,11 +59,26 @@ class _MyProfileState extends State<MyProfile> {
   String _selectedOption='1';
   String _selectedOption2 = 'user';
   String _selectedOption3 = 'service';
-  String? _dropItem1;
   List<String> items = ['North', 'South', 'East', 'West'];
-  String? _dropItem2;
-  List<String> items2 = ['Maddhya Pradesh', 'Rajisthan', 'Gujarat', 'U.P'];
-  String? _dropItem3;
+  List<StataData> stateList=[];
+  List<CityData> cityList=[];
+  List<CountryData> countryList=[];
+  CityData? cityValue;
+  CountryData? countryValue;
+  StataData? stateValue;
+  String? stateName;
+  String? stateId;
+  String? cityId;
+  String? countryId;
+  String? cityName;
+  String? countryName;
+  String? adhaarFront;
+  String? adhaarBack;
+  String? panImage;
+  String? selfiImage;
+  String? customerLocationImage;
+  String? shopImage;
+
   List<String> items3 = ['Indore', 'Bhopal', 'jaipur', 'Ujjain'];
 
 
@@ -75,6 +92,7 @@ class _MyProfileState extends State<MyProfile> {
   File? _image6;
   bool isVisible = true;
   bool isVisible2 = true;
+  bool isLoading = true;
 
   String? _validateEmail(value) {
     if (value!.isEmpty) {
@@ -139,19 +157,52 @@ class _MyProfileState extends State<MyProfile> {
       } else if (pickedFile != null && imageCode == 8) {
         _qrimage= File(pickedFile.path);
       }
-
       else {
         print('no image picked');
       }
     });
   }
-
-
+   loading(){
+    Future.delayed(Duration(seconds: 1),(){
+      setState(() {
+        isLoading = false;
+      });
+    });
+   }
   String errorText = '';
   void initState() {
+    loading();
     dropdownController.text = items[0];
     super.initState();
+    getProfile().then(
+        (val){
+          nameController.text = profileData?.data?.first?.uname ?? "";
+          shopController.text = profileData?.data?.first?.shopName ?? "";
+          yearController.text = profileData?.data?.first?.yearOfExperience ?? "";
+          phoneController.text = profileData?.data?.first?.mobile ?? "";
+          emailController.text = profileData?.data?.first?.email ?? "";
+          refferalcodeController.text = profileData?.data?.first?.refferalCode ?? "";
+          dobController.text = profileData?.data?.first?.dob ?? "";
+          currentlocationController.text = profileData?.data?.first?.address ?? "";
+          landController.text = profileData?.data?.first?.landMark ?? "";
+          stateId = profileData?.data?.first?.state ?? "";
+          cityId = profileData?.data?.first?.city ?? "";
+          countryId = profileData?.data?.first?.region ?? "";
+          banknameController.text = profileData?.data?.first?.bandDetails ?? "";
+          selfiImage = profileData?.data?.first?.selfiImage;
+          adhaarBack = profileData?.data?.first?.adharBack;
+          adhaarFront = profileData?.data?.first?.adharFront;
+          customerLocationImage = profileData?.data?.first?.customerLocation;
+          panImage = profileData?.data?.first?.panImage;
+          shopImage = profileData?.data?.first?.shopImage;
+          getState();
+          getCity(stateId);
+          getArea(cityId);
+        }
+    );
+
   }
+
   void validateDropdown() {
     if (dropdownController.text.isEmpty) {
       setState(() {
@@ -163,6 +214,127 @@ class _MyProfileState extends State<MyProfile> {
       });
     }
   }
+  getState() async {
+    print("state apiii isss");
+    var headers = {
+      'Cookie': 'ci_session=95bbd5f6f543e31f65185f824755bcb57842c775'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getState));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseData = await response.stream.transform(utf8.decoder).join();
+      var userData = json.decode(responseData);
+      if (mounted) {
+        setState(() {
+          stateList = StateModel.fromJson(userData).data!;
+          if(stateId != null){
+            for(var stateValue in stateList){
+              if(stateValue.id == stateId){
+                this.stateValue = stateValue;
+              }
+            }
+          }
+          print("state list is $stateList");
+        });
+      }
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+  getCity(String? sId) async{
+    var headers = {
+      'Cookie': 'ci_session=95bbd5f6f543e31f65185f824755bcb57842c775'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getCities));
+    request.fields.addAll({
+      'state_id': sId.toString()
+    });
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseData = await response.stream.transform(utf8.decoder).join();
+      var userData = json.decode(responseData);
+      if (mounted) {
+        setState(() {
+          cityList = GetCityModel.fromJson(userData).data!;
+          print("city list is $stateList");
+        });
+        if(cityId != null){
+          for(var cityValue in cityList){
+            if(cityValue.id == cityId){
+              this.cityValue = cityValue;
+            }
+          }
+        }
+      }
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+  getArea(String? city_Id) async {
+    var headers = {
+      'Cookie': 'ci_session=cb5a399c036615bb5acc0445a8cd39210c6ca648'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getArea));
+    request.headers.addAll(headers);
+    request.fields.addAll({
+      'city_id': city_Id.toString()
+    });
+    print("get aresaa ${request.fields}");
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseData = await response.stream.transform(utf8.decoder).join();
+      var userData = json.decode(responseData);
+      if (mounted) {
+        setState(() {
+          countryList = GetAreaModel.fromJson(userData).data!;
+        });
+        print("region list is $countryList");
+        if(countryId != null){
+          for(var countryValue in countryList){
+            if(countryValue.id == countryId){
+              this.countryValue = countryValue;
+            }
+          }
+      }
+      }
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  String? vendorId;
+  GetProfileModel? profileData;
+  getProfile() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    var headers = {
+      'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
+    request.fields.addAll({
+      'user_id': vendorId.toString()
+    });
+    debugPrint("get profile parametersssss ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = GetProfileModel.fromJson(json.decode(finalResponse));
+      print("profile data responsee $finalResult");
+      setState(() {
+        profileData = finalResult;
+        setState(() {});
+      });
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
 
   Future<void> _showPickerOptions() async {
     showModalBottomSheet(
@@ -208,7 +380,7 @@ class _MyProfileState extends State<MyProfile> {
           ),
           title: const Text('MyProfile'),
           backgroundColor: colors.primary),
-      body: SingleChildScrollView(
+      body: isLoading ? const Center(child: CircularProgressIndicator(),):SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
@@ -269,7 +441,7 @@ class _MyProfileState extends State<MyProfile> {
                             //   }
                             //   return null;
                             // },
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                                 hintText: 'Name',
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -348,7 +520,7 @@ class _MyProfileState extends State<MyProfile> {
                               color: colors.lightgray),
                           child: TextFormField(
                             controller: yearController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                                 hintText: 'Year of Experience',
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -440,120 +612,6 @@ class _MyProfileState extends State<MyProfile> {
 
                             decoration: InputDecoration(
                                 hintText: 'Email Address',
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.white))),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Card(
-                        child: Container(
-                            width: 50,
-                            height: 50,
-                            // color: Colors.black,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: colors.lightgray),
-                            child: Image.asset(
-                                'assets/images/password.png')),
-                      ),
-                      Card(
-                        child: Container(
-                          width: 220,
-                          height: 50,
-                          // color: Colors.black,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: colors.lightgray),
-                          child: TextFormField(
-                            controller: passwordController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Enter password';
-                              } else if (value.length < 8) {
-                                return 'At least 8 characters required';
-                              }
-                              return null;
-                            },
-                            obscureText: isVisible ? false : true,
-
-                            decoration: InputDecoration(
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      isVisible ? isVisible = false : isVisible = true;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    isVisible ? Icons.remove_red_eye : Icons.visibility_off,
-                                    color:colors.secondary,
-                                  ),
-                                ),
-                                hintText: 'Password',
-
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.white))),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Card(
-                        child: Container(
-                            width: 50,
-                            height: 50,
-                            // color: Colors.black,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: colors.lightgray),
-                            child: Image.asset(
-                                'assets/images/password.png')),
-                      ),
-                      Card(
-                        child: Container(
-                          width: 220,
-                          height: 50,
-                          // color: Colors.black,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: colors.lightgray),
-                          child: TextFormField(
-                            controller: confirmPasswordController,
-                            obscureText: isVisible2 ? false : true,
-                            validator: (value) {
-                              if (value != passwordController.text.toString()) {
-                                return 'Enter Not Match';
-                              }
-                              return null;
-                            },
-
-                            decoration: InputDecoration(
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      isVisible2 ? isVisible2 = false : isVisible2 = true;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    isVisible2 ? Icons.remove_red_eye : Icons.visibility_off,
-                                    color: colors.secondary,
-                                  ),
-                                ),
-
-                                hintText: 'Confirm Password',
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: Colors.white)),
@@ -840,6 +898,139 @@ class _MyProfileState extends State<MyProfile> {
                                     ),
                                   ],
                                 ),
+
+
+                                Row(
+                                  children: [
+                                    Card(
+                                      child: Container(
+                                          width: 50,
+                                          height: 50,
+                                          // color: Colors.black,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: colors.lightgray),
+                                          child:
+                                          Image.asset('assets/images/state.png')),
+                                    ),
+                                    Card(
+                                      child: Container(
+                                        width: 220,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(5),
+
+                                        ),
+                                        child: DropdownButton(
+                                          isExpanded: true,
+                                          value: stateValue,
+                                          hint: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Text('State'),
+                                          ),
+                                          // Down Arrow Icon
+                                          icon: const Icon(Icons.keyboard_arrow_down),
+                                          // Array list of items
+                                          items: stateList.map((items) {
+                                            return DropdownMenuItem(
+                                                value: items,
+                                                child: Container(
+                                                  child: Padding(
+                                                    padding:
+                                                    const EdgeInsets.only(left: 10),
+                                                    child: Text(items.name.toString()),
+                                                  ),
+                                                ));
+                                          }).toList(),
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              stateValue = newValue;
+                                              getCity("${stateValue!.id}");
+                                              stateName = stateValue!.name;
+                                              stateId = stateValue!.id;
+                                              debugPrint("name herererb $stateName $stateId" );
+                                            });
+                                          },
+                                          underline: Container(),
+                                        ),
+                                      ),
+
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Card(
+                                      child: Container(
+                                          width: 50,
+                                          height: 50,
+                                          // color: Colors.black,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: colors.lightgray),
+                                          child:
+                                          Image.asset('assets/images/state.png')),
+                                    ),
+                                    Card(
+                                      child: Container(
+                                        width: 220,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(5),
+                                          // boxShadow: const [
+                                          //   BoxShadow(
+                                          //     color: Colors.grey,
+                                          //     offset: Offset(
+                                          //       1.0,
+                                          //       1.0,
+                                          //     ),
+                                          //     blurRadius: 0.2,
+                                          //     spreadRadius: 0.5,
+                                          //   ),
+                                          // ],
+                                        ),
+                                        child: DropdownButton(
+                                          isExpanded: true,
+                                          value: cityValue,
+                                          hint: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Text('City'),
+                                          ),
+                                          // Down Arrow Icon
+                                          icon: const Icon(Icons.keyboard_arrow_down),
+                                          // Array list of items
+                                          items: cityList.map((items) {
+                                            return DropdownMenuItem(
+                                                value: items,
+                                                child: Container(
+                                                  child: Padding(
+                                                    padding:
+                                                    const EdgeInsets.only(left: 10),
+                                                    child: Text(items.name.toString()),
+                                                  ),
+                                                ));
+                                          }).toList(),
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              cityValue= newValue;
+                                              getArea("${cityValue!.id}");
+                                              cityName = cityValue!.name;
+                                              cityId = cityValue!.id;
+                                              //stateValue = value!;
+                                              //getCity("${stateValue!.id}");
+                                              //stateName = stateValue!.name;
+                                              //print("name herererb $stateName");
+                                            });
+                                          },
+                                          underline: Container(),
+                                        ),
+                                      ),
+
+                                    ),
+                                  ],
+                                ),
                                 Row(
                                   children: [
                                     Card(
@@ -875,7 +1066,7 @@ class _MyProfileState extends State<MyProfile> {
                                         child: DropdownButton(
 
                                           isExpanded: true,
-                                          value: _dropItem1,
+                                          value: countryValue,
                                           hint: Padding(
                                             padding: const EdgeInsets.only(left: 10),
                                             child: Text('Region'),
@@ -883,24 +1074,22 @@ class _MyProfileState extends State<MyProfile> {
                                           // Down Arrow Icon
                                           icon: const Icon(Icons.keyboard_arrow_down),
                                           // Array list of items
-                                          items: items.map((items) {
+                                          items: countryList.map((items) {
                                             return DropdownMenuItem(
                                                 value: items,
                                                 child: Container(
                                                   child: Padding(
                                                     padding:
                                                     const EdgeInsets.only(left: 10),
-                                                    child: Text(items),
+                                                    child: Text(items.name.toString()),
                                                   ),
                                                 ));
                                           }).toList(),
-                                          onChanged: (String? newValue) {
+                                          onChanged: ( newValue) {
                                             setState(() {
-                                              _dropItem1 = newValue;
-                                              //stateValue = value!;
-                                              //getCity("${stateValue!.id}");
-                                              //stateName = stateValue!.name;
-                                              //print("name herererb $stateName");
+                                              countryValue = newValue;
+                                              countryId = countryValue!.id;
+                                              print("name herererb $countryId");
                                             });
                                           },
                                           underline: Container(),
@@ -909,135 +1098,6 @@ class _MyProfileState extends State<MyProfile> {
 
                                     ),
 
-                                  ],
-                                ),
-
-                                Row(
-                                  children: [
-                                    Card(
-                                      child: Container(
-                                          width: 50,
-                                          height: 50,
-                                          // color: Colors.black,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: colors.lightgray),
-                                          child:
-                                          Image.asset('assets/images/state.png')),
-                                    ),
-                                    Card(
-                                      child: Container(
-                                        width: 220,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(5),
-
-                                        ),
-                                        child: DropdownButton(
-                                          isExpanded: true,
-                                          value: _dropItem2,
-                                          hint: Padding(
-                                            padding: const EdgeInsets.only(left: 10),
-                                            child: Text('State'),
-                                          ),
-                                          // Down Arrow Icon
-                                          icon: const Icon(Icons.keyboard_arrow_down),
-                                          // Array list of items
-                                          items: items2.map((items) {
-                                            return DropdownMenuItem(
-                                                value: items,
-                                                child: Container(
-                                                  child: Padding(
-                                                    padding:
-                                                    const EdgeInsets.only(left: 10),
-                                                    child: Text(items),
-                                                  ),
-                                                ));
-                                          }).toList(),
-                                          onChanged: (String? newValue) {
-                                            setState(() {
-                                              _dropItem2 = newValue;
-                                              //stateValue = value!;
-                                              //getCity("${stateValue!.id}");
-                                              //stateName = stateValue!.name;
-                                              //print("name herererb $stateName");
-                                            });
-                                          },
-                                          underline: Container(),
-                                        ),
-                                      ),
-
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Card(
-                                      child: Container(
-                                          width: 50,
-                                          height: 50,
-                                          // color: Colors.black,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: colors.lightgray),
-                                          child:
-                                          Image.asset('assets/images/state.png')),
-                                    ),
-                                    Card(
-                                      child: Container(
-                                        width: 220,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(5),
-                                          // boxShadow: const [
-                                          //   BoxShadow(
-                                          //     color: Colors.grey,
-                                          //     offset: Offset(
-                                          //       1.0,
-                                          //       1.0,
-                                          //     ),
-                                          //     blurRadius: 0.2,
-                                          //     spreadRadius: 0.5,
-                                          //   ),
-                                          // ],
-                                        ),
-                                        child: DropdownButton(
-                                          isExpanded: true,
-                                          value: _dropItem3,
-                                          hint: Padding(
-                                            padding: const EdgeInsets.only(left: 10),
-                                            child: Text('Region'),
-                                          ),
-                                          // Down Arrow Icon
-                                          icon: const Icon(Icons.keyboard_arrow_down),
-                                          // Array list of items
-                                          items: items.map((items) {
-                                            return DropdownMenuItem(
-                                                value: items,
-                                                child: Container(
-                                                  child: Padding(
-                                                    padding:
-                                                    const EdgeInsets.only(left: 10),
-                                                    child: Text(items),
-                                                  ),
-                                                ));
-                                          }).toList(),
-                                          onChanged: (String? newValue) {
-                                            setState(() {
-                                              _dropItem3= newValue;
-                                              //stateValue = value!;
-                                              //getCity("${stateValue!.id}");
-                                              //stateName = stateValue!.name;
-                                              //print("name herererb $stateName");
-                                            });
-                                          },
-                                          underline: Container(),
-                                        ),
-                                      ),
-
-                                    ),
                                   ],
                                 ),
                                 Row(
@@ -1467,12 +1527,7 @@ class _MyProfileState extends State<MyProfile> {
                                       _qrimage!.absolute,
                                       fit: BoxFit.fill,
                                     )
-                                        : Icon(
-                                      Icons.file_upload_outlined,
-                                      color: colors.secondary,
-                                     // weight: 50,
-                                      size:50,
-                                    ),
+                                        : Image.network(selfiImage!,fit: BoxFit.fill,)
                                   ),
                                 ),
                               ),
@@ -1583,11 +1638,7 @@ class _MyProfileState extends State<MyProfile> {
                                   _image!.absolute,
                                   fit: BoxFit.fill,
                                 )
-                                    : Icon(
-                                  Icons.file_upload_outlined,
-                                  size: 50,
-                                  color: colors.secondary,
-                                ),
+                                    : Image.network("https://developmentalphawizz.com/hojayega${shopImage!}",fit: BoxFit.fill,)
                               ),
                             ),
                           ),
@@ -1620,11 +1671,7 @@ class _MyProfileState extends State<MyProfile> {
                                   _image2!.absolute,
                                   fit: BoxFit.fill,
                                 )
-                                    : Icon(
-                                  Icons.file_upload_outlined,
-                                  size: 50,
-                                  color: colors.secondary,
-                                ),
+                                    : Image.network(panImage!,fit: BoxFit.fill,)
                               ),
                             ),
                           ),
@@ -1657,11 +1704,7 @@ class _MyProfileState extends State<MyProfile> {
                                   _image3!.absolute,
                                   fit: BoxFit.fill,
                                 )
-                                    : Icon(
-                                  Icons.file_upload_outlined,
-                                  size: 50,
-                                  color: colors.secondary,
-                                ),
+                                    : Image.network(adhaarFront!,fit: BoxFit.fill,)
                               ),
                             ),
                           ),    Padding(
@@ -1694,11 +1737,7 @@ class _MyProfileState extends State<MyProfile> {
                                   _image4!.absolute,
                                   fit: BoxFit.fill,
                                 )
-                                    : Icon(
-                                  Icons.file_upload_outlined,
-                                  size: 50,
-                                  color: colors.secondary,
-                                ),
+                                    : Image.network(adhaarBack!,fit: BoxFit.fill,)
                               ),
                             ),
                           ),
@@ -1763,11 +1802,7 @@ class _MyProfileState extends State<MyProfile> {
                                   _image5!.absolute,
                                   fit: BoxFit.fill,
                                 )
-                                    : Icon(
-                                  Icons.file_upload_outlined,
-                                  size: 50,
-                                  color: colors.secondary,
-                                ),
+                                    : Image.network(customerLocationImage!,fit: BoxFit.fill,)
                               ),
                             ),
                           ),Padding(
@@ -1808,11 +1843,7 @@ class _MyProfileState extends State<MyProfile> {
                                   _image6!.absolute,
                                   fit: BoxFit.fill,
                                 )
-                                    : Icon(
-                                  Icons.file_upload_outlined,
-                                  size: 50,
-                                  color: colors.secondary,
-                                ),
+                                    : Image.network(selfiImage!,fit: BoxFit.fill,)
                               ),
                             ),
                           ),

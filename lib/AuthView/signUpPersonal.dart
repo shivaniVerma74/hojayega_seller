@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +19,8 @@ import '../Model/StateModel.dart';
 import '../Screen/ThankYouScreen.dart';
 
 class SignUpPersonal extends StatefulWidget {
-  const SignUpPersonal({super.key});
+  final String mobileOrEmail;
+  const SignUpPersonal({super.key,required this.mobileOrEmail});
 
   @override
   State<SignUpPersonal> createState() => _SignUpPersonalState();
@@ -30,6 +34,17 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     super.initState();
     dropdownController.text = items[0];
     getstate();
+    if(isNumeric(widget.mobileOrEmail)){
+      phoneController.text = widget.mobileOrEmail;
+    }else{
+      emailController.text = widget.mobileOrEmail;
+    }
+  }
+  bool isNumeric(String s) {
+    if(s == null) {
+      return false;
+    }
+    return double.tryParse(s) != null;
   }
 
   var nameController = TextEditingController();
@@ -91,18 +106,18 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       'password': passwordController.text,
       'dob': dobController.text,
       'refferal_code': refferalcodeController.text,
-      'address': currentlocationController.text,
+      'address': addressController.text,
       'land_mark': landController.text,
       'friend_code': friendcodeController.text,
       'bank_name': banknameController.text,
       'account_number': accountNumberController.text,
       'ifsc_code': ifscController.text,
       'upi_id': upiidContoler.text,
-      'roll': _selectedOption3 == "service" ? "1" : "2",
+      'roll': _selectedOption3 == "shop" ? "1" : "2",
       'city': cityId.toString(),
       'state': stateId.toString(),
       'region': countryId.toString(),
-      "shop_type": _selectedOption3 == "service" ? "1" : "2",
+      "shop_type": _selectedOption3 == "shop" ? "1" : "2",
       "gst_no": gstNumberController.text
     });
     print("register parameter ${request.fields}");
@@ -129,11 +144,14 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     if (response.statusCode == 200) {
       print("resonse-------${response.statusCode}");
       var result = await response.stream.bytesToString();
+      print("result $result");
       var finaResult = jsonDecode(result);
       print("resonse===== $finaResult");
       if (finaResult['response_code'] == '1') {
-        vendor_id = finaResult['data']['id'];
-        await prefs.setString('vendor_id', finaResult['data']['id'].toString());
+        vendor_id = finaResult['data']['vendor_id'];
+        debugPrint("vemdor_id :$vendor_id");
+        log("vendor_id :$vendor_id");
+        await prefs.setString('vendor_id', finaResult['data']['vendor_id'].toString());
         await prefs.setString('vendor_name', finaResult['data']['username'].toString());
         await prefs.setString('vendor_email', finaResult['data']['email'].toString());
         await prefs.setString('roll', finaResult['data']['roll'].toString());
@@ -183,6 +201,13 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     }
   }
 
+
+  bool isStrongPassword(String s){
+    RegExp regex =
+    RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
+    return regex.hasMatch(s);
+  }
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool isVisible = true;
@@ -196,6 +221,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       return "Please enter a valid email";
     }
   }
+  bool loading = false;
 
   var data = [
     'Personal Information',
@@ -212,7 +238,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   List<String> items3 = ['Indore', 'Bhopal', 'jaipur', 'Ujjain'];
 
   String _selectedOption2 = 'user';
-  String _selectedOption3 = 'service';
+  String _selectedOption3 = 'shop';
   var arrValue = ['Cake', 'fragile', 'Ready', 'Non'];
 
   File? _qrimage;
@@ -226,26 +252,33 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   final picker = ImagePicker();
 
   var imageCode;
+  File? croppedFile;
   Future getImageGallery() async {
     final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 70,maxWidth: 300,maxHeight: 400);
+    if(pickedFile != null){
+       final cropFile = await ImageCropper().cropImage(sourcePath: pickedFile.path,cropStyle: CropStyle.rectangle);
+       if(cropFile != null){
+         croppedFile = File(cropFile.path);
+       }
+    }
     setState(() {
-      if (pickedFile != null && imageCode == 1) {
-        _image = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 2) {
-        _image2 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 3) {
-        _image3 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 4) {
-        _image4 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 5) {
-        _image5 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 6) {
-        _image6 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 7) {
-        _currentlocationimage = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 8) {
-        _qrimage = File(pickedFile.path);
+      if (croppedFile != null && imageCode == 1) {
+        _image = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 2) {
+        _image2 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 3) {
+        _image3 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 4) {
+        _image4 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 5) {
+        _image5 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 6) {
+        _image6 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 7) {
+        _currentlocationimage = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 8) {
+        _qrimage = File(croppedFile!.path);
       } else {
         print('no image picked');
       }
@@ -254,24 +287,30 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
 
   Future _getImageFromCamera() async {
     final pickedFile =
-        await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 70,maxWidth: 300,maxHeight: 400);
+    if(pickedFile != null){
+      final cropFile = await ImageCropper().cropImage(sourcePath: pickedFile.path,cropStyle: CropStyle.rectangle);
+      if(cropFile != null){
+        croppedFile = File(cropFile.path);
+      }
+    }
     setState(() {
-      if (pickedFile != null && imageCode == 1) {
-        _image = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 2) {
-        _image2 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 3) {
-        _image3 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 4) {
-        _image4 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 5) {
-        _image5 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 6) {
-        _image6 = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 7) {
-        _currentlocationimage = File(pickedFile.path);
-      } else if (pickedFile != null && imageCode == 8) {
-        _qrimage = File(pickedFile.path);
+      if (croppedFile != null && imageCode == 1) {
+        _image = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 2) {
+        _image2 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 3) {
+        _image3 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 4) {
+        _image4 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 5) {
+        _image5 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 6) {
+        _image6 = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 7) {
+        _currentlocationimage = File(croppedFile!.path);
+      } else if (croppedFile != null && imageCode == 8) {
+        _qrimage = File(croppedFile!.path);
       } else {
         print('no image picked');
       }
@@ -379,8 +418,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2025),
+        firstDate: DateTime(1950),
+        lastDate: DateTime.now(),
         builder: (BuildContext context, Widget? child) {
           return Theme(
             data: ThemeData.light().copyWith(
@@ -410,17 +449,20 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       builder: (BuildContext context) {
         return Wrap(
           children: <Widget>[
-            ListTile(
+            imageCode ==6?const SizedBox.shrink():ListTile(
               leading: Icon(Icons.photo_library),
               title: Text('Gallery'),
               onTap: () {
+                Navigator.pop(context);
                 getImageGallery();
+
               },
             ),
             ListTile(
               leading: Icon(Icons.camera_alt),
               title: Text('Camera'),
               onTap: () {
+                Navigator.pop(context);
                 _getImageFromCamera();
                 // _getImage(ImageSource.camera);
               },
@@ -467,8 +509,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     const Padding(
                       padding: EdgeInsets.only(top: 5),
                       child: Text(
-                        "Kindly complete the form below, specifying the\npurpose of your application",
-                        style: TextStyle(fontSize: 12),
+                        "Complete the form , specifying your application's purpose.",
+                        style: TextStyle(fontSize: 14),
                       ),
                     ),
                     // const Padding(
@@ -528,32 +570,40 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: Colors.black)),
                         child: Row(
-                          // mainAxisAlignment: MainAxisAlignment.center,
+                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             // SizedBox(width: 5,),
-                            Radio<String>(
-                              value: 'service',
-                              activeColor: Colors.green,
-                              groupValue: _selectedOption3,
-                              onChanged: (String? value) {
-                                setState(() {
-                                  _selectedOption3 = value!;
-                                });
-                              },
+                            Row(
+                              children: [
+                                Radio<String>(
+                                  value: 'shop',
+                                  activeColor: Colors.green,
+                                  groupValue: _selectedOption3,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _selectedOption3 = value!;
+                                    });
+                                  },
+                                ),
+                                const Text("Shop"),
+                              ],
                             ),
-                            const Text("Service Provider"),
                             //  SizedBox(width: 5,),
-                            Radio<String>(
-                              value: 'shop',
-                              activeColor: Colors.green,
-                              groupValue: _selectedOption3,
-                              onChanged: (String? value) {
-                                setState(() {
-                                  _selectedOption3 = value!;
-                                });
-                              },
-                            ),
-                            const Text("Shopkeeper")
+                            Row(
+                              children: [
+                                Radio<String>(
+                                  value: 'service',
+                                  activeColor: Colors.green,
+                                  groupValue: _selectedOption3,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _selectedOption3 = value!;
+                                    });
+                                  },
+                                ),
+                                const Text("Service Provider"),
+                              ],
+                            )
                           ],
                         ),
                       ),
@@ -576,30 +626,33 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/person.png')),
                                 ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: nameController,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Enter  Name';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: const InputDecoration(
-                                          hintText: 'Name',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                Expanded(
+                                  child: Card(
+                                    child: Container(
+                                      // width: 220,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+
+                                        controller: nameController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter  Name';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: const InputDecoration(
+                                            isDense : true,
+                                            hintText: 'Name',
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -619,30 +672,31 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/shopname.png')),
                                 ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: shopController,
-                                      decoration: const InputDecoration(
-                                          hintText: 'Shop Name/Company Name',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Enter shop name';
-                                        }
-                                        return null;
-                                      },
+                                Expanded(
+                                  child: Card(
+                                    child: Container(
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        controller: shopController,
+                                        decoration:  InputDecoration(
+                                            hintText: _selectedOption3 == "shop"?'Shop Name':'Company Name',
+                                            isDense : true,
+                                            enabledBorder: const OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter shop name';
+                                          }
+                                          return null;
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -662,31 +716,32 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/yearofexperience.png')),
                                 ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: yearController,
-                                      keyboardType: TextInputType.number,
-                                      decoration: const InputDecoration(
-                                          hintText: 'Year of Experience',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Enter your experience';
-                                        }
-                                        return null;
-                                      },
+                                Expanded(
+                                  child: Card(
+                                    child: Container(
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        controller: yearController,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                            isDense : true,
+                                            hintText: 'Year of Experience',
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter your experience';
+                                          }
+                                          return null;
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -706,35 +761,36 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/phonenumber.png')),
                                 ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      keyboardType: TextInputType.number,
-                                      maxLength: 10,
-                                      controller: phoneController,
-                                      decoration: const InputDecoration(
-                                        counterText: "",
-                                          hintText: 'Phone Number',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Enter Phone Number';
-                                        } else if (value.length < 10) {
-                                          return 'At least 10 characters required';
-                                        }
-                                        return null;
-                                      },
+                                Expanded(
+                                  child: Card(
+                                    child: Container(
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        maxLength: 10,
+                                        controller: phoneController,
+                                        decoration: const InputDecoration(
+                                            isDense : true,
+                                          counterText: "",
+                                            hintText: 'Phone Number',
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter Phone Number';
+                                          } else if (value.length < 10) {
+                                            return 'At least 10 characters required';
+                                          }
+                                          return null;
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -754,32 +810,31 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/email address.png')),
                                 ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
+                                Expanded(
+                                  child: Card(
+                                    child: Container(
+                                      // width: 220,
 
-                                  // height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
+                                    // height: 50,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
 
-                                      controller: emailController,
-                                      validator: _validateEmail,
-                                      decoration: const InputDecoration(
-                                        isDense: true,
-                                        border: InputBorder.none,
-                                          hintText: 'Email Address',
-
-                                          enabledBorder: const OutlineInputBorder(
-                                              borderSide: BorderSide(
-
-
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))
+                                        controller: emailController,
+                                        validator: _validateEmail,
+                                        decoration: const InputDecoration(
+                                          isDense: true,
+                                          border: InputBorder.none,
+                                            hintText: 'Email Address',
+                                            enabledBorder: const OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -800,114 +855,116 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/password.png')),
                                 ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: passwordController,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Enter password';
-                                        } else if (value.length < 8) {
-                                          return 'At least 8 characters required';
-                                        }
-                                        return null;
-                                      },
-                                      obscureText: isVisible ? false : true,
-                                      decoration: InputDecoration(
-                                          suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
+                                Expanded(
+                                  child: Card(
+                                    child: Container(
+                                      // width: 220,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        controller: passwordController,
+                                        maxLength: 15,
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please Enter password';
+                                          }
+                                          return null;
+                                        },
+                                        obscureText: isVisible ? false : true,
+                                        decoration: InputDecoration(
+                                          counterText: "",
+                                            isDense : true,
+                                            suffixIcon: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  isVisible
+                                                      ? isVisible = false
+                                                      : isVisible = true;
+                                                });
+                                              },
+                                              icon: Icon(
                                                 isVisible
-                                                    ? isVisible = false
-                                                    : isVisible = true;
-                                              });
-                                            },
-                                            icon: Icon(
-                                              isVisible
-                                                  ? Icons.remove_red_eye
-                                                  : Icons.visibility_off,
-                                              color: colors.secondary,
+                                                    ? Icons.remove_red_eye
+                                                    : Icons.visibility_off,
+                                                color: colors.secondary,
+                                              ),
                                             ),
-                                          ),
-                                          hintText: 'Password',
-                                          enabledBorder: const OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))
+                                            hintText: 'Password',
+                                            enabledBorder: const OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            Row(
-                              children: [
-                                Card(
-                                  child: Container(
-                                      width: 50,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: Image.asset(
-                                          'assets/images/password.png')),
-                                ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: confirmPasswordController,
-                                      obscureText: isVisibleTwo ? false : true,
-                                      validator: (value) {
-                                        if (value != passwordController.text
-                                                .toString()) {
-                                          return 'Enter Not Match';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                          suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                isVisibleTwo
-                                                    ? isVisibleTwo = false
-                                                    : isVisibleTwo = true;
-                                              });
-                                            },
-                                            icon: Icon(
-                                              isVisibleTwo
-                                                  ? Icons.remove_red_eye
-                                                  : Icons.visibility_off,
-                                              color: colors.secondary,
-                                            ),
-                                          ),
-                                          hintText: 'Confirm Password',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            // Row(
+                            //   children: [
+                            //     Card(
+                            //       child: Container(
+                            //           width: 50,
+                            //           height: 50,
+                            //           // color: Colors.black,
+                            //           decoration: BoxDecoration(
+                            //               borderRadius:
+                            //                   BorderRadius.circular(10),
+                            //               color: colors.lightgray),
+                            //           child: Image.asset(
+                            //               'assets/images/password.png')),
+                            //     ),
+                            //     Card(
+                            //       child: Container(
+                            //         width: 220,
+                            //         height: 50,
+                            //         // color: Colors.black,
+                            //         decoration: BoxDecoration(
+                            //             borderRadius: BorderRadius.circular(10),
+                            //             color: colors.lightgray),
+                            //         child: TextFormField(
+                            //           controller: confirmPasswordController,
+                            //           obscureText: isVisibleTwo ? false : true,
+                            //           validator: (value) {
+                            //             if (value != passwordController.text
+                            //                     .toString()) {
+                            //               return 'Password Not Match';
+                            //             }
+                            //             return null;
+                            //           },
+                            //           decoration: InputDecoration(
+                            //               suffixIcon: IconButton(
+                            //                 onPressed: () {
+                            //                   setState(() {
+                            //                     isVisibleTwo
+                            //                         ? isVisibleTwo = false
+                            //                         : isVisibleTwo = true;
+                            //                   });
+                            //                 },
+                            //                 icon: Icon(
+                            //                   isVisibleTwo
+                            //                       ? Icons.remove_red_eye
+                            //                       : Icons.visibility_off,
+                            //                   color: colors.secondary,
+                            //                 ),
+                            //               ),
+                            //               hintText: 'Confirm Password',
+                            //               enabledBorder: OutlineInputBorder(
+                            //                   borderSide: BorderSide(
+                            //                       color: Colors.white)),
+                            //               focusedBorder: OutlineInputBorder(
+                            //                   borderSide: BorderSide(
+                            //                       color: Colors.white))),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                             Row(
                               children: [
                                 Card(
@@ -922,33 +979,35 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/daetofbirth.png')),
                                 ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      onTap: () {
-                                        _selectDate1();
-                                      },
-                                      controller: dobController,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Enter DOB';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: 'Date of Birth',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                Expanded(
+                                  child: Card(
+                                    child: Container(
+                                      // width: 220,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        onTap: () {
+                                          _selectDate1();
+                                        },
+                                        controller: dobController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Enter DOB';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: 'Date of Birth',
+                                            isDense : true,
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white))),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -968,30 +1027,35 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       child: Image.asset(
                                           'assets/images/refferalcode.png')),
                                 ),
-                                Card(
-                                  child: Container(
-                                    width: 220,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: TextFormField(
-                                      controller: refferalcodeController,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Enter Refferal Code';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: 'Refferal Code',
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                Expanded(
+                                  child: Card(
+                                    child: Container(
+                                      // width: 220,
+                                      // color: Colors.black,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: colors.lightgray),
+                                      child: TextFormField(
+                                        controller: refferalcodeController,
+                                        // validator: (value) {
+                                        //   if (value == null || value.isEmpty) {
+                                        //     return 'Enter Refferal Code';
+                                        //   }
+                                        //   return null;
+                                        // },
+                                        decoration: const InputDecoration(
+                                            hintText: 'Referral Code(Optional)',
+                                            isDense : true,
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.white),
+                                            ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1049,16 +1113,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       setState(() {
                                         _selectedOption = '2';
                                       });
-                                      print(nameController.text.toString());
-                                      print(shopController.text.toString());
-                                      print(yearController.text.toString());
-                                      print(phoneController.text.toString());
-                                      print(emailController.text.toString());
-                                      print(passwordController.text.toString());
-                                      print(confirmPasswordController.text.toString());
-                                      print(dobController.text.toString());
-                                      print(refferalcodeController.text.toString());
-                                      print(friendcodeController.text.toString());
                                     }
                                   },
                                   child: Container(
@@ -1110,7 +1164,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                   //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
-                      children: [
+                      children: const [
                         CircleAvatar(
                             backgroundColor: colors.primary, maxRadius: 8),
                         SizedBox(
@@ -1140,34 +1194,36 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         color: colors.lightgray),
                                     child: Image.asset('assets/images/current address.png')),
                               ),
-                              Card(
-                                child: Container(
-                                  width: 220,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child: TextFormField(
-                                    controller: addressController,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Enter Current Address';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: const InputDecoration(
-                                        suffixIcon: Icon(
-                                          Icons.location_searching_sharp,
-                                          color: colors.secondary,
-                                        ),
-                                        hintText: 'Current Address',
-                                        enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.white)),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.white))),
+                              Expanded(
+                                child: Card(
+                                  child: Container(
+                                    // width: 220,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: TextFormField(
+                                      controller: addressController,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter Current Address';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: const InputDecoration(
+                                          suffixIcon: Icon(
+                                            Icons.location_searching_sharp,
+                                            color: colors.secondary,
+                                          ),
+                                          hintText: 'Current Address',
+                                          isDense: true,
+                                          enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white)),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white))),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1187,30 +1243,31 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         'assets/images/landmark.png'),
                                 ),
                               ),
-                              Card(
-                                child: Container(
-                                  width: 220,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child: TextFormField(
-                                    controller: landController,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Enter Land Mark';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: const InputDecoration(
-                                        hintText: 'Land Mark',
-                                        enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.white)),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.white))),
+                              Expanded(
+                                child: Card(
+                                  child: Container(
+                                    // width: 220,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: TextFormField(
+                                      controller: landController,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter Land Mark';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: const InputDecoration(
+                                          hintText: 'Land Mark',
+                                          enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white)),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white))),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1228,42 +1285,42 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         color: colors.lightgray),
                                     child: Image.asset('assets/images/state.png')),
                               ),
-                              Card(
-                                child: Container(
-                                  width: 220,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child:
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: DropdownButton(
-                                      isExpanded: true,
-                                      value: stateValue,
-                                      hint: const Text('State'),
-                                      // Down Arrow Icon
-                                      icon: const Icon(Icons.keyboard_arrow_down),
-                                      // Array list of items
-                                      items: stateList.map((items) {
-                                        return
-                                          DropdownMenuItem(
-                                            value: items,
-                                            child: Container(
-                                                child: Text(items.name.toString())),
-                                          );
-                                      }).toList(),
-                                      onChanged: (StataData? value) {
-                                        setState(() {
-                                          stateValue = value!;
-                                          getCity("${stateValue!.id}");
-                                          stateName = stateValue!.name;
-                                          stateId = stateValue!.id;
-                                          print("name herererb $stateName $stateId" );
-                                        });
-                                      },
-                                      underline: Container(),
+                              Expanded(
+                                child: Card(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child:
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: DropdownButton(
+                                        isExpanded: true,
+                                        value: stateValue,
+                                        hint: const Text('State'),
+                                        // Down Arrow Icon
+                                        icon: const Icon(Icons.keyboard_arrow_down),
+                                        // Array list of items
+                                        items: stateList.map((items) {
+                                          return
+                                            DropdownMenuItem(
+                                              value: items,
+                                              child: Container(
+                                                  child: Text(items.name.toString())),
+                                            );
+                                        }).toList(),
+                                        onChanged: (StataData? value) {
+                                          setState(() {
+                                            stateValue = value!;
+                                            getCity("${stateValue!.id}");
+                                            stateName = stateValue!.name;
+                                            stateId = stateValue!.id;
+                                            print("name herererb $stateName $stateId" );
+                                          });
+                                        },
+                                        underline: Container(),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1283,37 +1340,38 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     child:
                                     Image.asset('assets/images/state.png')),
                               ),
-                              Card(
-                                child: Container(
-                                  width: 220,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: DropdownButton(
-                                      isExpanded: true,
-                                      value: cityValue,
-                                      hint: const Text('City'),
-                                      // Down Arrow Icon
-                                      icon: const Icon(Icons.keyboard_arrow_down),
-                                      // Array list of items
-                                      items: cityList.map((items) {
-                                        return DropdownMenuItem(value: items, child: Container(child: Text(items.name.toString())),
-                                        );
-                                      }).toList(),
-                                      onChanged: (CityData? value) {
-                                        setState(() {
-                                          cityValue = value!;
-                                          getArea("${cityValue!.id}");
-                                          cityId = cityValue!.id;
-                                          // stateName = stateValue!.name;
-                                          print("name herererb $cityValue $cityId");
-                                        });
-                                      },
-                                      underline: Container(),
+                              Expanded(
+                                child: Card(
+                                  child: Container(
+                                    // width: 220,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: DropdownButton(
+                                        isExpanded: true,
+                                        value: cityValue,
+                                        hint: const Text('City'),
+                                        // Down Arrow Icon
+                                        icon: const Icon(Icons.keyboard_arrow_down),
+                                        // Array list of items
+                                        items: cityList.map((items) {
+                                          return DropdownMenuItem(value: items, child: Container(child: Text(items.name.toString())),
+                                          );
+                                        }).toList(),
+                                        onChanged: (CityData? value) {
+                                          setState(() {
+                                            cityValue = value!;
+                                            getArea("${cityValue!.id}");
+                                            cityId = cityValue!.id;
+                                            // stateName = stateValue!.name;
+                                            print("name herererb $cityValue $cityId");
+                                          });
+                                        },
+                                        underline: Container(),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1333,44 +1391,46 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     child:
                                     Image.asset('assets/images/region.png')),
                               ),
-                              Card(
-                                child: Container(
-                                  width: 220,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: DropdownButton(
-                                      isExpanded: true,
-                                      value: countryValue,
-                                      hint: const Text('Region'),
-                                      // Down Arrow Icon
-                                      icon: const Icon(Icons.keyboard_arrow_down),
-                                      // Array list of items
-                                      items: countryList.map((items) {
-                                        return
-                                          DropdownMenuItem(
-                                            value: items,
-                                            child: Container(
-                                                child: Text(items.name.toString())),
-                                          );
-                                      }).toList(),
-                                      // After selecting the desired option,it will
-                                      // change button value to selected value
-                                      onChanged: (CountryData? value) {
-                                        setState(() {
-                                          countryValue = value!;
-                                          countryId = countryValue!.id;
-                                          // getstate("${countryValue!.id}");
-                                          // ("${stateValue!.id}");
-                                          // stateName = stateValue!.name;
-                                          print("name herererb $countryId");
-                                        });
-                                      },
-                                      underline: Container(),
+                              Expanded(
+                                child: Card(
+                                  child: Container(
+                                    // width: 220,
+                                    // height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: DropdownButton(
+                                        isExpanded: true,
+                                        value: countryValue,
+                                        hint: const Text('Region'),
+                                        // Down Arrow Icon
+                                        icon: const Icon(Icons.keyboard_arrow_down),
+                                        // Array list of items
+                                        items: countryList.map((items) {
+                                          return
+                                            DropdownMenuItem(
+                                              value: items,
+                                              child: Container(
+                                                  child: Text(items.name.toString())),
+                                            );
+                                        }).toList(),
+                                        // After selecting the desired option,it will
+                                        // change button value to selected value
+                                        onChanged: (CountryData? value) {
+                                          setState(() {
+                                            countryValue = value!;
+                                            countryId = countryValue!.id;
+                                            // getstate("${countryValue!.id}");
+                                            // ("${stateValue!.id}");
+                                            // stateName = stateValue!.name;
+                                            print("name herererb $countryId");
+                                          });
+                                        },
+                                        underline: Container(),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1390,32 +1450,36 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     child: Image.asset(
                                         'assets/images/pincode.png')),
                               ),
-                              Card(
-                                child: Container(
-                                  width: 220,
-                                  height: 50,
-                                  // color: Colors.black,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: colors.lightgray),
-                                  child: TextFormField(
-                                    maxLength: 6,
-                                    controller: pincodeController,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Enter Pin code';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: const InputDecoration(
-                                      counterText: "",
-                                        hintText: 'Pincode',
-                                        enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.white)),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.white))),
+                              Expanded(
+                                child: Card(
+                                  child: Container(
+                                    // width: 220,
+                                    // height: 50,
+                                    // color: Colors.black,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: colors.lightgray),
+                                    child: TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      maxLength: 6,
+                                      controller: pincodeController,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Enter Pin code';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: const InputDecoration(
+                                        counterText: "",
+                                          hintText: 'Pincode',
+                                          enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white))),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1432,36 +1496,43 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: Image.asset(
-                                        'assets/images/uploadcurrentlocation.png'),
+                                        'assets/images/current address.png'),
                                 ),
                               ),
-                              InkWell(
-                                onTap: () {
-                                  imageCode = 7;
-                                  //  getImageGallery();
-                                  _showPickerOptions();
-                                },
-                                child: Card(
-                                  child: Container(
-                                    height: 80,
-                                    width: 220,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: colors.primary),
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: Colors.white,
-                                      // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                    ),
-                                    child: _currentlocationimage != null
-                                        ? Image.file(
-                                            _currentlocationimage!.absolute,
-                                            fit: BoxFit.fill,
-                                          )
-                                        : Icon(
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () {
+                                    imageCode = 7;
+                                    //  getImageGallery();
+                                    _showPickerOptions();
+                                  },
+                                  child: Card(
+                                    child: Container(
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: colors.primary),
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Colors.white,
+                                        // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                      ),
+                                      child: _currentlocationimage != null
+                                          ? Image.file(
+                                              _currentlocationimage!.absolute,
+                                              fit: BoxFit.fill,
+                                            )
+                                          : Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
 
                                             Icons.file_upload_outlined,
                                             color: colors.secondary,
-                                      size: 50,
+                                            size: 40,
                                           ),
+                                          Text("Upload Current Location Image")
+                                        ],
+                                      )
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1476,15 +1547,14 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 if (stateValue == null) {
                                   Fluttertoast.showToast(msg: "Slect state");
                                 }
-
                                 if (_formKey.currentState!.validate() && stateValue != null && cityValue != null) {
-                                  print(addressController.text.toString());
-                                  print(landController.text.toString());
-                                  print(countryValue);
-                                  print(stateValue);
-                                  print(pincodeController.text.toString());
-                                  print(currentlocationController.text
-                                      .toString());
+                                  // print(addressController.text.toString());
+                                  // print(landController.text.toString());
+                                  // print(countryValue);
+                                  // print(stateValue);
+                                  // print(pincodeController.text.toString());
+                                  // print(currentlocationController.text
+                                  //     .toString());
                                   // validateDropdown();
                                   // showToast();
                                   setState(() {
@@ -1573,31 +1643,33 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         child: Image.asset(
                                             'assets/images/bankname.png')),
                                   ),
-                                  Card(
-                                    child: Container(
-                                      width: 220,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: TextFormField(
-                                        controller: banknameController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Enter Bank Name';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: const InputDecoration(
-                                            hintText: 'Bank Name',
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white)),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white))),
+                                  Expanded(
+                                    child: Card(
+                                      child: Container(
+                                        // width: 220,
+                                        // height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: TextFormField(
+                                          controller: banknameController,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Enter Bank Name';
+                                            }
+                                            return null;
+                                          },
+                                          decoration: const InputDecoration(
+                                              hintText: 'Bank Name',
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.white)),
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.white))),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1617,34 +1689,39 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         child: Image.asset(
                                             'assets/images/accountnumber.png')),
                                   ),
-                                  Card(
-                                    child: Container(
-                                      width: 220,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: TextFormField(
-                                        keyboardType: TextInputType.number,
-                                        controller: accountNumberController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Enter Accoutn Number';
-                                          } else if (value.length < 10) {
-                                            return 'At least 10 characters required';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: const InputDecoration(
-                                            hintText: 'Account Number',
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white)),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white))),
+                                  Expanded(
+                                    child: Card(
+                                      child: Container(
+                                        // width: 220,
+                                        // height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: TextFormField(
+                                          keyboardType: TextInputType.number,
+                                          controller: accountNumberController,
+                                          maxLength: 14,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Enter Account Number';
+                                            }
+                                            // else if (value.length < 10) {
+                                            //   return 'At least 10 characters required';
+                                            // }
+                                            return null;
+                                          },
+                                          decoration: const InputDecoration(
+                                              hintText: 'Account Number',
+                                              counterText: "",
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.white)),
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.white))),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1664,33 +1741,35 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         child: Image.asset(
                                             'assets/images/IFSCcode.png')),
                                   ),
-                                  Card(
-                                    child: Container(
-                                     width: 220,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: TextFormField(
-                                        controller: ifscController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Enter IFSC Code';
-                                          } else if (value.length < 10) {
-                                            return 'At least 10 characters required';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: const InputDecoration(
-                                            hintText: 'IFSC code',
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white)),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white))),
+                                  Expanded(
+                                    child: Card(
+                                      child: Container(
+                                       // width: 220,
+                                       //  height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: TextFormField(
+                                          controller: ifscController,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Enter IFSC Code';
+                                            } else if (value.length < 10) {
+                                              return 'At least 10 characters required';
+                                            }
+                                            return null;
+                                          },
+                                          decoration: const InputDecoration(
+                                              hintText: 'IFSC code',
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.white)),
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.white))),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1735,31 +1814,33 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         child: Image.asset(
                                             'assets/images/upiid.png')),
                                   ),
-                                  Card(
-                                    child: Container(
-                                      width: 220,
-                                      height: 50,
-                                      // color: Colors.black,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: colors.lightgray),
-                                      child: TextFormField(
-                                        controller: upiidContoler,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Enter UPI ID';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: const InputDecoration(
-                                            hintText: 'Upi Id',
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white)),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white))),
+                                  Expanded(
+                                    child: Card(
+                                      child: Container(
+                                        // width: 220,
+                                        // height: 50,
+                                        // color: Colors.black,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: colors.lightgray),
+                                        child: TextFormField(
+                                          controller: upiidContoler,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Enter UPI ID';
+                                            }
+                                            return null;
+                                          },
+                                          decoration: const InputDecoration(
+                                              hintText: 'Upi Id',
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.white)),
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.white))),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1780,33 +1861,41 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         child: Image.asset(
                                             'assets/images/uploadqrcode.png')),
                                   ),
-                                  InkWell(
-                                    onTap: () {
-                                      imageCode = 8;
-                                      //  getImageGallery();
-                                      _showPickerOptions();
-                                    },
-                                    child: Card(
-                                      child: Container(
-                                        height: 80,
-                                        width: 220,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: colors.primary),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.white,
-                                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                        ),
-                                        child: _qrimage != null
-                                            ? Image.file(
-                                                _qrimage!.absolute,
-                                                fit: BoxFit.fill,
-                                              )
-                                            : const Icon(
-                                                Icons.file_upload_outlined,
-                                                color: colors.secondary,
-                                          size: 50,
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        imageCode = 8;
+                                        //  getImageGallery();
+                                        _showPickerOptions();
+                                      },
+                                      child: Card(
+                                        child: Container(
+                                          height: 150,
+                                          // width: 220,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: colors.primary),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.white,
+                                            // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                          ),
+                                          child: _qrimage != null
+                                              ? Image.file(
+                                                  _qrimage!.absolute,
+                                                  fit: BoxFit.fill,
+                                                )
+                                              : Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                children:const  [
+                                                   Icon(
+                                                      Icons.file_upload_outlined,
+                                                      color: colors.secondary,
+                                            size: 50,
+                                                    ),
+                                                  Text("Upload QR Code Image")
+                                                ],
                                               ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -2158,10 +2247,19 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       child: Card(
                         child: InkWell(
                           onTap: () {
-                            if (_image == null || _image2 == null || _image3 == null || _image4 == null || _image5 == null || _image6 == null) {
-                              Fluttertoast.showToast(msg: "Select All Images");
-                            }
-                            vendorRegister();
+                            setState(() {
+                              loading = true;
+                            });
+                           Future.delayed(Duration(seconds: 2), (){
+                             setState(() {
+                               loading = false;
+                             });
+                                 if (_image == null || _image2 == null || _image3 == null || _image4 == null || _image5 == null || _image6 == null) {
+                                   Fluttertoast.showToast(msg: "Select All Images");
+                                 }
+                                 vendorRegister();
+                               }
+                           );
                             // if (_formKey.currentState!.validate()) {
                             //   vendorRegister();
                             // }
@@ -2169,7 +2267,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           },
                           child: Container(
                             child: Center(
-                              child: Text(
+                              child: loading?CircularProgressIndicator(
+                                color: colors.whiteTemp,
+                              ):Text(
                                 'Next',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -2210,7 +2310,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
           image: DecorationImage(
             fit: BoxFit.fill,
             image: AssetImage(
-              "assets/images/otp verification – 3.png",
+              "assets/images/otp verification3.png",
             ),
           ),
         ),
@@ -2258,7 +2358,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                           activeColor: colors.secondary,
                           onChanged: (String? value) {
                             setState(() {
-                              // _selectedOption = value!;
+                               // _selectedOption = value!;
                               // _selectedOption = value!;
                             });
                           },
@@ -2273,8 +2373,23 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                 ),
               ),
               SizedBox(
-                height: 50,
+                height: 32,
               ),
+              _selectedOption != "1"?IconButton(
+                  onPressed: (){
+                    _selectedOption == "1"? null: _selectedOption == "2" ?
+                    setState((){
+                      _selectedOption = "1";
+                    }):_selectedOption == "3"?
+                    setState((){
+                      _selectedOption = "2";
+                    }):_selectedOption == "3"?
+                    setState((){
+                      _selectedOption = "2";
+                    }):setState((){
+                      _selectedOption = "3";
+                    });
+                  }, icon: Icon(Icons.arrow_back,color: colors.whiteTemp,)):const SizedBox.shrink(),
               _getStepCard(_selectedOption),
             ],
           ),

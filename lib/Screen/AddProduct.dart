@@ -113,7 +113,7 @@ class _AddProductState extends State<AddProduct> {
       print(prefs.get('sub'));
       print(prefs.get('child'));
 
-    //  myCategory=prefs.get('category') as String?;
+      //  myCategory=prefs.get('category') as String?;
       String? s1=prefs.get('category') as String?;
       myCategory = s1==null?"":s1;
 
@@ -126,20 +126,22 @@ class _AddProductState extends State<AddProduct> {
       for (int i = 0; i < jsonResponse.data!.length; i++) {
         print("${jsonResponse.data?[i].id}");
         category_id = jsonResponse.data?[i].id ?? "";
+
+
       }
       setState(() {
         getCatModel = jsonResponse;
       });
-     //  SharedPreferences prefs = await SharedPreferences.getInstance();
-     // Object? s1=prefs.get('category');
-     //
-     //  SharedPreferences prefs = await SharedPreferences.getInstance();
-     //  String? id = prefs.getString('id');
-     //  int i=int.parse(id!);
-     //
-     //  print(prefs.get('category'));
-     //  print(prefs.get('sub'));
-     //  print(prefs.get('child'));
+      //  SharedPreferences prefs = await SharedPreferences.getInstance();
+      // Object? s1=prefs.get('category');
+      //
+      //  SharedPreferences prefs = await SharedPreferences.getInstance();
+      //  String? id = prefs.getString('id');
+      //  int i=int.parse(id!);
+      //
+      //  print(prefs.get('category'));
+      //  print(prefs.get('sub'));
+      //  print(prefs.get('child'));
 
     } else {
       print(response.reasonPhrase);
@@ -156,7 +158,7 @@ class _AddProductState extends State<AddProduct> {
       'Cookie': 'ci_session=42a446b2158b0665d69eb924baea971b3adf8b1d'
     };
     var request =
-        http.MultipartRequest('POST', Uri.parse(ApiServicves.getSubCategories));
+    http.MultipartRequest('POST', Uri.parse(ApiServicves.getSubCategories));
     request.fields.addAll({
       'parent_id': service_Id.toString(),
       'roll': '1',
@@ -168,7 +170,7 @@ class _AddProductState extends State<AddProduct> {
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       final jsonResponse =
-          SubCategoryModel.fromJson(json.decode(finalResponse));
+      SubCategoryModel.fromJson(json.decode(finalResponse));
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? idSub = prefs.getString('sub');
@@ -182,7 +184,7 @@ class _AddProductState extends State<AddProduct> {
         print(idSub);
         if(subCatId==idSub)
         {setState(() {
-         sub =jsonResponse.data?[i].cName;
+          sub =jsonResponse.data?[i].cName;
         });
 
         print("------mm-------pp-------");
@@ -283,6 +285,7 @@ class _AddProductState extends State<AddProduct> {
     if (response.statusCode == 200) {
       var result = await response.stream.bytesToString();
       var finalResult = jsonDecode(result);
+      print("finalresult $finalResult");
       Fluttertoast.showToast(msg: "${finalResult['message']}");
       Navigator.pop(context);
       // Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeScreen()));
@@ -324,10 +327,10 @@ class _AddProductState extends State<AddProduct> {
           ),
           title: const Text('Add Product'),
           backgroundColor: colors.primary),
-        body:
-          // getBrandModel == null ? const Center(
-          //     child: CircularProgressIndicator()) :
-          SingleChildScrollView(
+      body:
+      // getBrandModel == null ? const Center(
+      //     child: CircularProgressIndicator()) :
+      SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Card(
@@ -390,7 +393,7 @@ class _AddProductState extends State<AddProduct> {
                     controller: _fullDesCtr,
                     decoration: const InputDecoration(
                       contentPadding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                      EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                       border: OutlineInputBorder(),
                       hintStyle: TextStyle(color: Colors.grey),
                       hintText: 'Product Description',
@@ -1284,11 +1287,11 @@ class _AddProductState extends State<AddProduct> {
                 },
                 child:  Container(
                   child: ListTile(
-                      title:  Text("Gallery"),
-                      leading: Icon(
-                        Icons.image,
-                        color: colors.primary,
-                      ),
+                    title:  Text("Gallery"),
+                    leading: Icon(
+                      Icons.image,
+                      color: colors.primary,
+                    ),
                   ),
                 ),
               ),

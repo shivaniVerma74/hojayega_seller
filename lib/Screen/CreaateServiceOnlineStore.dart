@@ -87,7 +87,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
           image: DecorationImage(
             fit: BoxFit.fill,
             image: AssetImage(
-              "assets/images/otp verification – 3.png",
+              "assets/images/otp verification3.png",
             ),
           ),
         ),
@@ -499,7 +499,6 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
     );
   }
 }
-
 // class MyGridView extends StatefulWidget {
 //   @override
 //   _MyGridViewState createState() => _MyGridViewState();

@@ -1,11 +1,16 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Login.dart';
 import 'PageIndicator.dart';
 
+
+
+
+
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
-
   @override
   State<IntroScreen> createState() => _IntroScreenState();
 }
@@ -64,23 +69,24 @@ class FirstScreen extends StatelessWidget {
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.3,
             ),
-            const Text(
+            const AutoSizeText(
               'No middleman charges',
-              style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.red),
+              style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold, color: Colors.red), maxLines: 2,
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: const Text(
-                'correct the sentences- direct transection between user and merchant. No middleman charges for your products. Provide top-notch service to stand out in the market competition. it\'s your key to success!',
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: const AutoSizeText(
+                'Receive direct payments from clients – no middleman charges for your products. Provide top-notch service to stand out in the market competition. It\'s your key to success!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 30,
                 ),
+                maxLines: 4,
               ),
-            )
+            ),
           ],
         ),
       ],
@@ -155,7 +161,7 @@ class ThirdScreen extends StatelessWidget {
               height: 50,
             ),
             Image.asset(
-              'assets/images/2.png',
+              'assets/images/3.png',
               scale: 2,
             ),
             SizedBox(
@@ -181,7 +187,7 @@ class ThirdScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: const Text(
-                'Discover the perfect solution to boost your business effortlessly – Hojayega! It',
+                'Hojayega! It\'s user-friendly and caters to freelancers, shopkeepers, and service providers. Save time, save money, and expand your reach seamlessly.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -214,7 +220,7 @@ class FourthScreen extends StatelessWidget {
               height: 100,
             ),
             Image.asset(
-              'assets/images/3.png',
+              'assets/images/4.png',
               scale: 2,
             ),
             SizedBox(
@@ -230,7 +236,7 @@ class FourthScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: const Text(
-                'Get best service.Pre Book the service. save time and money',
+                'Say goodbye to receiving calls during busy hours! With Hojayega, secure fixed orders and effortlessly schedule appointment dates and times automatically. Streamline your business and save time.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -246,6 +252,12 @@ class FourthScreen extends StatelessWidget {
 
 class FifthScreen extends StatelessWidget {
   const FifthScreen({super.key});
+
+
+  setPreferances()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("isFirstTime", false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +275,7 @@ class FifthScreen extends StatelessWidget {
               height: 60,
             ),
             Image.asset(
-              'assets/images/4.png',
+              'assets/images/5.png',
               scale: 2,
             ),
             SizedBox(
@@ -279,7 +291,7 @@ class FifthScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: const Text(
-                'No need to stress about updating your portfolio rates daily with Hojayega! Easily adjust and offer the best rates to yourloyal clients whenever you want',
+                'No need to stress about updating your portfolio rates daily with Hojayega! Easily adjust and offer the best rates to your loyal clients whenever you want.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -293,8 +305,12 @@ class FifthScreen extends StatelessWidget {
           child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: GestureDetector(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const LoginPage())),
+                onTap: ()
+                {
+                  setPreferances();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()));
+              },
                 child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(

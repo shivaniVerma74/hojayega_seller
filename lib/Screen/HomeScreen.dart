@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hojayega_seller/Model/GetProfileModel.dart';
+import 'package:hojayega_seller/Model/SliderModel.dart';
 import 'package:hojayega_seller/Screen/BusinessCard.dart';
 import 'package:hojayega_seller/Screen/DeliveryCard.dart';
 import 'package:http/http.dart' as http;
@@ -23,34 +27,133 @@ class _HomePageState extends State<HomeScreen> {
 
   Homepageimagemodel? homepageimagemodel;
   String? imageUrl;
-
+  String? deliveryCardBalance;
+  String? businessCardBalance;
+  String? vendorId;
+getData() async {
+ await getProfile();
+ await  getSetting();
+ await getBanner();
+}
   @override
   void initState() {
     super.initState();
-    getSetting();
-    getBanner();
+    // getWalletAmount();
+    getData();
+
+
   }
 
-  int _pageIndex = 0;
+  GetProfileModel? profileData;
+  String? roll;
 
-  Future<void> getBanner() async {
-    var response = await http.get(Uri.parse(ApiServicves.getBanners));
+  getProfile() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+   roll=  prefs.getString('roll');
+
+
+   print("${prefs.getString('roll')}+++++++++++++++++++++++");
+    var headers = {
+      'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
+    request.fields.addAll({
+      'user_id': vendorId.toString()
+    });
+    debugPrint("get profile parametersssss ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
-      setState(() {
-        homepageimagemodel =
-            Homepageimagemodel.fromJson(json.decode(response.body));
-      });
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = GetProfileModel.fromJson(json.decode(finalResponse));
+      print("profile data responsee $finalResult");
+
+        profileData = finalResult;
+
+          deliveryCardBalance = profileData?.data?.first.dCard;
+          businessCardBalance = profileData?.data?.first.bCard;
+         setState(() {});
     } else {
-      print('image not found');
+      print(response.reasonPhrase);
     }
   }
 
+
+
+
+  SliderMOdel? sliderModel;
+  List<BannerListModel> sliderList1 = [];
+  List sliderList = [];
+  bool isLoading = false;
+
+  SliderMOdel? sliderMOdel;
+
+  getBanner() async {
+    setState(() {
+      isLoading = true;
+    });
+    var headers = {
+      'Cookie': 'ci_session=ec3da314aabd690ad47ed36f9337c27b856dd58e'
+    };
+    var request =
+    http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/hojayega/api/get_banners'));
+    request.fields.addAll({'banner_type': 'shop'});
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    print("===my technic=======${request.fields}===============");
+    print("===my technic=======${request.url}===============");
+
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      var finalresult = jsonDecode(result);
+      if (finalresult['error'] == false) {
+        sliderMOdel = SliderMOdel.fromJson(json.decode(result));
+        sliderList1 = SliderMOdel.fromJson(json.decode(result)).data ?? [];
+        if (sliderList1.isNotEmpty) {
+          setState(() {
+            for (int i = 0; i < sliderList1.length; i++) {
+              sliderList.add(sliderList1[i].image);
+            }
+          });
+        } else {
+          setState(() {
+            sliderList.add("${sliderMOdel?.image.toString()}");
+          });
+        }
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+   // getWalletAmount() async {
+   //   SharedPreferences prefs = await SharedPreferences.getInstance();
+   //   deliveryCardBalance = prefs.getString("delivery_card_wallet");
+   //   businessCardBalance = prefs.getString("business_card_wallet");
+   // }
+
+  int _pageIndex = 0;
+
+
   var arrNames = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop', 'Track \nOrder'];
+  var arrNames2 = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop'];
   var iconsNames = [
     'assets/images/Manageads.png',
     'assets/images/Reports.png',
     'assets/images/Pickdrop.png',
     'assets/images/trackorder.png'
+  ];
+  var iconsNames2 = [
+    'assets/images/Manageads.png',
+    'assets/images/Reports.png',
+    'assets/images/Pickdrop.png',
   ];
   final List<Order> orders = [
     Order('10:00 to 12:00 pm', 'Indore', 'Pending'),
@@ -121,10 +224,9 @@ class _HomePageState extends State<HomeScreen> {
       var finaResult = jsonDecode(result);
       print("responseee $finaResult");
       if (finaResult['status'] == 1) {
-        card_limit = finaResult['setting']['cart_limit'];
-        await prefs.setString(
+       // card_limit = finaResult['setting']['cart_limit'];
+         prefs.setString(
             'card_limit', finaResult['setting']['cart_limit'].toString());
-        print('____credit data limit is$card_limit ___');
         setState(() {});
         // Fluttertoast.showToast(msg: '${finaResult['message']}');
       } else {
@@ -552,57 +654,50 @@ class _HomePageState extends State<HomeScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 flex: 4,
-                child: Container(
-                  height: 100,
-                  // width: 280,
-                  child: ListView.builder(
-                    scrollDirection:
-                        Axis.horizontal, // Set the direction to horizontal
-                    itemCount: arrNames.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 8),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(
-                                    5,
-                                  ),
-                                  color: colors.primary),
-                              child: Image.asset(iconsNames[index]),
-                            ),
-                            Text(arrNames[index]),
-                          ],
-                        ),
-                      );
-                      // Text(
-                      //   arrNames[index],
-                      //   style: TextStyle(color: Colors.black),
-                      // ),
-                    },
-                  ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List<Widget>.generate(roll == "2"?arrNames2.length:arrNames.length, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 8),
+                      child: Column(
+
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  5,
+                                ),
+                                color: colors.primary),
+                            child: Image.asset(roll == "2"?iconsNames2[index]:iconsNames[index]),
+                          ),
+                          Text(roll == "2"?arrNames2[index]:arrNames[index]),
+                        ],
+                      ),
+                    );
+                  }),),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Calender()));
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: Expanded(
+              Expanded(
+                flex: 1,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Calender(isFromBottom: false,)));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 5),
                     child: Column(
                       children: [
                         Container(
@@ -620,47 +715,47 @@ class _HomePageState extends State<HomeScreen> {
               ),
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
-            child: Text(
-              "Today's Order Status",
-              style: TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20),
-            ),
-          ),
-          Center(
-            child: Table(
-              border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
-              columnWidths: const <int, TableColumnWidth>{
-                0: FixedColumnWidth(125.0),
-                1: FixedColumnWidth(125.0),
-                2: FixedColumnWidth(90.0),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: [
-                // Header Row
-                TableRow(
-                  children: [
-                    headerCell('Time Slot'),
-                    headerCell('Region'),
-                    headerCell('Order Status'),
-                  ],
-                ),
-                // Data Rows
-                ...orders.map((order) {
-                  return TableRow(
-                    children: [
-                      dataCell(order.timeSlot),
-                      dataCell(order.region),
-                      statusCell(order.status),
-                    ],
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
+          // const Padding(
+          //   padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
+          //   child: Text(
+          //     "Today's Order Status",
+          //     style: TextStyle(
+          //         color: Colors.black54,
+          //         fontWeight: FontWeight.bold,
+          //         fontSize: 20),
+          //   ),
+          // ),
+          // Center(
+          //   child: Table(
+          //     border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
+          //     columnWidths: const <int, TableColumnWidth>{
+          //       0: FixedColumnWidth(125.0),
+          //       1: FixedColumnWidth(125.0),
+          //       2: FixedColumnWidth(90.0),
+          //     },
+          //     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          //     children: [
+          //       // Header Row
+          //       TableRow(
+          //         children: [
+          //           headerCell('Time Slot'),
+          //           headerCell('Region'),
+          //           headerCell('Order Status'),
+          //         ],
+          //       ),
+          //       // Data Rows
+          //       ...orders.map((order) {
+          //         return TableRow(
+          //           children: [
+          //             dataCell(order.timeSlot),
+          //             dataCell(order.region),
+          //             statusCell(order.status),
+          //           ],
+          //         );
+          //       }).toList(),
+          //     ],
+          //   ),
+          // ),
           //
           // Container(
           //   height: 100,
@@ -715,38 +810,135 @@ class _HomePageState extends State<HomeScreen> {
           //     ),
           //   ),
           // ),
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 10.0,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                3,
-                (index) => Container(
-                  width: 8.0,
-                  height: 8.0,
-                  margin: EdgeInsets.symmetric(horizontal: 4.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:
-                        currentIndex == index ? Color(0xff6EE2F5) : Colors.grey,
+          Column(
+            children: [
+              CarouselSlider(
+                options: CarouselOptions(
+                  height: MediaQuery.of(context).size.height * 0.22,
+                  aspectRatio: 16 / 9,
+                  viewportFraction: 1.0,
+                  initialPage: 0,
+                  enableInfiniteScroll: true,
+                  reverse: false,
+                  autoPlay: true,
+                  autoPlayInterval: const Duration(seconds: 3),
+                  autoPlayAnimationDuration:
+                  const Duration(milliseconds: 800),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enlargeCenterPage: false,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                  },
+                ),
+                items: sliderList
+                    .map(
+                      (item) => Padding(
+                    padding:
+                    const EdgeInsets.only(left: 5, right: 5),
+                    child: item == null || item == ""
+                        ? Container(
+                      width:
+                      MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                        BorderRadius.circular(8),
+                        image: const DecorationImage(
+                            image: AssetImage(
+                              "assets/images/placeholder.png",
+                            ),
+                            fit: BoxFit.fill),
+                      ),
+                    )
+                        : Container(
+                      width:
+                      MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                        BorderRadius.circular(8),
+                        image: DecorationImage(
+                            image: NetworkImage(
+                              "$item",
+                            ),
+                            fit: BoxFit.fill),
+                      ),
+                    ),
+                  ),
+                )
+                    .toList(),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Center(
+                child: SizedBox(
+                  width: 100,
+                  height: 6,
+                  child: Center(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: sliderList.length ?? 0,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          height: 6,
+                          width: 6,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: index == currentIndex
+                                ? colors.primary
+                                : Colors.grey,
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return const SizedBox(
+                          width: 5,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
+          // Padding(
+          //   padding: const EdgeInsets.only(
+          //     top: 10.0,
+          //   ),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: List.generate(
+          //       3,
+          //       (index) => Container(
+          //         width: 8.0,
+          //         height: 8.0,
+          //         margin: EdgeInsets.symmetric(horizontal: 4.0),
+          //         decoration: BoxDecoration(
+          //           shape: BoxShape.circle,
+          //           color:
+          //               currentIndex == index ? Color(0xff6EE2F5) : Colors.grey,
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Padding(
             padding: const EdgeInsets.only(top: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 InkWell(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                   await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => DeliveryCard()));
+                            builder: (context) => DeliveryCard(walletAmount: deliveryCardBalance ?? card_limit.toString(),))).then((value)async{
+
+                               await getProfile();
+
+                    });
                   },
                   child: Container(
                     height: 100,
@@ -768,7 +960,7 @@ class _HomePageState extends State<HomeScreen> {
                                 color: colors.whiteTemp,
                                 fontSize: 18),
                           ),
-                          Text("$card_limit",
+                          Text("₹ ${deliveryCardBalance?? card_limit}",
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,
@@ -779,11 +971,14 @@ class _HomePageState extends State<HomeScreen> {
                   ),
                 ),
                 InkWell(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                   await  Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => BusinessCard()));
+                            builder: (context) => BusinessCard(walletAmount: businessCardBalance ?? card_limit.toString(),))).then((value)async{
+
+                       await getProfile();
+                    });
                   },
                   child: Container(
                     height: 100,
@@ -803,7 +998,7 @@ class _HomePageState extends State<HomeScreen> {
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,
                                   fontSize: 18)),
-                          Text("$card_limit",
+                          Text("₹ ${businessCardBalance?? card_limit}",
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,

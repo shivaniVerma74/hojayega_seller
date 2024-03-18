@@ -133,14 +133,14 @@ class _PendingOrdersState extends State<PendingOrders> {
                           child: Center(
                               child: Padding(
                               padding: const EdgeInsets.only(left: 2),
-                              child: Text("${order.time.toString().replaceAll("From", "")}"),
+                              child: Text(order.time.toString().replaceAll("From", "")),
                             ),
                           ),
                       ),
                       Container(
                         height: 50,
                         child: Center(
-                            child: Text("${order.address.toString()}")),
+                            child: Text(order.address.toString())),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 4, right: 4),
@@ -149,7 +149,7 @@ class _PendingOrdersState extends State<PendingOrders> {
                           width: 60,
                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: const Color(0xffE5CB24)) ,
                           child: const Center(
-                              child: Text("Completed", style: TextStyle(color: colors.primary, fontWeight:FontWeight.bold))),
+                              child: Text("Pending", style: TextStyle(color: colors.primary, fontWeight:FontWeight.bold))),
                         ),
                       ),
                     ],

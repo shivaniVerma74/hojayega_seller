@@ -317,8 +317,6 @@ class _AddServicesScreenState extends State<AddServicesScreen> {
                     Fluttertoast.showToast(msg: "All fields are required ");
                   }
                 }
-
-
               },
               child:  Text(widget.isUpdate?"Update":"Submit")),
         ],

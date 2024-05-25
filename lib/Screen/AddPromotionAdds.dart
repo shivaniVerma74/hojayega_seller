@@ -74,16 +74,18 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
           children: <Widget>[
             ListTile(
               leading: Icon(Icons.photo_library),
-              title: Text('Gallery'),
+              title: const Text('Gallery'),
               onTap: () {
                 getImageGallery();
+                Navigator.pop(context);
               },
             ),
             ListTile(
               leading: Icon(Icons.camera_alt),
-              title: Text('Camera'),
+              title: const Text('Camera'),
               onTap: () {
                 _getImageFromCamera();
+                Navigator.pop(context);
                 // _getImage(ImageSource.camera);
               },
             ),
@@ -131,6 +133,7 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
 
 Razorpay? _razorpay;
 int? pricerazorpayy;
+
 void openCheckout(amount) async {
   double res = double.parse(amount.toString());
   pricerazorpayy= int.parse(res.toStringAsFixed(0)) * 100;
@@ -179,10 +182,11 @@ getSetting() async {
   }
 }
 
-  String? vendorId;
+  String? vendorId, roll;
   addPromotionAdd() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     vendorId = preferences.getString('vendor_id');
+    roll=  preferences.getString('roll');
     print("vendor id add product screen $vendorId");
     var headers = {
       'Cookie': 'ci_session=d3b1699eb1ea7c8e063b47767b2b9c44a2205458'
@@ -195,7 +199,7 @@ getSetting() async {
       'day': dayCtr.text,
       'total_amount': totalamtCtr.text,
       'transaction_id': 'wallet',
-      'type': 'shop'
+      'type': roll=="1" ? "shop" : "service"
     });
     print("===============${request.fields}===========");
     request.files.add(await http.MultipartFile.fromPath('image', _image!.path.toString()));
@@ -305,8 +309,7 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
           title: const Text('Promotion & Adds'),
           backgroundColor: colors.primary),
       body: SingleChildScrollView(
-        child:
-        Form(
+        child: Form(
           key: _formkey,
           child: Column(
             children: [
@@ -411,10 +414,7 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                                 //   // dayCtr.text=difference.inDays.toString();
                                 //   dayCtr.text=y.toString();
                                 // });
-
-
                               },
-
                               style: TextStyle(color: Colors.black),
                               keyboardType: TextInputType.number,
                               maxLength: 10,
@@ -528,7 +528,7 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                                 counterText: '',
                                 border: InputBorder.none,
                                 hintStyle: TextStyle(fontWeight: FontWeight.w400),
-                                hintText: "Enter Day"
+                                hintText: "Total Days"
                             ),
 
                           ),
@@ -567,7 +567,7 @@ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
                   ),
                 ],
               ),
-              const SizedBox(height: 70,),
+              const SizedBox(height: 70),
               Center(
                 child: Card(
                   child: InkWell(

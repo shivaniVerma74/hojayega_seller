@@ -40,19 +40,15 @@ getData() async {
     super.initState();
     // getWalletAmount();
     getData();
-
-
   }
 
   GetProfileModel? profileData;
   String? roll;
 
-  getProfile() async{
+  getProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     vendorId = prefs.getString("vendor_id");
    roll=  prefs.getString('roll');
-
-
    print("${prefs.getString('roll')}+++++++++++++++++++++++");
     var headers = {
       'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
@@ -70,7 +66,6 @@ getData() async {
       print("profile data responsee $finalResult");
 
         profileData = finalResult;
-
           deliveryCardBalance = profileData?.data?.first.dCard;
           businessCardBalance = profileData?.data?.first.bCard;
          setState(() {});
@@ -78,8 +73,6 @@ getData() async {
       print(response.reasonPhrase);
     }
   }
-
-
 
 
   SliderMOdel? sliderModel;
@@ -97,11 +90,11 @@ getData() async {
       'Cookie': 'ci_session=ec3da314aabd690ad47ed36f9337c27b856dd58e'
     };
     var request =
-    http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/hojayega/api/get_banners'));
+    http.MultipartRequest('POST', Uri.parse(ApiServicves.getBanners));
     request.fields.addAll({'banner_type': 'shop'});
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
-    print("===my technic=======${request.fields}===============");
+    print("get banner=======${request.fields}===============");
     print("===my technic=======${request.url}===============");
 
     if (response.statusCode == 200) {
@@ -177,7 +170,7 @@ getData() async {
       child: Center(
         child: Text(
           text,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -666,23 +659,21 @@ getData() async {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List<Widget>.generate(roll == "2"?arrNames2.length:arrNames.length, (index) {
+                    children: List<Widget>.generate(roll == "2"? arrNames2.length:arrNames.length, (index) {
                     return Padding(
                       padding: const EdgeInsets.only(left: 20, right: 8),
                       child: Column(
-
                         children: [
                           Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  5,
+                                borderRadius: BorderRadius.circular(5,
                                 ),
                                 color: colors.primary),
-                            child: Image.asset(roll == "2"?iconsNames2[index]:iconsNames[index]),
+                            child: Image.asset(roll == "2"? iconsNames2[index]: iconsNames[index]),
                           ),
-                          Text(roll == "2"?arrNames2[index]:arrNames[index]),
+                          Text(roll == "2"? arrNames2[index]: arrNames[index]),
                         ],
                       ),
                     );
@@ -694,7 +685,7 @@ getData() async {
                 child: InkWell(
                   onTap: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Calender(isFromBottom: false,)));
+                        MaterialPageRoute(builder: (context) => const Calender(isFromBottom: false,)));
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(right: 5),
@@ -715,48 +706,48 @@ getData() async {
               ),
             ],
           ),
-          // const Padding(
-          //   padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
-          //   child: Text(
-          //     "Today's Order Status",
-          //     style: TextStyle(
-          //         color: Colors.black54,
-          //         fontWeight: FontWeight.bold,
-          //         fontSize: 20),
-          //   ),
-          // ),
-          // Center(
-          //   child: Table(
-          //     border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
-          //     columnWidths: const <int, TableColumnWidth>{
-          //       0: FixedColumnWidth(125.0),
-          //       1: FixedColumnWidth(125.0),
-          //       2: FixedColumnWidth(90.0),
-          //     },
-          //     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          //     children: [
-          //       // Header Row
-          //       TableRow(
-          //         children: [
-          //           headerCell('Time Slot'),
-          //           headerCell('Region'),
-          //           headerCell('Order Status'),
-          //         ],
-          //       ),
-          //       // Data Rows
-          //       ...orders.map((order) {
-          //         return TableRow(
-          //           children: [
-          //             dataCell(order.timeSlot),
-          //             dataCell(order.region),
-          //             statusCell(order.status),
-          //           ],
-          //         );
-          //       }).toList(),
-          //     ],
-          //   ),
-          // ),
-          //
+          const Padding(
+            padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
+            child: Text(
+              "Today's Order Status",
+              style: TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20),
+            ),
+          ),
+          Center(
+            child: Table(
+              border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FixedColumnWidth(125.0),
+                1: FixedColumnWidth(125.0),
+                2: FixedColumnWidth(90.0),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                // Header Row
+                TableRow(
+                  children: [
+                    headerCell('Time Slot'),
+                    headerCell('Region'),
+                    headerCell('Order Status'),
+                  ],
+                ),
+                // Data Rows
+                ...orders.map((order) {
+                  return TableRow(
+                    children: [
+                      dataCell(order.timeSlot),
+                      dataCell(order.region),
+                      statusCell(order.status),
+                    ],
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+
           // Container(
           //   height: 100,
           //   width: 200,
@@ -781,7 +772,7 @@ getData() async {
           //     }).toList(),
           //   ),
           // ),
-          //
+
           // Padding(
           //   padding: const EdgeInsets.only(top:10),
           //   child: CarouselSlider(
@@ -832,41 +823,31 @@ getData() async {
                     });
                   },
                 ),
-                items: sliderList
-                    .map(
-                      (item) => Padding(
-                    padding:
-                    const EdgeInsets.only(left: 5, right: 5),
+                items: sliderList.map((item) => Padding(
+                    padding: const EdgeInsets.only(left: 5, right: 5),
                     child: item == null || item == ""
                         ? Container(
-                      width:
-                      MediaQuery.of(context).size.width,
+                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        borderRadius:
-                        BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8),
                         image: const DecorationImage(
                             image: AssetImage(
                               "assets/images/placeholder.png",
                             ),
                             fit: BoxFit.fill),
                       ),
-                    )
-                        : Container(
-                      width:
-                      MediaQuery.of(context).size.width,
+                    ): Container(
+                      width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         borderRadius:
                         BorderRadius.circular(8),
                         image: DecorationImage(
-                            image: NetworkImage(
-                              "$item",
-                            ),
+                            image: NetworkImage("$item"),
                             fit: BoxFit.fill),
                       ),
                     ),
                   ),
-                )
-                    .toList(),
+                ).toList(),
               ),
               const SizedBox(
                 height: 10,
@@ -932,12 +913,8 @@ getData() async {
                 InkWell(
                   onTap: () async {
                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DeliveryCard(walletAmount: deliveryCardBalance ?? card_limit.toString(),))).then((value)async{
-
-                               await getProfile();
-
+                        context, MaterialPageRoute(builder: (context) => DeliveryCard(walletAmount: deliveryCardBalance ?? card_limit.toString(),))).then((value) async {
+                          await getProfile();
                     });
                   },
                   child: Container(
@@ -953,30 +930,29 @@ getData() async {
                       padding: const EdgeInsets.only(top: 25),
                       child: Column(
                         children: [
-                          Text(
+                          const Text(
                             "Delivery Card",
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: colors.whiteTemp,
                                 fontSize: 18),
                           ),
-                          Text("₹ ${deliveryCardBalance?? card_limit}",
-                              style: TextStyle(
+                          Text("₹ ${deliveryCardBalance ?? card_limit}",
+                              style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,
-                                  fontSize: 18)),
+                                  fontSize: 18),
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
                 InkWell(
-                  onTap: () async {
-                   await  Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BusinessCard(walletAmount: businessCardBalance ?? card_limit.toString(),))).then((value)async{
-
+                  onTap:() async {
+                   await Navigator.push(
+                        context, MaterialPageRoute(
+                            builder: (context) => BusinessCard(walletAmount: businessCardBalance ?? card_limit.toString()))).then((value) async {
                        await getProfile();
                     });
                   },
@@ -993,7 +969,7 @@ getData() async {
                       padding: const EdgeInsets.only(top: 25),
                       child: Column(
                         children: [
-                          const Text("Busines Card",
+                          const Text("Business Card",
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,
@@ -1002,7 +978,8 @@ getData() async {
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,
-                                  fontSize: 18))
+                                  fontSize: 18),
+                          ),
                         ],
                       ),
                     ),

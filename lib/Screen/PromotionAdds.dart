@@ -10,6 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/color.dart';
+import '../Model/PromotionAdsList.dart';
+import '../Model/Sec15ModelList.dart';
+import '15SecAdds.dart';
 import 'AddPromotionAdds.dart';
 
 class PromotionAdds extends StatefulWidget {
@@ -26,6 +29,64 @@ class _PromotionAddsState extends State<PromotionAdds> {
     // TODO: implement initState
     super.initState();
     getSetting();
+    getPromotionList();
+  }
+
+  PromotionAdsList? promotionAdsList;
+  getPromotionList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    var headers = {
+      'Cookie': 'ci_session=3e77e7aa026a5d8de1e1559474dae89c2d280f6c'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.promotionList));
+    request.fields.addAll({
+      'vendor_id': vendorId.toString()
+    });
+    print("vendor id inn prmotion add ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      print("aksdjakldjaksjd");
+      var finalResponse = await response.stream.bytesToString();
+      final jsonResponse = PromotionAdsList.fromJson(json.decode(finalResponse));
+      print("response $jsonResponse");
+      setState(() {
+        promotionAdsList = jsonResponse;
+      });
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
+
+  Sec15ModelList? sec15List;
+  get15SecList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    var headers = {
+      'Cookie': 'ci_session=3e77e7aa026a5d8de1e1559474dae89c2d280f6c'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.sec15ListApi));
+    request.fields.addAll({
+      'vendor_id': vendorId.toString()
+    });
+    print("vendor id inn prmotion add ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      print("aksdjakldjaksjd");
+      var finalResponse = await response.stream.bytesToString();
+      final jsonResponse = Sec15ModelList.fromJson(json.decode(finalResponse));
+      print("response $jsonResponse");
+      setState(() {
+        sec15List = jsonResponse;
+      });
+    }
+    else {
+      print(response.reasonPhrase);
+    }
   }
 
   int selected = 0;
@@ -35,16 +96,18 @@ class _PromotionAddsState extends State<PromotionAdds> {
       backgroundColor: colors.appbarColor,
       floatingActionButton: InkWell(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AddPromotionAdds()));
+          selected == 0 ?
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const AddPromotionAdds())):
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const Add15Sec()));
         },
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 40,),
+          padding: const EdgeInsets.only(bottom: 40),
           child: Container(
             height: 55,
             width: 55,
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(150), color: colors.primary
             ),
-            child: const Icon(Icons.add, color: Colors.white, size: 37,),
+            child: const Icon(Icons.add, color: Colors.white, size: 37),
           ),
         ),
       ),
@@ -106,6 +169,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
                         onTap: () {
                           setState(() {
                             selected = 1;
+                            get15SecList();
                           });
                         },
                         child: Container(
@@ -172,34 +236,67 @@ class _PromotionAddsState extends State<PromotionAdds> {
   }
 
   getFirstTap() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            mainAxisAlignment:  MainAxisAlignment.spaceBetween,
-            children: const [
-              Text("25 October", style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary, fontSize: 18),),
-              Text("5 Day = 500",style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary, fontSize: 18))
-            ],
+    return promotionAdsList!.data!.isEmpty ? Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Center(child: const Text("Banners Not Found", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),)),
+    ):
+      ListView.builder(
+      itemCount: promotionAdsList?.data?.length ?? 0,
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+        itemBuilder: (c,i) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              mainAxisAlignment:  MainAxisAlignment.spaceBetween,
+              children: [
+                 Text("${promotionAdsList?.data?[i].startDate}", style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary, fontSize: 18),),
+                Text("${promotionAdsList?.data?[i].totalDay}Day = ${promotionAdsList?.data?[i].amount}",style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary, fontSize: 18))
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 10,),
-        Image.asset("assets/images/specialdeal.png"),
-        const SizedBox(height: 10,),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            mainAxisAlignment:  MainAxisAlignment.spaceBetween,
-            children: const [
-              Text("25 October", style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary, fontSize: 18),),
-              Text("5 Day = 500",style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary, fontSize: 18))
-            ],
-          ),
-        ),
-        Image.asset("assets/images/superbanner.png"),
-      ],
-    );
+          const SizedBox(height: 5,),
+          promotionAdsList?.data?[i].status == "0"?
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: Container(
+              width: 70,
+              height: 30,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+              child: Center(child: const Text("Pending", style: TextStyle(color: colors.whiteTemp),)),
+            ),
+          ):  const SizedBox(),
+          promotionAdsList?.data?[i].status == "1" ?
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: Container(
+              width: 70,
+              height: 30,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+              child: const Center(child: Text("Active", style: TextStyle(color: colors.whiteTemp),)),
+            ),
+          ): SizedBox(),
+          promotionAdsList?.data?[i].status == "2" ?
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: Container(
+              width: 70,
+              height: 30,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+              child: const Center(child: Text("Reject", style: TextStyle(color: colors.whiteTemp),)),
+            ),
+          ): SizedBox(),
+          const SizedBox(height: 5),
+          Container(
+            height: 150,
+              width: MediaQuery.of(context).size.width,
+              child: Image.network("https://developmentalphawizz.com/hojayega/${promotionAdsList?.data?[i].image}", fit: BoxFit.fill,)),
+        ],
+      );
+    });
   }
 
   String? banner_Charge;
@@ -232,10 +329,11 @@ class _PromotionAddsState extends State<PromotionAdds> {
   }
 
 
-  String? vendorId;
+  String? vendorId, roll;
   addOffers() async{
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     vendorId = preferences.getString('vendor_id');
+    roll=  preferences.getString('roll');
     print("vendor id add product screen $vendorId");
     var headers = {
       'Cookie': 'ci_session=60bef4788330603caab520de3a388682e1b2fdea'
@@ -243,11 +341,11 @@ class _PromotionAddsState extends State<PromotionAdds> {
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.offers));
     request.fields.addAll({
       'user_id': vendorId.toString(),
-      'type': 'shop',
+      'type': roll=="1" ? "shop" : "service",
       'total_amount': totalamtCtr.text,
       'transaction_id': 'wallet'
     });
-    print("===============${request.fields}===========");
+    print("======15sec=========${request.fields}===========");
     request.files.add(await http.MultipartFile.fromPath('image', _image!.path.toString()));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -412,281 +510,66 @@ class _PromotionAddsState extends State<PromotionAdds> {
   TextEditingController totalamtCtr = TextEditingController();
 
   getsecondTapFields() {
-    return Form(
-      key: _formkey,
-      child: Column(
-        children: [
-          SizedBox(height: 20,),
-          InkWell(
-            onTap: () {
-              imageCode = 1;
-              _showPickerOptions();
-            },
-            child: Card(
-              child: Container(
-                height: MediaQuery.of(context).size.height/4.3,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                ),
-                child: _image != null
-                    ? Image.file(
-                  _image!.absolute,
-                  fit: BoxFit.fill,
-                ): Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: Column(
-                    children: const [
-                      Text("Upload Image", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),),
-                      Icon(
-                        Icons.file_upload_outlined,
-                        color: colors.secondary,
-                        size: 50,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.only(left: 15, right: 15),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       Padding(
-          //         padding: const EdgeInsets.only(top: 12, bottom: 12),
-          //         child: Column(
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           children: [
-          //             Container(
-          //               padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-          //               height: 50,
-          //               decoration: BoxDecoration(
-          //                   color: colors.whiteTemp,
-          //                   borderRadius: BorderRadius.circular(10),
-          //                   border: Border.all(color: colors.primary)
-          //               ),
-          //               width: MediaQuery.of(context).size.width/1.1,
-          //               child: TextFormField(
-          //                 onTap: () {
-          //                   _selectDate1();
-          //                 },
-          //                 // enabled: false,
-          //                 style: const TextStyle(color: Colors.black),
-          //                 controller: startDateCtr,
-          //                 keyboardType: TextInputType.number,
-          //                 maxLength: 10,
-          //                 decoration: const InputDecoration(
-          //                   // suffix: Text("₹"),
-          //                     contentPadding: EdgeInsets.symmetric(vertical: 0),
-          //                     counterText: '',
-          //                     border: InputBorder.none,
-          //                     hintText: "Start Date"
-          //                 ),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //       // Padding(
-          //       //   padding: const EdgeInsets.only(top: 12, bottom: 12),
-          //       //   child: Column(
-          //       //     crossAxisAlignment: CrossAxisAlignment.start,
-          //       //     children: [
-          //       //       Container(
-          //       //         padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-          //       //         height: 50,
-          //       //         decoration: BoxDecoration(
-          //       //             color: colors.whiteTemp,
-          //       //             borderRadius: BorderRadius.circular(10),
-          //       //             border: Border.all(color: colors.primary)
-          //       //         ),
-          //       //         width: MediaQuery.of(context).size.width/2-30,
-          //       //         child: TextFormField(
-          //       //           onTap: () {
-          //       //             _selectEndDate();
-          //       //           },
-          //       //           style: TextStyle(color: Colors.black),
-          //       //           keyboardType: TextInputType.number,
-          //       //           maxLength: 10,
-          //       //           controller: endDateCtr,
-          //       //           decoration: InputDecoration(
-          //       //             // suffix: Text("₹"),
-          //       //               contentPadding: EdgeInsets.symmetric(vertical: 0),
-          //       //               counterText: '',
-          //       //               border: InputBorder.none,
-          //       //               hintText: "End Date"
-          //       //           ),
-          //       //         ),
-          //       //       ),
-          //       //     ],
-          //       //   ),
-          //       // ),
-          //     ],
-          //   ),
-          // ),
-          // Column(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //     Container(
-          //       padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-          //       height: 50,
-          //       decoration: BoxDecoration(
-          //           color: colors.whiteTemp,
-          //           borderRadius: BorderRadius.circular(10),
-          //           border: Border.all(color: colors.primary)
-          //       ),
-          //       width: MediaQuery.of(context).size.width/1.1,
-          //       child: TextFormField(
-          //         style: const TextStyle(color: Colors.black),
-          //         // controller: oldPriceController,
-          //         keyboardType: TextInputType.number,
-          //         maxLength: 10,
-          //         decoration: const InputDecoration(
-          //             suffixIcon: Icon(Icons.calendar_month),
-          //             contentPadding: EdgeInsets.only(top: 16),
-          //             counterText: '',
-          //             border: InputBorder.none,
-          //             hintText: "Check Availability"
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          SizedBox(height: 16,),
-          Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                      height: 60,
-                      decoration: BoxDecoration(
-                          color: colors.whiteTemp,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: colors.primary)
-                      ),
-                      width: MediaQuery.of(context).size.width/2-30,
-                      child: TextFormField(
-                        readOnly: true,
-                        style: const TextStyle(color: Colors.black),
-                        // controller: oldPriceController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 10,
-                        decoration:  InputDecoration(
-                          // suffixIcon: Icon(Icons.calendar_month),
-                          // contentPadding: EdgeInsets.only(top: 16),
-                            counterText: '',
-                            border: InputBorder.none,
-                            hintStyle: const TextStyle(fontWeight: FontWeight.w400),
-                            hintText: "Charges: $banner_Charge"
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                      height: 60,
-                      decoration: BoxDecoration(
-                          color: colors.whiteTemp,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: colors.primary)
-                      ),
-                      width: MediaQuery.of(context).size.width/2-30,
-                      child: TextFormField(
-                        onChanged:(value) => {
-                          totalAmtCtr.text = "${(int.parse(banner_Charge??""))* (int.parse(value))} RS",
-                          print("===============${totalAmtCtr.text}==========="),
-                        },
-                        style:  const TextStyle(color: Colors.black),
-                        controller: dayCtr,
-                        keyboardType: TextInputType.number,
-                        maxLength: 10,
-                        decoration:  const InputDecoration(
-                          // suffixIcon: Icon(Icons.calendar_month),
-                          // contentPadding: EdgeInsets.only(top: 16),
-                            counterText: '',
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(fontWeight: FontWeight.w400),
-                            hintText: "Enter Day"
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          SizedBox(height: 16,),
-          Column(
+    return sec15List!.data!.isEmpty ? const Padding(
+      padding: EdgeInsets.only(top: 10),
+      child: Center(child: Text("Banners Not Found", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),)),
+     ): sec15List?.data?.length == null || sec15List?.data?.length == "" ? CircularProgressIndicator(color: colors.primary,):
+      ListView.builder(
+        itemCount: sec15List?.data?.length ?? 0,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemBuilder: (c,i) {
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: EdgeInsets.only(top: 0, left: 12, right: 8),
-                height: 50,
-                decoration: BoxDecoration(
-                    color: colors.whiteTemp,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: colors.primary)
-                ),
-                width: MediaQuery.of(context).size.width/1.1,
-                child: TextFormField(
-                  readOnly: true,
-                  style: const TextStyle(color: Colors.black),
-                  controller: totalAmtCtr,
-                  keyboardType: TextInputType.number,
-                  maxLength: 10,
-                  decoration: const InputDecoration(
-                      // suffixIcon: Padding(
-                      //   padding: EdgeInsets.only(top: 16),
-                      //   child: Text("0 Rs"),
-                      // ),
-                      contentPadding: EdgeInsets.only(top: 6),
-                      counterText: '',
-                      border: InputBorder.none,
-                      hintText: "Total Amount "
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 70,),
-          Center(
-            child: Card(
-              child: InkWell(
-                onTap: () {
-                  if (_image == null || totalAmtCtr.text == "" || totalAmtCtr.text == null
-                  ) {
-                    Fluttertoast.showToast(msg: "Please Fill All Fields");
-                  }
-                  addOffers();
-                },
+              // Padding(
+              //   padding: const EdgeInsets.all(10.0),
+              //   child: Row(
+              //     mainAxisAlignment:  MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Text("${sec15List?.data?[i].startDate}", style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary, fontSize: 18),),
+              //       Text("${sec15List?.data?[i].totalDay}Day = ${sec15List?.data?[i].totalAmount}",style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary, fontSize: 18))
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 5,),
+              sec15List?.data?[i].status == "0" ?
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
                 child: Container(
-                  child: Center(
-                    child: Text(
-                      'Pay',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 19
-                      ),
-                    ),
-                  ),
-                  decoration: BoxDecoration(
-                    color: colors.secondary,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  height: MediaQuery.of(context).size.height * 0.06,
-                  width: MediaQuery.of(context).size.width * .6,
+                  width: 70,
+                  height: 30,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+                  child: Center(child: const Text("Pending", style: TextStyle(color: colors.whiteTemp),)),
                 ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+              ):  const SizedBox(),
+              sec15List?.data?[i].status == "1" ?
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: Container(
+                  width: 70,
+                  height: 30,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+                  child: const Center(child: Text("Active", style: TextStyle(color: colors.whiteTemp),)),
+                ),
+              ): SizedBox(),
+              sec15List?.data?[i].status == "2" ?
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: Container(
+                  width: 70,
+                  height: 30,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+                  child: const Center(child: Text("Reject", style: TextStyle(color: colors.whiteTemp),)),
+                ),
+              ): const SizedBox.shrink(),
+              const SizedBox(height: 5),
+              Container(
+                  height: 150,
+                  width: MediaQuery.of(context).size.width,
+                  child: Image.network("https://developmentalphawizz.com/hojayega/${sec15List?.data?[i].image}", fit: BoxFit.fill,)),
+            ],
+          );
+        });
   }
 }

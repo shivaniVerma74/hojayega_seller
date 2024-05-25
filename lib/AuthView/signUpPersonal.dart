@@ -1,14 +1,18 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helper/api.path.dart';
@@ -17,6 +21,9 @@ import '../Model/GetAreaModel.dart';
 import '../Model/GetCityModel.dart';
 import '../Model/StateModel.dart';
 import '../Screen/ThankYouScreen.dart';
+
+var homelat;
+var homeLong;
 
 class SignUpPersonal extends StatefulWidget {
   final String mobileOrEmail;
@@ -32,6 +39,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getUserCurrentLocation();
     dropdownController.text = items[0];
     getstate();
     if(isNumeric(widget.mobileOrEmail)){
@@ -40,6 +48,36 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       emailController.text = widget.mobileOrEmail;
     }
   }
+
+
+  Position? currentLocation;
+
+  getUserCurrentLocation() async {
+    var status = await Permission.location.request();
+    print("location status $status");
+    if (status.isDenied) {
+      Fluttertoast.showToast(msg: "Permision is requiresd");
+    } else if (status == PermissionStatus.granted) {
+      print("workingggggg");
+      await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((position) {
+        print("current location isss ${position.latitude}");
+        if (mounted) {
+          setState(() {
+            currentLocation = position;
+            print("current location isss ${currentLocation!.latitude}");
+            homelat = currentLocation!.latitude;
+            homeLong = currentLocation!.longitude;
+            print("home lat long is $homeLong &&& $homelat");
+          });
+        }
+      });
+    } else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+  }
+
+
+
   bool isNumeric(String s) {
     if(s == null) {
       return false;
@@ -118,15 +156,18 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       'state': stateId.toString(),
       'region': countryId.toString(),
       "shop_type": _selectedOption3 == "shop" ? "1" : "2",
-      "gst_no": gstNumberController.text
+      "gst_no": gstNumberController.text,
+      "latitude": currentLocation!.latitude.toString(),
+      "longitude": currentLocation!.longitude.toString(),
     });
     print("register parameter ${request.fields}");
+    // request.files.add(
+    //   await http.MultipartFile.fromPath(
+    //       'upload_location', _currentlocationimage?.path ?? ""),
+    // );
     request.files.add(
-      await http.MultipartFile.fromPath(
-          'upload_location', _currentlocationimage?.path ?? ""),
+        await http.MultipartFile.fromPath('shop_image', _image?.path ?? "")
     );
-    request.files.add(
-        await http.MultipartFile.fromPath('shop_image', _image?.path ?? ""));
     request.files.add(
         await http.MultipartFile.fromPath('pan_image', _image2?.path ?? ""));
     request.files.add(
@@ -160,7 +201,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         roll = finaResult['data']['roll'];
         print("ggghhhhhjjff");
         Fluttertoast.showToast(msg: '${finaResult['message']}');
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ThankYou()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ThankYou()));
         nameController.clear();
         shopController.clear();
         yearController.clear();
@@ -212,6 +253,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
 
   bool isVisible = true;
   bool isVisibleTwo = true;
+
+
   String? _validateEmail(value) {
     if (value!.isEmpty) {
       return "Please enter an email";
@@ -221,6 +264,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       return "Please enter a valid email";
     }
   }
+
   bool loading = false;
 
   var data = [
@@ -307,9 +351,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         _image5 = File(croppedFile!.path);
       } else if (croppedFile != null && imageCode == 6) {
         _image6 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 7) {
-        _currentlocationimage = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 8) {
+      }
+      // else if (croppedFile != null && imageCode == 7) {
+      //   _currentlocationimage = File(croppedFile!.path);
+      // }
+      else if (croppedFile != null && imageCode == 7) {
         _qrimage = File(croppedFile!.path);
       } else {
         print('no image picked');
@@ -470,6 +516,36 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
           ],
         );
       },
+    );
+  }
+
+
+  String? latitude, longitudes;
+
+  late String myLoction = "";
+
+  getLocation() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PlacePicker(
+          apiKey: Platform.isAndroid
+              ? "AIzaSyDBDy-PbXUrSevFfZ_8X-lyT5W_LxlXwpM"
+              : "AIzaSyDBDy-PbXUrSevFfZ_8X-lyT5W_LxlXwpM",
+          onPlacePicked: (result) {
+            print(result.formattedAddress);
+            setState(() {
+              addressController.text = result.formattedAddress.toString();
+              latitude = result.geometry!.location.lat.toString();
+              longitudes = result.geometry!.location.lng.toString();
+              myLoction = result.formattedAddress.toString();
+            });
+            Navigator.of(context).pop();
+          },
+          initialPosition: const LatLng(22.719568, 75.857727),
+          useCurrentLocation: true,
+        ),
+      ),
     );
   }
 
@@ -1210,19 +1286,27 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         }
                                         return null;
                                       },
-                                      decoration: const InputDecoration(
-                                          suffixIcon: Icon(
-                                            Icons.location_searching_sharp,
-                                            color: colors.secondary,
+                                      decoration:  InputDecoration(
+                                          suffixIcon: InkWell(
+                                            onTap: (){
+                                              getLocation();
+                                            },
+                                            child: const Icon(
+                                              Icons.location_searching_sharp,
+                                              color: colors.secondary,
+                                            ),
                                           ),
                                           hintText: 'Current Address',
                                           isDense: true,
-                                          enabledBorder: OutlineInputBorder(
+                                          enabledBorder: const OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
+                                                  color: Colors.white),
+                                          ),
+                                          focusedBorder: const OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                                  color: Colors.white),
+                                          ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1283,7 +1367,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
-                                    child: Image.asset('assets/images/state.png')),
+                                    child: Image.asset('assets/images/state.png'),
+                                ),
                               ),
                               Expanded(
                                 child: Card(
@@ -1478,66 +1563,67 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
-                                                  color: Colors.white))),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Card(
-                                child: Container(
-                                    width: 50,
-                                    height: 75,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: Image.asset(
-                                        'assets/images/current address.png'),
-                                ),
-                              ),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    imageCode = 7;
-                                    //  getImageGallery();
-                                    _showPickerOptions();
-                                  },
-                                  child: Card(
-                                    child: Container(
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: colors.primary),
-                                        borderRadius: BorderRadius.circular(5),
-                                        color: Colors.white,
-                                        // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                      ),
-                                      child: _currentlocationimage != null
-                                          ? Image.file(
-                                              _currentlocationimage!.absolute,
-                                              fit: BoxFit.fill,
-                                            )
-                                          : Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-
-                                            Icons.file_upload_outlined,
-                                            color: colors.secondary,
-                                            size: 40,
+                                                  color: Colors.white),
                                           ),
-                                          Text("Upload Current Location Image")
-                                        ],
-                                      )
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
+                          // Row(
+                          //   children: [
+                          //     Card(
+                          //       child: Container(
+                          //           width: 50,
+                          //           height: 75,
+                          //           // color: Colors.black,
+                          //           decoration: BoxDecoration(
+                          //               borderRadius: BorderRadius.circular(10),
+                          //               color: colors.lightgray),
+                          //           child: Image.asset(
+                          //               'assets/images/current address.png'),
+                          //       ),
+                          //     ),
+                          //     Expanded(
+                          //       child: InkWell(
+                          //         onTap: () {
+                          //           imageCode = 7;
+                          //           //  getImageGallery();
+                          //           _showPickerOptions();
+                          //         },
+                          //         child: Card(
+                          //           child: Container(
+                          //             height: 150,
+                          //             decoration: BoxDecoration(
+                          //               border: Border.all(color: colors.primary),
+                          //               borderRadius: BorderRadius.circular(5),
+                          //               color: Colors.white,
+                          //               // image: DecorationImage(image:FileImage(_image!.absolute) )
+                          //             ),
+                          //             child: _currentlocationimage != null
+                          //                 ? Image.file(
+                          //                     _currentlocationimage!.absolute,
+                          //                     fit: BoxFit.fill,
+                          //                   )
+                          //                 : Column(
+                          //                   mainAxisAlignment: MainAxisAlignment.center,
+                          //               children: const [
+                          //                 Icon(
+                          //                   Icons.file_upload_outlined,
+                          //                   color: colors.secondary,
+                          //                   size: 40,
+                          //                 ),
+                          //                 Text("Upload Current Location Image")
+                          //               ],
+                          //             )
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
                           Card(
                             child: InkWell(
                               onTap: () {
@@ -1748,27 +1834,31 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                        //  height: 50,
                                         // color: Colors.black,
                                         decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             color: colors.lightgray),
                                         child: TextFormField(
+                                          maxLength: 11,
                                           controller: ifscController,
                                           validator: (value) {
                                             if (value == null || value.isEmpty) {
                                               return 'Enter IFSC Code';
-                                            } else if (value.length < 10) {
+                                            } else if (value.length < 11) {
                                               return 'At least 10 characters required';
                                             }
                                             return null;
                                           },
                                           decoration: const InputDecoration(
+                                            counterText: "",
                                               hintText: 'IFSC code',
                                               enabledBorder: OutlineInputBorder(
                                                   borderSide: BorderSide(
-                                                      color: Colors.white)),
+                                                      color: Colors.white),
+                                              ),
                                               focusedBorder: OutlineInputBorder(
                                                   borderSide: BorderSide(
-                                                      color: Colors.white))),
+                                                      color: Colors.white),
+                                              ),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -1777,7 +1867,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               ),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -1785,11 +1875,13 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
               ),
               Card(
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                ),
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black, width: 2)),
+                      border: Border.all(color: Colors.black, width: 2),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Column(

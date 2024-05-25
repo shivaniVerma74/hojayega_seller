@@ -208,14 +208,15 @@ class _LoginPageState extends State<LoginPage> {
                                         // labelText: 'Email/Phone Number',
                                         focusedBorder: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(10),
+                                            BorderRadius.circular(10),
                                             borderSide: BorderSide(
                                                 color: Colors.grey.shade200)),
                                         enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            borderSide: BorderSide(
-                                                color: Colors.grey.shade200)),
+                                          borderRadius:
+                                          BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey.shade200),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -233,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                                     width: 50,
                                     height: 55,
                                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.grey.shade200,),
-                                  //  color: Colors.grey.shade200,
+                                   //  color: Colors.grey.shade200,
                                     child: const Icon(
                                       Icons.lock,
                                       size: 25,
@@ -280,14 +281,13 @@ class _LoginPageState extends State<LoginPage> {
                                         ),
                                         focusedBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(10),
-                                          borderSide: BorderSide(
-                                              color: Colors.grey.shade200),
+                                          borderSide: BorderSide(color: Colors.grey.shade200),
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             borderSide: BorderSide(
-                                                color: Colors.grey.shade200)),
+                                                color: Colors.grey.shade200),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -319,20 +319,20 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(right: 10),
-                                child: Flexible(
-                                  child: TextButton(
-                                      onPressed: () {
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>  SignUp()));
-                                      },
-                                      child: const AutoSizeText(
-                                        'Forgot Password?',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            color: Colors.green,
-                                            // fontSize: 16,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                  ),
+                                child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>   SignUp(
+                                        forget: true,
+                                      )));
+                                    },
+                                    child: const AutoSizeText(
+                                      'Forgot Password?',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color: Colors.green,
+                                          // fontSize: 16,
+                                          fontWeight: FontWeight.w500),
+                                    ),
                                 ),
                               ),
                             ],
@@ -414,7 +414,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       TextButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUp()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>  SignUp()));
                           },
                           child: const Text('Sign Up',
                               style: TextStyle(
@@ -422,15 +422,16 @@ class _LoginPageState extends State<LoginPage> {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green),
                           ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+                       ),
+                     ],
+                   ),
+                 ],
+               ),
+             ),
+           ],
+         ),
         ),
-      )),
+      ),
     );
   }
 }

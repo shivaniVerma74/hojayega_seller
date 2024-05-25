@@ -36,7 +36,6 @@ class _DeliveryCardState extends State<DeliveryCard> {
 
   addWallet() async {
     // SharedPreferences prefs = await SharedPreferences.getInstance();
-
     var headers = {
       'Cookie': 'ci_session=b5700f932d8b03efe164db4d2f6eccb8c428fdfa'
     };
@@ -86,8 +85,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
-      final jsonResponse =
-          TransactionModel.fromJson(json.decode(finalResponse));
+      final jsonResponse = TransactionModel.fromJson(json.decode(finalResponse));
       setState(() {
         transactionModel = jsonResponse;
       });
@@ -237,12 +235,10 @@ class _DeliveryCardState extends State<DeliveryCard> {
                               }
                               return null;
                             },
-
                             // keyboardType: TextInputType.phone,
                             decoration: InputDecoration(
                               hintText: "Add Money",
                               hintStyle: const TextStyle(
-
                                   fontSize: 20, fontWeight: FontWeight.bold),
                               isDense: true,
                               filled: true,
@@ -264,13 +260,10 @@ class _DeliveryCardState extends State<DeliveryCard> {
                           child: Container(
                             height: 30,
                             child: ListView.builder(
-
                               scrollDirection:
                               Axis.horizontal,
                               // Set the direction to horizontal
-
                               itemCount: arrPrice.length,
-
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -280,9 +273,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
                                       addMoney=addMoney+arrPrice[index];
                                       setState(() {
                                         addMoneyCtr.text=addMoney.toString();
-
                                       });
-
                                     },
                                     child: Container(
                                       width:  60,

@@ -3,12 +3,15 @@ import 'package:pinput/pinput.dart';
 
 import '../Helper/color.dart';
 import 'SignUpPersonal.dart';
+import 'forgotPassword.dart';
 
 class VerifyOtp extends StatefulWidget {
   final OTP;
   final isMobile;
+  bool? forget;
   final mobileEmail;
-  const VerifyOtp({super.key, this.OTP, this.isMobile,this.mobileEmail});
+  String? userid;
+   VerifyOtp({super.key, this.OTP, this.isMobile,this.mobileEmail, this.forget, this.userid});
 
   @override
   State<VerifyOtp> createState() => _OtpState();
@@ -122,8 +125,22 @@ class _OtpState extends State<VerifyOtp> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            Navigator.push(context, MaterialPageRoute(builder:(context)=>  SignUpPersonal(mobileOrEmail: widget.mobileEmail)));
+                            if (widget.forget == true) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ForgetPassword(
+                                        userId: widget.userid.toString(),
+                                      ),
+                                  ),
+                              );
+                            } else {
+                              Navigator.push(context, MaterialPageRoute(builder:(context)=>  SignUpPersonal(mobileOrEmail: widget.mobileEmail)));
+                            }
                           }
+                          // if (_formKey.currentState!.validate()) {
+                          //   Navigator.push(context, MaterialPageRoute(builder:(context)=>  SignUpPersonal(mobileOrEmail: widget.mobileEmail)));
+                          // }
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                         child: const Text('Verify',style: TextStyle(color: colors.whiteTemp),),

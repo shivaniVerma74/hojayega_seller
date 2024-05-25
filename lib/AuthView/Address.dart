@@ -66,7 +66,7 @@ class _AddressState extends State<Address> {
                       height: 15,
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                       decoration: BoxDecoration(
                           color: colors.primary,
                           borderRadius: BorderRadius.circular(10),

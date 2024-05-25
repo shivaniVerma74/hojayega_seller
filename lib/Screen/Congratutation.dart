@@ -41,7 +41,7 @@ class _CongratulationState extends State<Congratulation> {
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.secondary),
                 child: const Center(
                   child: Text("Got It",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17, color: colors.appbarColor),
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17, color: colors.whiteTemp),
                   ),
                 ),
               ),

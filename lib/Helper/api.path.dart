@@ -11,8 +11,10 @@ class ApiServicves{
   static const String login = baseUrl+'login';
   static const String getProfile = baseUrl+'get_profile';
   static const String vendorsendOtp = baseUrl+'send_otp';
+  static const String updateProfile = baseUrl+'vendor_update';
   static const String getState = baseUrl+'get_states';
   static const String getCities = baseUrl+'get_cities';
+  static const String sendOtpforgetpassword = baseUrl + 'forgot_pass_user';
   static const String getArea = baseUrl+'get_regions';
   static const String resetpassword = baseUrl + 'reset_password';
   static const String getBanners = baseUrl+'get_banners';
@@ -37,12 +39,15 @@ class ApiServicves{
   static const String addAmount = baseUrl+'add_wallet';
   static const String walletTransaction = baseUrl+'get_wallet_transactions';
   static const String onOffStatus = baseUrl+'update_open_close_status';
+  static const String promotionList = baseUrl+'get_promotion_banner';
+  static const String sec15ListApi = baseUrl+'get_15_secound_ads';
   static const String updateOrderItem = baseUrl+'update_orders_items';
   static const String updateOrders = baseUrl+'update_orders';
   static const String checkAvailablity = baseUrl+'check_availibility';
   static const String promotionAdd = baseUrl+'add_promotion';
   static const String getSettings = baseUrl+'general_setting';
   static const String offers = baseUrl+'offer_add';
+  static const String completeBookings = baseUrl+'complete_booking';
 }
 
 String? vendor_name;

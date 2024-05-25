@@ -11,7 +11,8 @@ import 'Login.dart';
 import 'package:http/http.dart' as http;
 
 class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+  bool? forget;
+   SignUp({super.key, this.forget});
 
   @override
   State<SignUp> createState() => _SignUpState();
@@ -53,13 +54,22 @@ class _SignUpState extends State<SignUp> {
     setState(() {
       isLoading = true;
     });
+    var request;
     var headers = {
       'Cookie': 'ci_session=05bf1731f8a5f6bc9d9143b990a080085dfb8659'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorsendOtp));
-    request.fields.addAll({
-      'mobile': mobileEmailCtr.text
-    });
+    if (widget.forget == true) {
+      request = http.MultipartRequest(
+          'POST', Uri.parse(ApiServicves.sendOtpforgetpassword));
+      request.fields.addAll({
+        'identity': mobileEmailCtr.text
+      });
+    } else {
+      request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorsendOtp));
+      request.fields.addAll({
+        'mobile': mobileEmailCtr.text
+      });
+    }
     print("send otp parameter ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -67,12 +77,33 @@ class _SignUpState extends State<SignUp> {
       var result = await response.stream.bytesToString();
       var finaResult = jsonDecode(result);
       print("resonse $finaResult");
+      if (widget.forget == true) {
+        if (finaResult['status'] == 1) {
+          int otp = finaResult['otp'];
+          String userId = finaResult['user_id'];
+          print('____otp___${otp}___');
+          Fluttertoast.showToast(msg: '${finaResult['msg']}');
+          Navigator.pushReplacement(
+            context, MaterialPageRoute(
+            builder: (context) => VerifyOtp(
+              OTP: otp.toString(),
+              forget: widget.forget,
+              userid: userId.toString(),
+               ),
+             ),
+          );
+        } else {
+          Fluttertoast.showToast(msg: "${finaResult['msg']}");
+        }
+      }
       if (finaResult['error'] == false) {
         int otp = finaResult['otp'];
         print('____otp___${otp}___');
         Fluttertoast.showToast(msg: '${finaResult['message']}');
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VerifyOtp(OTP: otp.toString(),
-          isMobile: isNumeric(mobileEmailCtr.text),mobileEmail: mobileEmailCtr.text,)));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>
+            VerifyOtp(OTP: otp.toString(), isMobile: isNumeric(mobileEmailCtr.text),mobileEmail: mobileEmailCtr.text,),
+        ),
+        );
       } else {
         Fluttertoast.showToast(msg: "${finaResult['message']}");
       }

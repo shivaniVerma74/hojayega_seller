@@ -48,7 +48,6 @@ class _OrdersState extends State<Orders> {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = GetVendorOrderModel.fromJson(json.decode(finalResponse));
       print("get vendor order responsee $finalResult $finalResponse");
-
       setState(() {
         vendorOrderModel = finalResult;
         setState(() {});
@@ -211,12 +210,12 @@ class _OrdersState extends State<Orders> {
   getCurrentOrders() {
     return Column(
       children: [
-        vendorOrderModel?.orders.isNotEmpty ?? false ?
-        vendorOrderModel?.orders.length == "" || vendorOrderModel?.orders.length == null ? const Center(child: CircularProgressIndicator(color: colors.primary,)):
+        vendorOrderModel?.orders?.isNotEmpty ?? false ?
+        vendorOrderModel?.orders?.length == "" || vendorOrderModel?.orders?.length == null ? const Center(child: CircularProgressIndicator(color: colors.primary,)):
         ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: vendorOrderModel?.orders.length ?? 0,
+          itemCount: vendorOrderModel?.orders?.length ?? 0,
             itemBuilder: (c,i) {
           return Padding(
             padding: const EdgeInsets.only(
@@ -247,7 +246,7 @@ class _OrdersState extends State<Orders> {
                             child: Image.asset("assets/images/nmae.png"),
                           ),
                            Text(
-                            "${vendorOrderModel?.orders[i].username}",
+                            "${vendorOrderModel?.orders?[i].username}",
                             style: const TextStyle(color: colors.primary),
                           ),const SizedBox(width: 5,),
                           Container(
@@ -259,7 +258,7 @@ class _OrdersState extends State<Orders> {
                             child: Image.asset("assets/images/calenders.png"),
                           ),
                            Text(
-                            "${vendorOrderModel?.orders[i].date}".replaceAll("00:00:00.000", ""),
+                            "${vendorOrderModel?.orders?[i].date}".replaceAll("00:00:00.000", ""),
                             style: const TextStyle(color: colors.primary),
                           ),
                           Container(
@@ -271,7 +270,7 @@ class _OrdersState extends State<Orders> {
                             child: Image.asset("assets/images/time.png"),
                           ),
                            Text(
-                            "${vendorOrderModel?.orders[i].time}".replaceAll("From", ""),
+                            "${vendorOrderModel?.orders?[i].time}".replaceAll("From", ""),
                             style: const TextStyle(color: colors.primary),
                           ),
                           // Container(
@@ -310,7 +309,7 @@ class _OrdersState extends State<Orders> {
                             size: 15,
                           ),
                           Text(
-                            "${vendorOrderModel?.orders[i].address}",
+                            "${vendorOrderModel?.orders?[i].address}",
                             style: const TextStyle(fontSize: 15, color: colors.primary),
                           ),
 
@@ -322,12 +321,12 @@ class _OrdersState extends State<Orders> {
                       padding: const EdgeInsets.only(left: 8),
                       child: Row(
                         children: [
-                          Text(
+                          const Text(
                             "Order Id: ",
-                            style: const TextStyle(fontSize: 15, color: colors.primary),
+                            style: TextStyle(fontSize: 15, color: colors.primary),
                           ),
                           Text(
-                            "${vendorOrderModel?.orders[i].orderId}",
+                            "${vendorOrderModel?.orders?[i].orderId}",
                             style: const TextStyle(fontSize: 15, color: colors.primary),
                           ),
                         ],
@@ -344,17 +343,17 @@ class _OrdersState extends State<Orders> {
                             children: const [
                               Text("Name", style: TextStyle(color: colors.primary),),
                               SizedBox(
-                                width: 120,
+                                width: 150,
                               ),
-                              Text("Qty", style: TextStyle(color: colors.primary),),
+                              Text("Type", style: TextStyle(color: colors.primary),),
                               SizedBox(
-                                width: 40,
+                                width: 50,
                               ),
-                              Text("Rs",style: TextStyle(color: colors.primary),),
-                              SizedBox(
-                                width: 40,
-                              ),
-                              Text("Total", style: TextStyle(color: colors.primary),),
+                              Text("Rs.",style: TextStyle(color: colors.primary),),
+                              // SizedBox(
+                              //   width: 20,
+                              // ),
+                              // Text("Total", style: TextStyle(color: colors.primary),),
                             ],
                           ),
                         ],
@@ -365,9 +364,9 @@ class _OrdersState extends State<Orders> {
                     ),
                     ListView.builder(
                       shrinkWrap: true,
-                      itemCount: vendorOrderModel?.orders[i].orderItems.length??0,
+                      itemCount: vendorOrderModel?.orders?[i].orderItems?.length??0,
                         itemBuilder: (c,j) {
-                        var item = vendorOrderModel?.orders[i].orderItems[j];
+                        var item = vendorOrderModel?.orders?[i].orderItems?[j];
                       return Padding(
                         padding: const EdgeInsets.only(left: 5, right: 2),
                         child: Column(
@@ -381,28 +380,28 @@ class _OrdersState extends State<Orders> {
                                       width: 25,
                                       height: 25,
                                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(5,), color: Colors.white),
-                                      child: Image.network(vendorOrderModel?.orders[i].orderItems[0].productImage??"", fit: BoxFit.fill,)),
+                                      child: Image.network(vendorOrderModel?.orders?[i].orderItems?[0].productImage??"", fit: BoxFit.fill,)),
                                 ),
                                 const SizedBox(width: 5),
                                 item?.productName == "" || item?.productName == null ?
                                 const Text("Foods", style: TextStyle(color: colors.primary)):
                                  SizedBox(
-                                   width: 49,
+                                   width: 55,
                                      child: Text("${item?.productName}", style: const TextStyle(color: colors.primary, overflow: TextOverflow.ellipsis),)),
                                 const SizedBox(
-                                  width: 75,
+                                  width: 100,
                                 ),
-                                item?.qty == "" || item?.qty == null ?
+                                item?.unitType == "" || item?.unitType == null ?
                                 const Text("-", style: TextStyle(color: colors.primary)) :
-                                 Text("${item?.qty}", style: const TextStyle(color: colors.primary),),
+                                 Text("${item?.unitType}", style: const TextStyle(color: colors.primary),),
                                 const SizedBox(
-                                  width: 40,
+                                  width:35,
                                 ),
-                                 Text("${item?.productPrice}",style: const TextStyle(color: colors.primary, fontSize:12),),
+                                 Text("${item?.productPrice} Rs.",style: const TextStyle(color: colors.primary, fontSize:12),),
                                 const SizedBox(
-                                  width: 40,
+                                  width: 10,
                                 ),
-                                Text("${int.parse(item?.qty.toString() ?? "0")* double.parse(item?.productPrice.toString()??"0.0")}rs", style: const TextStyle(color: colors.primary, fontSize:12),)
+                                // Text("${int.parse(item?.qty.toString() ?? "0")* double.parse(item?.productPrice.toString()??"0.0")}rs", style: const TextStyle(color: colors.primary, fontSize:12),)
                               ],
                             )
                           ],
@@ -428,9 +427,9 @@ class _OrdersState extends State<Orders> {
                           const SizedBox(width: 6,),
                           InkWell(
                             onTap: () {
-                              acceptRejectOrders(vendorOrderModel?.orders[i].orderId);
+                              acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
                               setState(() {});
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails(model: vendorOrderModel?.orders[i]))).then((value) => getVendorOrder());
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails(model: vendorOrderModel?.orders?[i]))).then((value) => getVendorOrder());
                             },
                             child: Container(
                               height: 35,

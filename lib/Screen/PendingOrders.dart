@@ -38,7 +38,7 @@ class _PendingOrdersState extends State<PendingOrders> {
       'Cookie': 'ci_session=6430902524c1703efd1eeb4c66d3537c73dbe375'
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorOrders));
-    request.fields.addAll({'user_id': vendorId.toString(), 'status': "0"});
+    request.fields.addAll({'user_id': vendorId.toString(), 'status': "1"});
     print("parameterr ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -55,7 +55,6 @@ class _PendingOrdersState extends State<PendingOrders> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +62,7 @@ class _PendingOrdersState extends State<PendingOrders> {
       child: Column(
         children: [
           // Text("Pending Orders", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: colors.primary),),
-          SizedBox(height: 10,),
+          const SizedBox(height: 10),
          // ListView.builder(
          //   shrinkWrap: true,
          //   physics: NeverScrollableScrollPhysics(),
@@ -73,8 +72,8 @@ class _PendingOrdersState extends State<PendingOrders> {
          // },)
           getPendingOrders(context),
         ],
+       ),
       ),
-    ),
     );
   }
 

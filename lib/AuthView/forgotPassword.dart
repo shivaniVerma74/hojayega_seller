@@ -203,7 +203,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                                           contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 5),
-                                          border: OutlineInputBorder(
+                                          border: const OutlineInputBorder(
                                               borderSide: BorderSide.none),
                                           hintText: "Password"),
                                       validator: (value) {
@@ -267,7 +267,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                                           contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 5),
-                                          border: OutlineInputBorder(
+                                          border: const OutlineInputBorder(
                                               borderSide: BorderSide.none),
                                           hintText: "New Password"),
                                       validator: (value) {

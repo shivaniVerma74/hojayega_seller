@@ -70,11 +70,6 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = ShopModel.fromJson(json.decode(finalResponse));
       print("shop type responsee $finalResult");
-      // if (finalResult.data?.isNotEmpty ?? false) {
-      //   for (int i = 0; i < finalResult.data!.length; i++) {
-      //     checkboxlist.add(i);
-      //   }
-      // }
       setState(() {
         shopModel = finalResult;
       });
@@ -113,6 +108,8 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
   }
 
   String? vendorId;
+  String? parentId;
+
   saveCatDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     vendorId = prefs.getString("vendor_id");
@@ -120,7 +117,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
       'Cookie': 'ci_session=2af0bd20724524e1ebfba0e830885dbff718f536'
     };
     var data = <String, String>{
-      'parent_id': '1',
+      'parent_id': parentId.toString(),
       'categoies': categoriesIdSelected.join(","),
       'vendor_id': vendorId.toString(),
       'howmany_cient': clientsServesController.text,
@@ -131,7 +128,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
     var request =
         http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorDeals));
     request.fields.addAll(data);
-    print("=========requestttttt fieldsss======${request.fields}===========");
+    print("requestttt fieldsss======${request.fields}===========");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -243,15 +240,16 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                           const SizedBox(
                             height: 10,
                           ),
-                          roll_id == "1"
-                              ? shopModel?.data?.length == null || shopModel?.data?.length == ""
-                                  ? const Center(
-                                      child: CircularProgressIndicator(
-                                      color: colors.primary,
-                                    ))
-                                  : SizedBox(
+                          // roll_id == "1" ? shopModel?.data?.length == null || shopModel?.data?.length == ""
+                          //         ? const Center(
+                          //             child: CircularProgressIndicator(
+                          //             color: colors.primary,
+                          //           ))
+                          //         :
+                                SizedBox(
                                       height: 20,
-                                      child: ListView.builder(
+                                      child:
+                                      ListView.builder(
                                         scrollDirection: Axis
                                             .horizontal, // Horizontal scroll direction
                                         itemCount: shopModel?.data?.length ?? 0,
@@ -265,6 +263,8 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                   if (checked!) {
                                                     selectedIndex = index;
                                                     getCat(shopModel?.data?[index].id.toString() ??"");
+                                                    parentId =  shopModel?.data?[index].id.toString() ??"" ;
+                                                    print("=========parent id is ======$parentId===========");
                                                   }
                                                   setState(() {});
                                                   //  print("jjcjcjjf");
@@ -294,11 +294,12 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                           );
                                         },
                                       ),
-                                    )
-                              : SizedBox.shrink(),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                                    ),
+                          //     : SizedBox.shrink(),
+                          // const SizedBox(
+                          //   height: 20,
+                          // ),
+                          SizedBox(height: 5,),
                           Row(
                             children: const [
                               CircleAvatar(
@@ -323,18 +324,17 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                             ],
                           ),
                           const SizedBox(
-                            height: 10,
+                            height: 0,
                           ),
                           categoryModel == null
-                              ? Center(
+                              ? const Center(
                                   child: Text("Select Shop type"),
                                 )
                               : categoryModel!.responseCode == "0"
-                                  ? Center(
+                                  ? const Center(
                                       child: Text("Categories Not Found"),
                                     )
-                                  : categoryModel?.data?.length == null ||
-                                          categoryModel?.data?.length == ""
+                                  : categoryModel?.data?.length == null || categoryModel?.data?.length == ""
                                       ? const Center(
                                           child: CircularProgressIndicator(
                                             color: colors.primary,
@@ -814,13 +814,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                     if (_formKey.currentState!.validate()) {
                                       print(getData());
                                       saveCatDetails();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              CreatePortfolio(),
-                                        ),
-                                      );
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => ServicesDetails()));
                                     }
                                   }
                                 } else {
@@ -835,16 +829,14 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                       color: colors.secondary,
                                       borderRadius: BorderRadius.circular(5),
                                     ),
-                                    //   width: MediaQuery.of(context),
-                                    // decoration: BoxDecoration(borderRadius: ),
-                                    height: MediaQuery.of(context).size.height *
-                                        0.07,
-                                    width:
-                                        MediaQuery.of(context).size.width * .6,
+                                    height: MediaQuery.of(context).size.height * 0.06,
+                                    width: MediaQuery.of(context).size.width * .6,
                                     child: const Center(
                                       child: Text(
                                         'Next',
                                         style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
                                           color: Colors.white,
                                         ),
                                       ),

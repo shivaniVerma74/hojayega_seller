@@ -82,7 +82,7 @@ class _BusinessCardState extends State<BusinessCard> {
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       final jsonresponse = json.decode(finalResponse);
-      if(jsonresponse["response_code"] == "1"){
+      if(jsonresponse["response_code"] == "1") {
         print("workinggg}");
         wallet_balance_added = jsonresponse["data"].toString();
         print("wallet balance is $wallet_balance_added");

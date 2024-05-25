@@ -21,7 +21,7 @@ class _SuccessfullyState extends State<ThankYou> {
             const SizedBox(height: 150),
             Image.asset("assets/images/done.png"),
             const SizedBox(height: 15),
-            const AutoSizeText("Thanks for signing up!", style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600, color: Colors.black), textAlign: TextAlign.center,),
+            const AutoSizeText("Thanks for signing up!", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black), textAlign: TextAlign.center,),
             const SizedBox(height: 15),
             const Padding(
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -31,7 +31,7 @@ class _SuccessfullyState extends State<ThankYou> {
             const SizedBox(height: 20),
             InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => CreateOnlineStore()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateOnlineStore()));
               },
               child: Container(
                 height: 40,
@@ -39,7 +39,7 @@ class _SuccessfullyState extends State<ThankYou> {
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.secondary),
                 child: const Center(
                   child: Text("Done",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: colors.appbarColor),
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: colors.appbarColor),
                   ),
                 ),
               ),

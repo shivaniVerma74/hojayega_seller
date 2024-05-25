@@ -1,29 +1,27 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
+
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hojayega_seller/Helper/api.path.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
+import 'package:http/http.dart'as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../Helper/Color.dart';
 import '../Helper/Custom_Text.dart';
 import '../Helper/Custom_textForm.dart';
+import '../Helper/api.path.dart';
 import '../Helper/appButton.dart';
-import '../Helper/color.dart';
 import '../Model/CategoryModel.dart';
 import '../Model/ChildCategoryModel.dart';
 import '../Model/SubCategoryModel.dart';
-import 'HomeScreen.dart';
 
-class AddProduct extends StatefulWidget {
-  const AddProduct({Key? key}) : super(key: key);
+
+class EditProduct extends StatefulWidget {
+  const EditProduct({Key? key}) : super(key: key);
 
   @override
-  State<AddProduct> createState() => _AddProductState();
+  State<EditProduct> createState() => _EditProductState();
 }
 
 List<String> otherImageList = [];
@@ -48,7 +46,9 @@ int product = 0;
 
 final _formKey = GlobalKey<FormState>();
 
-class _AddProductState extends State<AddProduct> {
+
+class _EditProductState extends State<EditProduct> {
+
   final TextEditingController _nameCtr = TextEditingController();
   final TextEditingController _priceCtr = TextEditingController();
   final TextEditingController _unitCtr = TextEditingController();
@@ -319,9 +319,9 @@ class _AddProductState extends State<AddProduct> {
     setState(() {
       isLodding = true;
     });
-      var headers = {
-        'Cookie': 'ci_session=2844e71eb13a14bad7faba0b8d00d5626590d23e'
-      };
+    var headers = {
+      'Cookie': 'ci_session=2844e71eb13a14bad7faba0b8d00d5626590d23e'
+    };
     SharedPreferences prefs = await SharedPreferences.getInstance();
     category_Id = prefs.getString("catId");
     subCatId = prefs.getString("subCatId");
@@ -367,7 +367,7 @@ class _AddProductState extends State<AddProduct> {
     data.forEach((key, value) {
       request.fields[key] = value;
     });
-   print("add product api parar ${request.fields} hrerer $param");
+    print("add product api parar ${request.fields} hrerer $param");
     for (var i = 0; i < (imagePathList.length ?? 0); i++) {
       print('Imageeeeee $imagePathList');
       imagePathList[i] == "" ? null : request.files.add(await http.MultipartFile.fromPath('main_image[]', imagePathList[i].toString()));
@@ -420,7 +420,7 @@ class _AddProductState extends State<AddProduct> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
       appBar: AppBar(
           elevation: 0,
           centerTitle: true,
@@ -430,12 +430,9 @@ class _AddProductState extends State<AddProduct> {
               bottomRight: Radius.circular(25),
             ),
           ),
-          title: const Text('Add Product'),
+          title: const Text('Edit Product'),
           backgroundColor: colors.primary),
-      body:
-      // getBrandModel == null ? const Center(
-      //     child: CircularProgressIndicator()) :
-      SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Card(
@@ -947,8 +944,8 @@ class _AddProductState extends State<AddProduct> {
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: unit.length,
                     itemBuilder: (context, index){
-                    return addonUnit(index);
-                  },),
+                      return addonUnit(index);
+                    },),
                   const SizedBox(
                     height: 10,
                   ),
@@ -1884,4 +1881,5 @@ class _AddProductState extends State<AddProduct> {
     prefs.remove('sub'); //only
     prefs.remove('child'); //only
   }
+
 }

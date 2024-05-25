@@ -12,14 +12,14 @@ import 'package:hojayega_seller/Model/CategoryModel.dart';
 import 'package:hojayega_seller/Screen/addServicesScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CreatePortfolio extends StatefulWidget {
-  CreatePortfolio({Key? key}) : super(key: key);
+class ServicesDetails extends StatefulWidget {
+  ServicesDetails({Key? key}) : super(key: key);
 
   @override
-  State<CreatePortfolio> createState() => _CreatePortfolioState();
+  State<ServicesDetails> createState() => _ServicesDetailsState();
 }
 
-class _CreatePortfolioState extends State<CreatePortfolio> {
+class _ServicesDetailsState extends State<ServicesDetails> {
   int? selectedItemIndex ;
 
 
@@ -50,7 +50,6 @@ class _CreatePortfolioState extends State<CreatePortfolio> {
       print(response.reasonPhrase);
     }
   }
-
 
   GetVendorServicesModel? getVendorServicesModel;
   getVendorServices(categoryId ) async {
@@ -130,6 +129,7 @@ class _CreatePortfolioState extends State<CreatePortfolio> {
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
             Padding(
@@ -216,16 +216,14 @@ class _CreatePortfolioState extends State<CreatePortfolio> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: Color(0XFF112c48),
+                      color: const Color(0XFF112c48),
                     ),
                   ),
                   child: getVendorServicesModel == null? const SizedBox.shrink():MyListView(
                     getVendorServicesModel: getVendorServicesModel!,categoryId: categoryModel!.data![selectedItemIndex!].id.toString(),
-                    callApi:(bool value){
+                    callApi:(bool value) {
                       if(value) {
-                        getVendorServices(
-                            categoryModel!.data![selectedItemIndex!].id
-                                .toString());
+                        getVendorServices(categoryModel!.data![selectedItemIndex!].id.toString());
                       }
                     },
                   ),
@@ -615,11 +613,12 @@ class _CreatePortfolioState extends State<CreatePortfolio> {
                   //     ),
                   //   ],
                   // ),
-                )
+                ),
             ),
+            const SizedBox(height: 10),
             InkWell(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>Congratulation()));
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> const Congratulation()));
               },
               child: Center(
                 child: Card(
@@ -630,13 +629,14 @@ class _CreatePortfolioState extends State<CreatePortfolio> {
                     ),
                     //   width: MediaQuery.of(context),
                     // decoration: BoxDecoration(borderRadius: ),
-                    height:
-                    MediaQuery.of(context).size.height * 0.07,
-                    width: MediaQuery.of(context).size.width * .6,
+                    height: MediaQuery.of(context).size.height * 0.06,
+                    width: MediaQuery.of(context).size.width * .5,
                     child: const Center(
                       child: Text(
                         'Done',
                         style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
                           color: Colors.white,
                         ),
                       ),
@@ -644,7 +644,7 @@ class _CreatePortfolioState extends State<CreatePortfolio> {
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

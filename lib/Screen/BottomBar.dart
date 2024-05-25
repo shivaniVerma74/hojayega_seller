@@ -47,7 +47,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
       _child = Container();
     }
     super.initState();
-
     getData();
     // if (widget.dIndex != null) {
     //   selectedIndex = widget.dIndex!;
@@ -104,7 +103,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           key: _key,
           backgroundColor: colors.appbarColor,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(selectedIndex == 4||selectedIndex == 2 ? roll=="2"?80:0 : 80),
+            preferredSize: Size.fromHeight(selectedIndex == 4||selectedIndex == 2 ? roll=="2"? 80:0 : 80),
             child: selectedIndex == 0
                 ? homeAppBar(
               context,
@@ -115,17 +114,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
             ): selectedIndex == 0
                 ? Container()
                 : PreferredSize(
-              preferredSize: Size.fromHeight(80),
-              child: commonAppBar(context,
+              preferredSize: const Size.fromHeight(80),
+              child: commonAppBar(
+                  context,
                   text: selectedIndex == 0
-                      ? "Home"
-                      :
-                  selectedIndex == 3
-                      ? "Pending Order"
-                      : selectedIndex == 4
-                      ? "Pick & Drop":
-                  roll == "2"? selectedIndex==2? "Pending Orders":
-                       "My Orders":"My Orders"),
+                      ? "Home" : selectedIndex == 3
+                      ? "Pending Order" : selectedIndex == 4
+                      ? "Pick & Drop": roll == "2"? selectedIndex==2? "Pending Orders":
+                       "My Bookings":"My Orders"
+              ),
             ),
           ),
           body: _child,
@@ -650,7 +647,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
           _child = HomeScreen();
           break;
         case 1:
-          _child = roll=="2"? Calender(isFromBottom: true,):Orders();
+          // _child = roll=="2"? Calender(isFromBottom: true,) :Orders();
+          _child = roll=="2"? Calender(isFromBottom: true,) : Orders();
           break;
         case 2:
           _child =roll=="2"? PendingOrders(): AllCategory();

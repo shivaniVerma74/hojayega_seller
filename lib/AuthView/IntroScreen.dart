@@ -28,7 +28,7 @@ class _IntroScreenState extends State<IntroScreen> {
             controller: controller,
             children: const [
               FirstScreen(),
-              SecondScreen(),
+              // SecondScreen(),
               ThirdScreen(),
               FourthScreen(),
               FifthScreen(),
@@ -36,7 +36,7 @@ class _IntroScreenState extends State<IntroScreen> {
           ),
           PageIndicator(
             controller: controller,
-            itemCount: 5,
+            itemCount: 4,
           )
         ],
       ),
@@ -70,8 +70,9 @@ class FirstScreen extends StatelessWidget {
               height: MediaQuery.of(context).size.height * 0.3,
             ),
             const AutoSizeText(
-              'No middleman charges',
-              style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold, color: Colors.red), maxLines: 2,
+              'No Middleman charges',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.red), maxLines: 2,
             ),
             const SizedBox(
               height: 10,
@@ -79,10 +80,10 @@ class FirstScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: const AutoSizeText(
-                'Receive direct payments from clients – no middleman charges for your products. Provide top-notch service to stand out in the market competition. It\'s your key to success!',
+                'Receive direct payments from clients ,Provide top-notch service to stand out in the market competition',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 18,
                 ),
                 maxLines: 4,
               ),
@@ -121,27 +122,29 @@ class SecondScreen extends StatelessWidget {
             ),
             const Text(
               'Everything you need in one place',
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.red),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: const Text(
-                'Hojayega makes it easy - no middle commission rates. Connect directly with your favorite shopkeepers or find the the best service providers in the city. seamless and simple',
+                'Hojayega makes it easy - no middle commission rates. Connect directly with your favorite shopkeepers or find t/he the best service providers in the city. seamless and simple',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ],
     );
   }
 }
+
 
 class ThirdScreen extends StatelessWidget {
   const ThirdScreen({super.key});
@@ -154,7 +157,8 @@ class ThirdScreen extends StatelessWidget {
             child: Image.asset(
               'assets/images/introimage.png',
               fit: BoxFit.fill,
-            )),
+            ),
+        ),
         Column(
           children: [
             const SizedBox(
@@ -169,9 +173,10 @@ class ThirdScreen extends StatelessWidget {
             ),
             const Text(
               'Boost Your Business Effortlessly',
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.red),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             // Container(
@@ -185,15 +190,15 @@ class ThirdScreen extends StatelessWidget {
             //   ),
             // )
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: const Text(
                 'Hojayega! It\'s user-friendly and caters to freelancers, shopkeepers, and service providers. Save time, save money, and expand your reach seamlessly.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ],
@@ -228,21 +233,22 @@ class FourthScreen extends StatelessWidget {
             ),
             const Text(
               'Effortlessly Schedule Appointment Dates',
-              style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold, color: Colors.red),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.red),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: const Text(
-                'Say goodbye to receiving calls during busy hours! With Hojayega, secure fixed orders and effortlessly schedule appointment dates and times automatically. Streamline your business and save time.',
+                'Say goodbye to receiving calls during busy hours! With Hojayega, secure fixed orders and effortlessly schedule appointment dates and times automatically.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ],
@@ -250,11 +256,8 @@ class FourthScreen extends StatelessWidget {
   }
 }
 
-class FifthScreen extends StatelessWidget {
-  const FifthScreen({super.key});
-
-
-  setPreferances()async{
+class FifthScreen extends StatelessWidget {const FifthScreen({super.key});
+  setPreferances() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool("isFirstTime", false);
   }
@@ -268,7 +271,8 @@ class FifthScreen extends StatelessWidget {
             child: Image.asset(
               'assets/images/introimage.png',
               fit: BoxFit.fill,
-            )),
+            ),
+        ),
         Column(
           children: [
             const SizedBox(
@@ -283,9 +287,10 @@ class FifthScreen extends StatelessWidget {
             ),
             const Text(
               'It\'s Flexibility At Your Fingertips!',
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.red),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Container(
@@ -294,7 +299,7 @@ class FifthScreen extends StatelessWidget {
                 'No need to stress about updating your portfolio rates daily with Hojayega! Easily adjust and offer the best rates to your loyal clients whenever you want.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                 ),
               ),
             ),
@@ -305,11 +310,9 @@ class FifthScreen extends StatelessWidget {
           child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: GestureDetector(
-                onTap: ()
-                {
+                onTap: () {
                   setPreferances();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
               },
                 child: Container(
                     padding: const EdgeInsets.all(8),

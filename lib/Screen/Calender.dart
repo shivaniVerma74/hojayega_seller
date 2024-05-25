@@ -1,11 +1,14 @@
  import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Helper/api.path.dart';
 import 'package:hojayega_seller/Model/getVendorBookingsModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/color.dart';
 import 'package:http/http.dart'as http;
+
+import 'BottomBar.dart';
 
 class Calender extends StatefulWidget {
   final bool isFromBottom;
@@ -28,8 +31,7 @@ class _CalenderState extends State<Calender> {
     };
     var request =
     http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorBookings));
-    request.fields.addAll(
-        {'user_id':"25",});
+    request.fields.addAll({'user_id':vendorId.toString(),});
     debugPrint("=========fields of get bookings======${request.fields}===========");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -45,9 +47,10 @@ class _CalenderState extends State<Calender> {
       debugPrint(response.reasonPhrase);
     }
   }
+
     bool isLoading= true;
   load(){
-    Future.delayed(Duration(seconds: 1),(){
+    Future.delayed(Duration(seconds: 1),() {
       setState(() {
         isLoading = false;
       });
@@ -62,6 +65,26 @@ class _CalenderState extends State<Calender> {
     getVendorBookings();
   }
 
+  completeBooking(String? bookingID) async {
+    var headers = {
+      'Cookie': 'ci_session=665c4cfcb0fe58936a31c314dbaaf606bda67175'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.completeBookings));
+    request.fields.addAll({
+      'id': bookingID.toString(),
+    });
+    print("booking complete ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+      Fluttertoast.showToast(msg: "Booking Complete");
+      Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavBar()));
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +98,8 @@ class _CalenderState extends State<Calender> {
         leading: Container(
           decoration: BoxDecoration(
               color: Colors.white, borderRadius: BorderRadius.circular(5)),
-          margin: EdgeInsets.all(8), // Adjust padding inside container
-          child: Icon(Icons.arrow_back),
+          margin: const EdgeInsets.all(8), // Adjust padding inside container
+          child: const Icon(Icons.arrow_back),
         ),
         centerTitle: true,
         backgroundColor: colors.primary,
@@ -104,7 +127,8 @@ class _CalenderState extends State<Calender> {
         //   ),
         // ],
       ),
-      body: isLoading?const Center(child: CircularProgressIndicator(),):getVendorBookingModel!.msg == "No Booking found"?const Center(child: Text("No Booking found"),):ListView.builder(
+      body:
+      isLoading? const Center(child: CircularProgressIndicator(),):getVendorBookingModel?.msg == "No Booking found"?const Center(child: Text("No Booking found"),):ListView.builder(
         itemCount:getVendorBookingModel?.data.length ?? 0,
           itemBuilder: (_,index){
           GetBookingData? data = getVendorBookingModel?.data[index];
@@ -126,7 +150,7 @@ class _CalenderState extends State<Calender> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(5.0),
                         child: Row(
                           //crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -136,19 +160,19 @@ class _CalenderState extends State<Calender> {
                               children:  [
                                 Text(
                                   "Date: ${data?.date}".replaceAll("00:00:00.000", ''),
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  "Time: ${data?.time}",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  "Time: ${data?.slot}",
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   "Name: ${data?.username}",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   "Ph no: ${data?.mobile}",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 // Text("Hair cut",),
                                 // Text("Hair colour touch up",),
@@ -165,16 +189,22 @@ class _CalenderState extends State<Calender> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text('${data?.status}',
-                                    style: TextStyle(color: colors.grad1Color)),
-                                const SizedBox(height: 8,),
+                                data?.status == "Pending" ?
+                                const Text('Pending',
+                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)): SizedBox(),
+                                data?.status == "Complete" ?
+                                const Text('Complete',
+                                    style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)): SizedBox(),
+                                const SizedBox(height: 5,),
                                 Container(
                                   height: 80,
                                   width: 80,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5)),
-                                  child: data?.shopImage == null?Image.asset(
-                                      'assets/images/placeholder.png'):Image.network("${data!.shopImage}")
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: colors.primary)),
+                                  child:
+                                  // data?.shopImage == null?
+                                  // Image.asset(
+                                  //     'assets/images/placeholder.png'):
+                                  Image.network("${data!.shopImage}", fit: BoxFit.fill,)
                                 )
                               ],
                             ),
@@ -182,39 +212,54 @@ class _CalenderState extends State<Calender> {
                           ],
                         ),
                       ),
-                      Divider(
+                      const Divider(
                         color: Colors.black,
                       ),
                       Column(
-                        children: data!.serviceDetails.map((service){
+                        children: data.serviceDetails.map((service){
                           return Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(5.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children:  [
                                 Text(
                                   "${service.serviceName}",
                                 ),
-                                const SizedBox(height: 4,),
+                                const SizedBox(height: 3,),
                                 Text(
                                   "${service.price}/-",
                                 ),
-
-
                               ],
                             ),
                           );
                         }).toList()
-
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10,bottom: 10),
+                       Padding(
+                        padding: const EdgeInsets.only(left: 5,bottom: 10),
                         child: Text(
-                          "Note : I want to get it dont before 6:00. have to go to part.",
-                          style: TextStyle(
+                          "Note: ${data.note}",
+                          style: const TextStyle(
                               fontSize: 12, color: colors.grad1Color),
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 2, right: 2),
+                        child: Row(
+                         mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                completeBooking(data.bookingId.toString());
+                              },
+                              child: Container(
+                                height: 30,
+                                  width: 140,
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.primary),
+                                  child: const Center(child: Text("Complete Booking", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),))),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 ),

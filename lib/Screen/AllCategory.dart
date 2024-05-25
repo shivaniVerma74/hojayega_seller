@@ -692,7 +692,7 @@ class _AllCategoryState extends State<AllCategory> {
             log(prefs.get('category').toString());
             log(prefs.get('catId').toString());
             log(prefs.get('sunCatId').toString());
-            log("subid" + subcatid.toString());
+            log("subid$subcatid");
             print(prefs.get('sub'));
             print(prefs.get('child'));
 
@@ -702,11 +702,9 @@ class _AllCategoryState extends State<AllCategory> {
                 subcatid!.isEmpty ||
                 chidcatId == null ||
                 chidcatId!.isEmpty) {
-              Fluttertoast.showToast(msg: "Please select Categories ");
+              Fluttertoast.showToast(msg: "Please select Categories");
             } else {
-              Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => AddProduct()))
-                  .then((value) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct())).then((value) {
                 setState(() {
                   subcatid = null;
                   chidcatId = null;
@@ -1151,7 +1149,7 @@ class _AllCategoryState extends State<AllCategory> {
                         child: Column(
                           children: [
                             Container(
-                              height: size.height * 0.65,
+                              height: size.height * 0.68,
                               width: size.width * 0.7,
                               // color: Colors.orange,
                               child: Column(
@@ -1172,10 +1170,8 @@ class _AllCategoryState extends State<AllCategory> {
                                     ],
                                   ),
                                   Container(
-                                      height: 50,
-                                      child: childCategoryModel
-                                                  ?.data?.isNotEmpty ??
-                                              false
+                                      height: 40,
+                                      child: childCategoryModel?.data?.isNotEmpty ?? false
                                           ? ListView.builder(
                                               shrinkWrap: true,
                                               scrollDirection: Axis.horizontal,
@@ -1185,62 +1181,37 @@ class _AllCategoryState extends State<AllCategory> {
                                               itemBuilder: (context, index) {
                                                 return InkWell(
                                                   onTap: () async {
-                                                    SharedPreferences prefs =
-                                                        await SharedPreferences
-                                                            .getInstance();
+                                                    SharedPreferences prefs = await SharedPreferences.getInstance();
                                                     setState(() {
-                                                      chidcatId =
-                                                          childCategoryModel
-                                                              ?.data?[index].id;
-                                                      String? s1 =
-                                                          childCategoryModel
-                                                              ?.data?[index]
-                                                              .cName;
-                                                      prefs.setString(
-                                                          "childCatId",
-                                                          chidcatId!);
+                                                      chidcatId = childCategoryModel?.data?[index].id;
+                                                      String? s1 = childCategoryModel?.data?[index].cName;
+                                                      prefs.setString("childCatId", chidcatId!);
                                                       print(s1);
-                                                      print(
-                                                          "1111111111SSSSSSSSSSS@@2222222222");
-                                                      prefs.setString(
-                                                          'child', s1!);
+                                                      print("1111111111SSSSSSSSSSS@@2222222222");
+                                                      prefs.setString('child', s1!);
                                                     });
                                                     getProduct();
                                                   },
                                                   child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            5.0),
+                                                    padding: const EdgeInsets.all(5.0),
                                                     child: Column(
                                                       children: [
                                                         Container(
                                                           height: 30,
                                                           width: 90,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        5),
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(5),
                                                             border: Border.all(
-                                                                color: chidcatId ==
-                                                                        childCategoryModel
-                                                                            ?.data?[
-                                                                                index]
-                                                                            .id
-                                                                    ? colors
-                                                                        .secondary
-                                                                    : Colors
-                                                                        .black,
-                                                                width: 3),
-                                                            color: const Color(
-                                                                0XFF112c48),
+                                                                color: chidcatId == childCategoryModel?.data?[index].id
+                                                                    ? colors.secondary
+                                                                    : Colors.black, width: 3),
+                                                            color: const Color(0XFF112c48),
                                                           ),
                                                           child: Center(
                                                             child: Text(
                                                               '${childCategoryModel?.data?[index].cName}',
                                                               style: const TextStyle(
-                                                                  fontSize: 18,
+                                                                  fontSize: 16,
                                                                   color: Colors
                                                                       .white),
                                                             ),
@@ -1253,19 +1224,16 @@ class _AllCategoryState extends State<AllCategory> {
                                               })
                                           : const Center(
                                               child: Text('Data Not Found'),
-                                            )),
+                                            ),
+                                  ),
                                   SingleChildScrollView(
                                     child: Container(
-                                        margin:
-                                            EdgeInsets.only(left: 5, right: 5),
+                                        margin: EdgeInsets.only(left: 5, right: 5),
                                         height: 270,
                                         width: 280,
-                                        child: chidcatId == null ||
-                                                productList.isEmpty
+                                        child: chidcatId == null || productList.isEmpty
                                             ? const Center(
-                                                child:
-                                                    Text('Product Not Found'),
-                                              )
+                                                child: Text('Product Not Found'))
                                             : GridView.builder(
                                                 gridDelegate:
                                                     const SliverGridDelegateWithFixedCrossAxisCount(
@@ -1303,106 +1271,131 @@ class _AllCategoryState extends State<AllCategory> {
                                                                 .start,
                                                         children: [
                                                           Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    top: 5),
+                                                            padding: const EdgeInsets.only(top: 0),
                                                             child:
-                                                                CarouselSlider(
-                                                              options:
-                                                                  CarouselOptions(
-                                                                height: 50,
-                                                                aspectRatio:
-                                                                    16 / 9,
-                                                                viewportFraction:
-                                                                    1.0,
-                                                                initialPage: 0,
-                                                                enableInfiniteScroll:
-                                                                    true,
-                                                                reverse: false,
-                                                                autoPlay: true,
-                                                                autoPlayInterval:
-                                                                    const Duration(seconds: 3),
-                                                                autoPlayAnimationDuration:
-                                                                    const Duration(milliseconds: 800),
-                                                                autoPlayCurve:
-                                                                    Curves.fastOutSlowIn,
-                                                                enlargeCenterPage: false,
-                                                                onPageChanged:
-                                                                    (index, reason) {
-                                                                  setState(() {
-                                                                    currentIndex = index;
-                                                                  });
-                                                                },
+                                                            productList[index].otherImage?.first == null || productList[index].otherImage?.first == ""
+                                                                ? Center(
+                                                                  child: Container(
+                                                              decoration:
+                                                              BoxDecoration(
+                                                                  borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(5),
+                                                                  color: Colors.black,
                                                               ),
-                                                              items: productList[index].otherImage!.map(
-                                                                    (item) => Padding(padding: const EdgeInsets.only(left: 5, right: 5),
-                                                                      child:
-                                                                          Container(
-                                                                        width: MediaQuery.of(context)
-                                                                            .size
-                                                                            .width,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(8),
-                                                                          image: DecorationImage(
-                                                                              image: NetworkImage("$item"),
-                                                                              fit: BoxFit.fill),
-                                                                        ),
-                                                                      ),
+                                                              child: Image.asset(
+                                                                  "assets/images/placeholder.png",
+                                                                  fit: BoxFit.cover,
+                                                              ),
+                                                              )
+                                                            ) : Container(
+                                                                  height: 95,
+                                                                  width: 120,
+                                                                  decoration:
+                                                                  BoxDecoration(borderRadius: BorderRadius.circular(5),
+                                                                    color:
+                                                                    Colors.black,
+                                                                    image:
+                                                                    DecorationImage(
+                                                                      image: NetworkImage('${productList[index].otherImage?[0]}'),
+                                                                      fit: BoxFit.cover,
                                                                     ),
-                                                                  )
-                                                                  .toList(),
-                                                            ),
+                                                                  ),
+                                                                ),
+                                                            // CarouselSlider(
+                                                            //   options:
+                                                            //       CarouselOptions(
+                                                            //     height: 50,
+                                                            //     aspectRatio:
+                                                            //         16 / 9,
+                                                            //     viewportFraction:
+                                                            //         1.0,
+                                                            //     initialPage: 0,
+                                                            //     enableInfiniteScroll:
+                                                            //         true,
+                                                            //     reverse: false,
+                                                            //     autoPlay: true,
+                                                            //     autoPlayInterval:
+                                                            //         const Duration(seconds: 3),
+                                                            //     autoPlayAnimationDuration:
+                                                            //         const Duration(milliseconds: 800),
+                                                            //     autoPlayCurve:
+                                                            //         Curves.fastOutSlowIn,
+                                                            //     enlargeCenterPage: false,
+                                                            //     onPageChanged:
+                                                            //         (index, reason) {
+                                                            //       setState(() {
+                                                            //         currentIndex = index;
+                                                            //       });
+                                                            //     },
+                                                            //   ),
+                                                            //   items: productList[index].otherImage!.map(
+                                                            //         (item) => Padding(padding: const EdgeInsets.only(left: 5, right: 5),
+                                                            //           child:
+                                                            //               Container(
+                                                            //             width: MediaQuery.of(context)
+                                                            //                 .size
+                                                            //                 .width,
+                                                            //             decoration:
+                                                            //                 BoxDecoration(
+                                                            //               borderRadius:
+                                                            //                   BorderRadius.circular(8),
+                                                            //               image: DecorationImage(
+                                                            //                   image: NetworkImage("$item"),
+                                                            //                   fit: BoxFit.fill),
+                                                            //             ),
+                                                            //           ),
+                                                            //         ),
+                                                            //       )
+                                                            //       .toList(),
+                                                            // ),
                                                           ),
                                                           const SizedBox(
                                                             height: 10,
                                                           ),
-                                                          Center(
-                                                            child: SizedBox(
-                                                              width: 100,
-                                                              height: 6,
-                                                              child: Center(
-                                                                child: ListView
-                                                                    .separated(
-                                                                  shrinkWrap:
-                                                                      true,
-                                                                  itemCount: productList[
-                                                                              index]
-                                                                          .otherImage
-                                                                          ?.length ??
-                                                                      0,
-                                                                  scrollDirection:
-                                                                      Axis.horizontal,
-                                                                  itemBuilder:
-                                                                      (context,
-                                                                          index) {
-                                                                    return Container(
-                                                                      height: 6,
-                                                                      width: 6,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(10),
-                                                                        color: index ==
-                                                                                currentIndex
-                                                                            ? colors.secondary
-                                                                            : const Color(0xffFEE9E9E9),
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                  separatorBuilder:
-                                                                      (context,
-                                                                          index) {
-                                                                    return const SizedBox(
-                                                                      width: 5,
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
+                                                          // Center(
+                                                          //   child: SizedBox(
+                                                          //     width: 100,
+                                                          //     height: 6,
+                                                          //     child: Center(
+                                                          //       child: ListView
+                                                          //           .separated(
+                                                          //         shrinkWrap:
+                                                          //             true,
+                                                          //         itemCount: productList[
+                                                          //                     index]
+                                                          //                 .otherImage
+                                                          //                 ?.length ??
+                                                          //             0,
+                                                          //         scrollDirection:
+                                                          //             Axis.horizontal,
+                                                          //         itemBuilder:
+                                                          //             (context,
+                                                          //                 index) {
+                                                          //           return Container(
+                                                          //             height: 6,
+                                                          //             width: 6,
+                                                          //             decoration:
+                                                          //                 BoxDecoration(
+                                                          //               borderRadius:
+                                                          //                   BorderRadius.circular(10),
+                                                          //               color: index ==
+                                                          //                       currentIndex
+                                                          //                   ? colors.secondary
+                                                          //                   : const Color(0xffFEE9E9E9),
+                                                          //             ),
+                                                          //           );
+                                                          //         },
+                                                          //         separatorBuilder:
+                                                          //             (context, index) {
+                                                          //           return const SizedBox(
+                                                          //             width: 5,
+                                                          //           );
+                                                          //         },
+                                                          //       ),
+                                                          //     ),
+                                                          //   ),
+                                                          // ),
                                                           // ClipRRect(
                                                           //   child: Image.network("${productList[index].productImage}", height: 110),
                                                           // ),
@@ -1419,20 +1412,20 @@ class _AllCategoryState extends State<AllCategory> {
                                                                     '${productList[index].productName}',
                                                                     style: const TextStyle(
                                                                         color: colors.primary,
-                                                                        fontSize: 16,
+                                                                        fontSize: 14,
                                                                         fontWeight: FontWeight.w600),
                                                                 ),
-                                                                Text(
-                                                                  "${productList[index].unit ?? ""}kg",
-                                                                  style: const TextStyle(
-                                                                      color: colors
-                                                                          .primary,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
-                                                                      fontSize:
-                                                                          16),
-                                                                ),
+                                                                // Text(
+                                                                //   "${productList[index].unit ?? ""}kg",
+                                                                //   style: const TextStyle(
+                                                                //       color: colors
+                                                                //           .primary,
+                                                                //       fontWeight:
+                                                                //           FontWeight
+                                                                //               .w600,
+                                                                //       fontSize:
+                                                                //           16),
+                                                                // ),
                                                                 Text(
                                                                   "\u{20B9} ${productList[index].sellingPrice}",
                                                                   style: const TextStyle(
@@ -1492,7 +1485,7 @@ class _AllCategoryState extends State<AllCategory> {
                                   ),
                                   Center(
                                     child: Container(
-                                      height: 45,
+                                      height: 40,
                                       width: 200,
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
@@ -1502,13 +1495,14 @@ class _AllCategoryState extends State<AllCategory> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      Congratulation()));
+                                                      const Congratulation()));
                                         },
                                         child: const Text(
                                           'Next',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: 20,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600
                                           ),
                                         ),
                                       ),

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
 import 'package:http/http.dart' as http;
+import '../Model/FestivalModel.dart';
 import '../Model/GetTimeSlotModel.dart';
 import '../Model/GetVendorOrderModel.dart';
 
@@ -25,14 +26,18 @@ class _OrderDetailsState extends State<OrderDetails> {
     addToRow();
     getTimeSlot();
 
-    for (var i = 0; i< (widget.model?.orderItems.length ?? 0);i++){
-      rows[i][0] = widget.model?.orderItems[i].qty ??"0";
-      rows[i][1] = widget.model?.orderItems[i].productPrice ?? "0";
+    for (var i = 0; i< (widget.model?.orderItems?.length ?? 0);i++){
+      rows[i][0] = widget.model?.orderItems?[i].qty ??"0";
+      rows[i][1] = widget.model?.orderItems?[i].productPrice ?? "0";
 
     }
+    double tempTotal = widget.model?.orderItems?.fold(0.0, (previousValue, element) => previousValue! + double.parse(element.productPrice  ?? '0.0')) ?? 0.0;
+    // double tempTotal = widget.model?.orderItems.
+    print("total temp is $tempTotal");
+    totalPrice = tempTotal.toStringAsFixed(0);
     deliverychargesController.text = widget.model?.deliveryCharge ?? "";
     disController.text = widget.model?.discount ?? "";
-    totalController.text = "${int.parse(widget.model?.orderItems.first.qty.toString() ?? "0") * double.parse(widget.model?.orderItems.first.productPrice.toString() ?? "0.0") ?? ""}";
+    totalController.text = "${int.parse(widget.model?.orderItems?.first.qty.toString() ?? "0") * double.parse(widget.model?.orderItems?.first.productPrice.toString() ?? "0.0") ?? ""}";
   }
 
   String? vendorId;
@@ -59,7 +64,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   ];
 
    addToRow(){
-     for(var i = 0; i < (widget.model?.orderItems.length??0); i++){
+     for(var i = 0; i < (widget.model?.orderItems?.length??0); i++){
        rows.add(["u_R${i+1}","p_R${i+1}", "s_R${i+1}"]);
      }
      debugPrint("rows_____ $rows");
@@ -78,11 +83,12 @@ class _OrderDetailsState extends State<OrderDetails> {
     request.fields.addAll({
       'user_id': vendorId.toString(),
       'type': '1',
-      'product_id': widget.model?.orderItems[i].productId.toString()?? "",
+      'product_id': widget.model?.orderItems?[i].productId.toString()?? "",
       'qty': rows[i][0],
       'price': rows[i][1],
       'sub_total': rows[i][2],
       "order_id": widget.model?.orderId.toString()?? "",
+
     });
     print('update order itemsss para ${request.fields}');
     request.headers.addAll(headers);
@@ -107,13 +113,16 @@ class _OrderDetailsState extends State<OrderDetails> {
     request.fields.addAll({
       'user_id': vendorId.toString(),
       'order_id': widget.model?.orderId.toString() ?? "",
-      'sub_total': '1',
+      'sub_total': totalPrice.toString(),
       'discount': disController.text,
       'time': timefrom,
-      'promo_code': '',
-      'final_total': '10',
+      'promo_code': '1',
+      'final_total': discountAmt.toString(),
       'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
-      'total': widget.model?.total.toString() ?? ""
+      'total': finalTotal.toString(),
+      'time_id': time_id.toString(),
+      'order_type': (orderitem.indexOf(selectOrders.toString()) + 1).toString(),
+      'delivery_charge': delCharge.toString(),
     });
     print('update order para ${request.fields}');
     request.headers.addAll(headers);
@@ -124,6 +133,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       var finalresult = jsonDecode(result.toString());
       print("finalresult  ${finalresult["msg"]}");
       Fluttertoast.showToast(msg: finalresult['msg']);
+      Navigator.pop(context);
     } else {
       print(response.reasonPhrase);
     }
@@ -159,6 +169,7 @@ class _OrderDetailsState extends State<OrderDetails> {
 
   dynamic selectTimeslot;
   var timefrom;
+  String? time_id;
   List<TimeSlotListBooking> timeSlot = [];
   Future<void> getTimeSlot() async {
     var headers = {
@@ -184,6 +195,69 @@ class _OrderDetailsState extends State<OrderDetails> {
     }
   }
 
+  FestivalModel? festivalModel;
+  checkFestive() async{
+    var headers = {
+      'Cookie': 'ci_session=357aeaa9c34813410a247f64361084193b7c4337'
+    };
+    var request = http.Request('POST', Uri.parse('https://developmentalphawizz.com/hojayega/Vendorapi/check_festival'));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = FestivalModel.fromJson(json.decode(finalResponse));
+      print("get festival model $finalResult $finalResponse");
+      setState(() {
+        festivalModel = finalResult;
+        setState(() {});
+      });
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
+String? delCharge;
+  Future<void> deliveryCharge({required String vType}) async {
+    try {
+    var headers = {
+      'Cookie': 'ci_session=a4cf635dc882bdf7680025f3bdfc1b0dc4027b0b'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/hojayega/Vendorapi/get_delivery_charge_distacee'));
+    request.fields.addAll({
+      'res_lat': '${widget.model?.vendorLat.toString()}',
+      'res_lang': '${widget.model?.vendorLang.toString()}',
+      'latitude': '${widget.model?.lat.toString()}',
+      'longitude': '${widget.model?.lang.toString()}',
+      'vehicle_type': (vehicleItem.indexOf(vType) + 1).toString(),
+      'time_slot_id': time_id.toString(),
+      'product_type': (productitem.indexOf(selectproducts.toString()) + 1).toString(),
+      'type': '1',
+      'order_type': (orderitem.indexOf(selectOrders.toString()) + 1).toString(),
+    });
+    print("delivery cahrge para ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      var finalresult = jsonDecode(result.toString());
+      delCharge = finalresult["data"];
+      setState(() {
+
+      });
+      print("delivery charge is ${delCharge.toString()}");
+      print("final result  in delivery${finalresult["message"]}");
+      Fluttertoast.showToast(msg: finalresult['message']);
+    }
+    else {
+    print(response.reasonPhrase);
+    }}
+    catch (e) {
+    throw Exception(e);
+    }
+  }
+
+
   var vehicleItem = [
     'Bike',
     'Electric',
@@ -199,9 +273,23 @@ class _OrderDetailsState extends State<OrderDetails> {
 
   String? selectwhehicle;
   String? selectedVehicle;
+  String? totalPrice;
+  String? totalAmount;
+  String? selectOrders;
+  String? disAmt;
+
+  String? selectproducts;
+  var orderitem = [
+    'Cake/Fragile',
+    'Cooked Meal',
+    'Food',
+    'Non-Food',
+  ];
+  var productitem = ['Urgent', '2 Way', 'Multiple', 'Flexible'];
+
 
   getCurrentOrders() {
-    print("==nwennenenen=============${widget.model?.orderItems.first.productImage}===========");
+    print("sssss@@@@@@@@@@@@${widget.model?.orderItems?[0].subtotal}===========");
     return Column(
       children: [
         // ListView.builder(
@@ -352,24 +440,17 @@ class _OrderDetailsState extends State<OrderDetails> {
                             style: TextStyle(color: colors.primary),
                           ),
                           SizedBox(
-                            width: 100,
+                            width: 150,
                           ),
                           Text(
-                            "Qty",
+                            "Type",
                             style: TextStyle(color: colors.primary),
                           ),
                           SizedBox(
-                            width: 40,
+                            width: 50,
                           ),
                           Text(
-                            "Rs",
-                            style: TextStyle(color: colors.primary),
-                          ),
-                          SizedBox(
-                            width: 40,
-                          ),
-                          Text(
-                            "Total",
+                            "Rs.",
                             style: TextStyle(color: colors.primary),
                           ),
                         ],
@@ -383,9 +464,8 @@ class _OrderDetailsState extends State<OrderDetails> {
 
                 ListView.builder(
                   shrinkWrap: true,
-                  itemCount:widget.model?.orderItems.length ?? 0,
+                  itemCount:widget.model?.orderItems?.length ?? 0,
                   itemBuilder: (c, i) {
-                    print("======${rows[i][0].toString()}=======u_R${i + 1}=======");
                     return Padding(
                       padding: const EdgeInsets.only(left: 5, right: 2),
                       child: Column(
@@ -407,7 +487,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                             ),
                                             color: Colors.white),
                                         child: Image.network(
-                                            "${widget.model?.orderItems[i].productImage}", fit: BoxFit.fill,)),
+                                            "${widget.model?.orderItems?[i].productImage}", fit: BoxFit.fill,)),
                                   ),
                                   const SizedBox(
                                     width: 5,
@@ -415,19 +495,20 @@ class _OrderDetailsState extends State<OrderDetails> {
                                   Container(
                                     width: 60,
                                     child: Text(
-                                      "${widget.model?.orderItems[i].productName}",
+                                      "${widget.model?.orderItems?[i].productName}",
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
                               ),
                               const SizedBox(
-                                width: 50,
+                                width: 80,
                               ),
                               Text(
-                                rows[i][0].toString() == 'u_R${i + 1}'
-                                    ? "${widget.model?.orderItems[i].qty}"
-                                    : rows[i][0],
+                                "${widget.model?.orderItems?[i].unitType}",
+                                // rows[i][0].toString() == 'u_R${i + 1}'
+                                //     ? "${widget.model?.orderItems?[i].unitType}"
+                                //     : rows[i][0],
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(color: colors.primary),
                               ),
@@ -436,45 +517,44 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 width: 40,
                               ),
                               Text(
-                                rows[i][1].toString() == 'p_R${i + 1}'
-                                    ? "${widget.model?.orderItems[i].productPrice}"
-                                    : rows[i][1],
+                                // rows[i][1].toString() == 'p_R${i + 1}'
+                                //     ? "${widget.model?.orderItems?[i].subtotal} Rs."
+                                //     : rows[i][1],
+                                widget.model?.orderItems?[i].productPrice ??'',
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(color: colors.primary),
                               ),
                               const SizedBox(
-                                width: 30,
-                              ),
-                              Flexible(
-                                child: Text(
-                                  rows[i][2].toString() == 's_R${i + 1}'
-                                      ? "${int.parse(widget.model?.orderItems[i].qty.toString() ?? "0") *double.parse(widget.model?.orderItems[i].productPrice.toString() ?? "0.0")}"
-                                      : rows[i][2],
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: true,
-                                  style: const TextStyle(color: colors.primary),
-                                ),
-                              ),
-                              const SizedBox(
                                 width: 10,
                               ),
+                              // Flexible(
+                              //   child: Text(
+                              //     rows[i][2].toString() == 's_R${i + 1}'
+                              //         ? "${int.parse(widget.model?.orderItems?[i].qty.toString() ?? "0") *double.parse(widget.model?.orderItems?[i].productPrice.toString() ?? "0.0")}"
+                              //         : rows[i][2],
+                              //     overflow: TextOverflow.ellipsis,
+                              //     softWrap: true,
+                              //     style: const TextStyle(color: colors.primary),
+                              //   ),
+                              // ),
+                              // const SizedBox(
+                              //   width: 10,
+                              // ),
                               InkWell(
                                 onTap: () {
-                                   var sellingPrice = int.parse(widget.model?.orderItems[i].qty.toString() ?? "0") * double.parse(widget.model?.orderItems[i].productPrice.toString() ??"0");
-                                  print(i.toString());
-                                  unitController.text = rows[i][0].toString()  ?? "";
-                                  productPriceController.text =  rows[i][1].toString();
+                                   // var sellingPrice = int.parse(widget.model?.orderItems?[i].qty.toString() ?? "0") * double.parse(widget.model?.orderItems?[i].productPrice.toString() ??"0");
+                                    productPriceController.text = widget.model?.orderItems?[i].productPrice ?? "";
+                                  // unitController.text = rows[i][0].toString() ?? "";
+                                  // productPriceController.text =  rows[i][1].toString();
                                   // unitController.clear();
                                   // productPriceController.clear();
                                   // sellingPriceController.clear();
                                   setState(() {
-                                    //  selectedIndex=0;
                                     selectedIndex = i;
                                   });
                                   _showEditDialog12(
-                                    unitController,
-                                    productPriceController,
-                                     i,
+                                    // unitController,
+                                    productPriceController, i,
                                   );
                                   // unitController.text="";
                                   // unitController.text="";
@@ -598,17 +678,17 @@ class _OrderDetailsState extends State<OrderDetails> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8, right: 5),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      InkWell(
-                        onTap: () {
-                          _showEditDialog(totalController, "Total");
-                        },
-                        child: Image.asset("assets/images/edit.png"),
-                      ),
+                      // Image.asset("assets/images/edit.png"),
+                      totalPrice == null || totalPrice =="" ?  Text(
+                        "Total = ${totalAmount.toString()}",
+                        style: const TextStyle(color: colors.primary),
+                      ):
                       Text(
                         // "Total = ${rows[0][2]}",
-                        "Total = ${int.parse(widget.model?.orderItems[0].qty.toString() ?? "0") *double.parse(widget.model?.orderItems[0].productPrice.toString() ?? "0.0")}",
+                        // "Total = ${int.parse(widget.model?.orderItems?[0].qty.toString() ?? "0") *double.parse(widget.model?.orderItems?[0].productPrice.toString() ?? "0.0")}",
+                        "Total = ${totalPrice.toString()}Rs",
                         style: const TextStyle(color: colors.primary),
                       ),
                     ],
@@ -625,91 +705,33 @@ class _OrderDetailsState extends State<OrderDetails> {
                       InkWell(
                         onTap: () {
                           _showEditDialog(disController, "Discount");
+
                         },
                         child: Image.asset("assets/images/edit.png"),
                       ),
                       Text(
-                        "Discount = ${disController.text}rs",
+                        "Discount = ${disController.text}Rs",
                         style: const TextStyle(color: colors.primary),
                       ),
                     ],
                   ),
-                ),
-                const Divider(
-                  color: Colors.black,
-                ),
-                // Padding(
-                //   padding: const EdgeInsets.only(left: 8, right: 5),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     children: [
-                //       InkWell(
-                //         onTap: () {
-                //           _showEditDialog(couponController,
-                //               "Coupon =feb/haldiram/indira/001");
-                //         },
-                //         child: Image.asset("assets/images/edit.png"),
-                //       ),
-                //       Text("Coupon =feb/haldiram/indira/001 = ${couponController
-                //           .text}rs", style: TextStyle(color: colors.primary),),
-                //     ],
-                //   ),
-                // ),
-                // const Divider(
-                //   color: Colors.black,
-                // ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          _showEditDialog(deliverychargesController,
-                              "Delivery Charge as per Km ");
-                        },
-                        child: Image.asset("assets/images/edit.png"),
-                      ),
-                      Text(
-                        "Delivery Charge as per Km = ${deliverychargesController.text}rs",
-                        style: const TextStyle(color: colors.primary),
-                      ),
-                    ],
-                  ),
-                ),
-                // const Divider(
-                //   color: Colors.black,
-                // ),
-                // Padding(
-                //   padding: const EdgeInsets.only(left: 8, right: 5),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //
-                //     children: [
-                //       Image.asset("assets/images/EDIT.png"),
-                //       Text("Coupon =feb/haldiram/indira/001 = -3rs", style: TextStyle(color: colors.primary),),
-                //     ],
-                //   ),
-                // ),
-                const SizedBox(
-                  height: 7,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        // rejectOrders(context);
-                      },
-                      child: Container(
-                        height: 30,
-                        width: 110,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(0),
-                            color: const Color(0xffE5CB24)),
-                        child:  Center(
+                    Container(
+                      height: 30,
+                      width: 195,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(0),
+                        color: const Color(0xffE5CB24),
+                      ),
+                      child: Center(
+                        child: discountAmt == null || discountAmt == "" ? const Text("DiscountAmount = 0.0"):
+                        Padding(
+                          padding: const EdgeInsets.only(left: 2),
                           child: Text(
-                            "Total = ${widget.model?.total}rs",
+                            "DiscountAmount = $discountAmt Rs",
                             style: const TextStyle(fontSize: 15, color: colors.primary),
                           ),
                         ),
@@ -717,85 +739,281 @@ class _OrderDetailsState extends State<OrderDetails> {
                     ),
                   ],
                 ),
+                const Divider(
+                  color: Colors.black,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 15, right: 15, top: 5, bottom: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text("Time Slot",
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold)),
+                      Text("",
+                          style: TextStyle(
+                              fontSize: 1, fontWeight: FontWeight.w400))
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: DropdownButtonFormField<TimeSlotListBooking>(
+                    value: selectTimeslot,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_sharp,
+                      color: colors.primary,
+                    ),
+                    onChanged: ( newValue) {
+                      setState(() {
+                        selectTimeslot = newValue;
+                        time_id = newValue?.id.toString();
+                        timefrom ="From ${newValue?.fromTime.toString()} To ${newValue?.toTime.toString()}";
+                        print("time from=======$timefrom time id is $time_id===============");
+                      });
+                    },
+                    items: timeSlot.map((TimeSlotListBooking orderitem) {
+                      return DropdownMenuItem(
+                        value: orderitem,
+                        child: SizedBox(
+                            width:
+                            MediaQuery.of(context).size.width / 1.5,
+                            child: Text("${orderitem.fromTime.toString()} - ${orderitem.toTime.toString()}",
+                              style: const TextStyle(
+                                  color: colors.secondary),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            )),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.all(10),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10))),
+                        hintText: 'Select Time Slot',
+                        hintStyle: TextStyle(color: colors.primary),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                ),
+                // SizedBox(height: 5,),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 4),
+                //   child: Container(
+                //     decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(10),
+                //         color: colors.primary),
+                //     width: MediaQuery.of(context).size.width / 1.2,
+                //     child: Card(
+                //       color: colors.primary,
+                //       elevation: 2,
+                //       child: DropdownButtonFormField<String>(
+                //         value: selectedVehicle,
+                //         icon: const Icon(
+                //           Icons.keyboard_arrow_down_sharp,
+                //           color: colors.whiteTemp,
+                //         ),
+                //         onChanged: (String? newValue) {
+                //           setState(() {
+                //             selectedVehicle = newValue!;
+                //           });
+                //         },
+                //         items: vehicleItem.map((String orderitem) {
+                //           return DropdownMenuItem(
+                //             value: orderitem,
+                //             child: Text(
+                //               orderitem.toString(),
+                //               style: TextStyle(color: colors.secondary),
+                //             ),
+                //           );
+                //         }).toList(),
+                //         decoration: const InputDecoration(
+                //           border: InputBorder.none,
+                //           hintText: 'Select Vehicle Type',
+                //           hintStyle: TextStyle(color: Colors.white),
+                //           filled: true,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 15, right: 15, top: 10, bottom: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text("Product Type",
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text("",
+                          style: TextStyle(
+                              fontSize: 1, fontWeight: FontWeight.w400))
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 10, top: 0),
+                  child: DropdownButtonFormField<String>(
+                    value: selectOrders,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_sharp,
+                      color: colors.primary,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectOrders = newValue!;
+                        print(
+                            "===my technic=======$selectOrders===============");
+                      });
+                    },
+                    items: orderitem.map((String orderitem) {
+                      return DropdownMenuItem(
+                        value: orderitem,
+                        child: Text(
+                          orderitem.toString(),
+                          style:
+                          const TextStyle(color: colors.secondary),
+                        ),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.all(10),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10))),
+                        hintText: 'Select Product Type',
+                        hintStyle: TextStyle(color: colors.primary),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                ),
                 const SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 4),
-                  child: Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
-                    width: MediaQuery.of(context).size.width/1.2,
-                    child: Card(
-                      color: colors.primary,
-                      elevation: 2,
-                      child: DropdownButtonFormField<dynamic>(
-                        value: selectTimeslot,
-                        icon:  const Icon(Icons.keyboard_arrow_down_sharp, color: colors.whiteTemp,),
-                        onChanged: (dynamic newValue) {
-                          setState(() {
-                            selectTimeslot = newValue;
-                            timefrom ="From ${newValue.fromTime.toString()} To ${newValue.toTime.toString()}";
-                            print("===my technic=======$timefrom===============");
-                          });
-                        },
-                        items: timeSlot.map((dynamic orderitem) {
-                          return DropdownMenuItem(
-                            value:orderitem,
-                            child: SizedBox(
-                                width: MediaQuery.of(context).size.width/1.5,
-                                child: Text("From ${orderitem.fromTime.toString()} To ${orderitem.toTime.toString()}", style: TextStyle(color: colors.secondary),overflow: TextOverflow.ellipsis,maxLines: 1,)),
-                          );
-                        }).toList(),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Select Time Slot',
-                          hintStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                        ),
-                      ),
-                    ),
+                  padding: const EdgeInsets.only(
+                      left: 15, right: 15, top: 0, bottom: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text("Order Type",
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold)),
+                      Text("",
+                          style: TextStyle(
+                              fontSize: 1, fontWeight: FontWeight.w400))
+                    ],
                   ),
                 ),
-                SizedBox(height: 5,),
                 Padding(
-                  padding: const EdgeInsets.only(left: 4),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: colors.primary),
-                    width: MediaQuery.of(context).size.width / 1.2,
-                    child: Card(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: DropdownButtonFormField<String>(
+                    value: selectproducts,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_sharp,
                       color: colors.primary,
-                      elevation: 2,
-                      child: DropdownButtonFormField<String>(
-                        value: selectedVehicle,
-                        icon: const Icon(
-                          Icons.keyboard_arrow_down_sharp,
-                          color: colors.whiteTemp,
-                        ),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedVehicle = newValue!;
-                          });
-                        },
-                        items: vehicleItem.map((String orderitem) {
-                          return DropdownMenuItem(
-                            value: orderitem,
-                            child: Text(
-                              orderitem.toString(),
-                              style: TextStyle(color: colors.secondary),
-                            ),
-                          );
-                        }).toList(),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Select Vehicle Type',
-                          hintStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                        ),
-                      ),
                     ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectproducts = newValue!;
+                        print("===my technic=======$selectOrders===============");
+                      });
+                    },
+                    items: productitem.map((String orderitem) {
+                      return DropdownMenuItem(
+                        value: orderitem,
+                        child: Text(
+                          orderitem.toString(),
+                          style:
+                          const TextStyle(color: colors.secondary),
+                        ),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.all(10),
+                        border: OutlineInputBorder(
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(10),
+                          ),
+                        ),
+                        hintText: 'Select Order Type',
+                        hintStyle: TextStyle(color: colors.primary),
+                        filled: true,
+                        fillColor: Colors.white),
                   ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 15, right: 15, top: 5, bottom: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text("Vehicle Type",
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold)),
+                      Text("",
+                          style: TextStyle(
+                              fontSize: 1, fontWeight: FontWeight.w400))
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: DropdownButtonFormField<String>(
+                    value: selectedVehicle,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_sharp,
+                      color: colors.primary,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedVehicle = newValue!;
+                        print(
+                            "===vehicle =======$selectedVehicle===============");
+                        deliveryCharge(vType: selectedVehicle.toString());
+                        double? numericValue = double.tryParse(discountAmt ?? "");
+                        double? delValue = double.tryParse(delCharge ?? "");
+                        double? result = double.parse(numericValue.toString()) + delValue!;
+                        finalTotal = result.toString();
+                        print("final total is ${finalTotal.toString()}");
+                        setState(() {
+
+                        });
+                        // getDeliveryCharges(
+                        //     vType: selectedVehicle.toString());
+                      });
+                    },
+                    items: vehicleItem.map((String orderitem) {
+                      return DropdownMenuItem(
+                        value: orderitem,
+                        child: Text(
+                          orderitem.toString(),
+                          style: const TextStyle(color: colors.secondary),
+                        ),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.all(10),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10))),
+                        hintText: 'Select Vehicle Type',
+                        hintStyle: TextStyle(color: colors.primary),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
                 ),
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1016,7 +1234,93 @@ class _OrderDetailsState extends State<OrderDetails> {
                 //     ),
                 //   ],
                 // ),
-                const SizedBox(height: 20,),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 5),
+                  child:
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     InkWell(
+                  //       onTap: () {
+                  //         _showEditDialog(deliverychargesController,
+                  //             "Delivery Charge as per Km ");
+                  //       },
+                  //       child: Image.asset("assets/images/edit.png"),
+                  //     ),
+                  //     Text(
+                  //       "Delivery Charge as per Km = ${deliverychargesController.text}rs",
+                  //       style: const TextStyle(color: colors.primary),
+                  //     ),
+                  //   ],
+                  // ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Image.asset("assets/images/edit.png"),
+                      const Text(
+                        "Delivery Charge as per Km = ",
+                        style: TextStyle(color: colors.primary),
+                      ),
+                      delCharge == null || delCharge== "" ? const Text("0.0") :
+                      Text(
+                        "${delCharge.toString()}Rs",
+                        style: const TextStyle(color: colors.primary, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+                // const Divider(
+                //   color: Colors.black,
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 8, right: 5),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //
+                //     children: [
+                //       Image.asset("assets/images/EDIT.png"),
+                //       Text("Coupon =feb/haldiram/indira/001 = -3rs", style: TextStyle(color: colors.primary),),
+                //     ],
+                //   ),
+                // ),
+                const SizedBox(
+                  height: 7,
+                ),
+                const Divider(
+                  color: Colors.black,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        // rejectOrders(context);
+                      },
+                      child: Container(
+                        height: 30,
+                        width: 120,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(0),
+                            color: const Color(0xffE5CB24),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: finalTotal == null || finalTotal == "" ? Text("0.0"):
+                            Text(
+                              "Total = ${finalTotal.toString()} Rs",
+                              style: const TextStyle(fontSize: 15, color: colors.primary),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
                 Center(
                   child: InkWell(
                         onTap: () {
@@ -1027,7 +1331,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                           else if (selectedVehicle == null){
                             Fluttertoast.showToast(msg: "Please Select Vehicle Type");
                           }
-                          else{
+                          else {
                             setState(() {
                               updateOrder();
                             });
@@ -1047,7 +1351,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ),
                         ),
                       ),
-                ),
+                   ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -1059,6 +1363,8 @@ class _OrderDetailsState extends State<OrderDetails> {
     );
   }
 
+  String? discountAmt;
+  String? finalTotal;
   void _showEditDialog(TextEditingController controller, String fieldName) {
     showDialog(
       context: context,
@@ -1079,12 +1385,15 @@ class _OrderDetailsState extends State<OrderDetails> {
             ),
             TextButton(
               onPressed: () {
-                // Update the corresponding field and close the dialog
-
-                  // You may want to add validation here before updating the controller text
+                double? numericValue = double.tryParse(totalPrice ?? "");
+                double? inputValue = double.tryParse(controller.text);
+                double? result = double.parse(numericValue.toString()) - inputValue!;
+                discountAmt = result.toString();
+                print("dis amount is $discountAmt");
                   setState(() {
                     // controller.text = controller.text;
                   });
+                // disController.clear();
                   // switch(fieldName){
                   //   case "Total":
                   //     setState(() {
@@ -1112,32 +1421,29 @@ class _OrderDetailsState extends State<OrderDetails> {
   }
 
   void _showEditDialog12(
-    TextEditingController unitController,
     TextEditingController productPriceController,
-    // TextEditingController sellingPriceController,
-    //   totalPrice,
+
     int i,
   ) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Edit Product Details"),
+          title: const Text("Edit Product Details"),
           content: Container(
-            height: 150,
+            height: 100,
             child: Column(
               children: [
-                TextField(
-                  controller: unitController,
-                  keyboardType: TextInputType.text,
-                  decoration: const InputDecoration(labelText: "Unit"),
-                ),
+                // TextField(
+                //   controller: unitController,
+                //   keyboardType: TextInputType.text,
+                //   decoration: const InputDecoration(labelText: "Unit"),
+                // ),
                 TextField(
                   controller: productPriceController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: "Product Price"),
                 ),
-
                 // TextField(
                 //   controller: sellingPriceController,
                 //   readOnly: true,
@@ -1158,17 +1464,23 @@ class _OrderDetailsState extends State<OrderDetails> {
               onPressed: () {
                 setState(() {
                   // unitController.text=unitController.text;
-                  rows[i][0] = unitController.text;
-                  rows[i][1] = productPriceController.text;
-                  rows[i][2] = (double.parse(unitController.text) * double.parse(productPriceController.text) ).toString();
+                  // rows[i][0] = unitController.text;
+                  // rows[i][1] = productPriceController.text;
+                  //rows[i][2] = (double.parse(unitController.text) * double.parse(productPriceController.text) ).toString();
+                  widget.model?.orderItems?[i].productPrice= productPriceController.text;
+                  double tempTotal = widget.model?.orderItems?.fold(0.0, (previousValue, element) => previousValue! + double.parse(element.productPrice  ?? '0.0')) ?? 0.0;
+                  // double tempTotal = widget.model?.orderItems.
+                  print("total temp is $tempTotal");
+                  
+                  totalPrice = tempTotal.toStringAsFixed(0);
+
                   // productPriceController.text=productPriceController.text;
                   // sellingPriceController.text=sellingPriceController.text;
                   // widget.model?.orderItems?[i].unit = unitController.text;
                   // widget.model?.orderItems?[i].productPrice = productPriceController.text;
                   // widget.model?.orderItems?[i].sellingPrice = sellingPriceController.text;
-                  updateOrderItem(i).then((val){setState(() {
-
-                  });});
+                  // updateOrderItem(i).then((val){setState(() {
+                  // });});
                 });
                 Navigator.of(context).pop();
               },

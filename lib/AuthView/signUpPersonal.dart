@@ -77,7 +77,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
 
-
   bool isNumeric(String s) {
     if(s == null) {
       return false;
@@ -542,7 +541,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
             });
             Navigator.of(context).pop();
           },
-          initialPosition: const LatLng(22.719568, 75.857727),
+          initialPosition: LatLng(double.parse(latitude ?? "0.0"), double.parse(longitudes ?? "0.0")),
           useCurrentLocation: true,
         ),
       ),

@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import '../Model/FestivalModel.dart';
 import '../Model/GetTimeSlotModel.dart';
 import '../Model/GetVendorOrderModel.dart';
+import '../Model/VehicleModel.dart';
 
 class OrderDetails extends StatefulWidget {
   final VendorOrder? model;
@@ -23,6 +24,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getVehicle();
     addToRow();
     getTimeSlot();
 
@@ -88,7 +90,6 @@ class _OrderDetailsState extends State<OrderDetails> {
       'price': rows[i][1],
       'sub_total': rows[i][2],
       "order_id": widget.model?.orderId.toString()?? "",
-
     });
     print('update order itemsss para ${request.fields}');
     request.headers.addAll(headers);
@@ -117,9 +118,10 @@ class _OrderDetailsState extends State<OrderDetails> {
       'discount': disController.text,
       'time': timefrom,
       'promo_code': '1',
-      'final_total': discountAmt.toString(),
-      'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
-      'total': finalTotal.toString(),
+      'final_total': '830',
+       // 'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
+      'vehicle_type': vehicleId.toString(),
+      // 'total': finalTotal.toString(),
       'time_id': time_id.toString(),
       'order_type': (orderitem.indexOf(selectOrders.toString()) + 1).toString(),
       'delivery_charge': delCharge.toString(),
@@ -223,13 +225,14 @@ String? delCharge;
     var headers = {
       'Cookie': 'ci_session=a4cf635dc882bdf7680025f3bdfc1b0dc4027b0b'
     };
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/hojayega/Vendorapi/get_delivery_charge_distacee'));
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.deliveryChargeByDistance));
     request.fields.addAll({
       'res_lat': '${widget.model?.vendorLat.toString()}',
       'res_lang': '${widget.model?.vendorLang.toString()}',
       'latitude': '${widget.model?.lat.toString()}',
       'longitude': '${widget.model?.lang.toString()}',
-      'vehicle_type': (vehicleItem.indexOf(vType) + 1).toString(),
+      'vehicle_type': vehicleId.toString(),
+      // 'vehicle_type': (vehicleItem.indexOf(vType) + 1).toString(),
       'time_slot_id': time_id.toString(),
       'product_type': (productitem.indexOf(selectproducts.toString()) + 1).toString(),
       'type': '1',
@@ -242,9 +245,7 @@ String? delCharge;
       var result = await response.stream.bytesToString();
       var finalresult = jsonDecode(result.toString());
       delCharge = finalresult["data"];
-      setState(() {
-
-      });
+      setState(() {});
       print("delivery charge is ${delCharge.toString()}");
       print("final result  in delivery${finalresult["message"]}");
       Fluttertoast.showToast(msg: finalresult['message']);
@@ -258,13 +259,15 @@ String? delCharge;
   }
 
 
-  var vehicleItem = [
-    'Bike',
-    'Electric',
-    'Car',
-    'Taxi',
-    'Truck',
-  ];
+  // var vehicleItem = [
+  //   'Bike',
+  //   'Electric',
+  //   'Car',
+  //   'Taxi',
+  //   'Truck',
+  // ];
+
+
   var selectBikeType;
   var bikeType = [
     'Electric',
@@ -272,7 +275,8 @@ String? delCharge;
   ];
 
   String? selectwhehicle;
-  String? selectedVehicle;
+  VehicleData? selectedVehicle;
+  String? vehicleId;
   String? totalPrice;
   String? totalAmount;
   String? selectOrders;
@@ -287,6 +291,23 @@ String? delCharge;
   ];
   var productitem = ['Urgent', '2 Way', 'Multiple', 'Flexible'];
 
+  VehicleModel? vehicleItem;
+  getVehicle() async {
+    var headers = {
+      'Cookie': 'ci_session=a13b5d98bb1165c193782ed72de9bf712b5ece9e'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vehicleList));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    var json = jsonDecode(await response.stream.bytesToString());
+    if (response.statusCode == 200) {
+      vehicleItem = VehicleModel.fromJson(json);
+      setState(() {});
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
 
   getCurrentOrders() {
     print("sssss@@@@@@@@@@@@${widget.model?.orderItems?[0].subtotal}===========");
@@ -968,37 +989,31 @@ String? delCharge;
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButtonFormField<String>(
+                  child: DropdownButtonFormField<VehicleData>(
                     value: selectedVehicle,
                     icon: const Icon(
                       Icons.keyboard_arrow_down_sharp,
                       color: colors.primary,
                     ),
-                    onChanged: (String? newValue) {
+                    onChanged: (VehicleData? newValue) {
                       setState(() {
                         selectedVehicle = newValue!;
+                        vehicleId = selectedVehicle?.id.toString();
                         print(
                             "===vehicle =======$selectedVehicle===============");
                         deliveryCharge(vType: selectedVehicle.toString());
-                        double? numericValue = double.tryParse(discountAmt ?? "");
-                        double? delValue = double.tryParse(delCharge ?? "");
-                        double? result = double.parse(numericValue.toString()) + delValue!;
+                        double? numericValue = double.parse(discountAmt ?? "0.0");
+                        double? delValue = double.parse(delCharge ?? "0.0");
+                        double? result = double.parse(numericValue.toString()) + delValue;
                         finalTotal = result.toString();
                         print("final total is ${finalTotal.toString()}");
-                        setState(() {
-
-                        });
-                        // getDeliveryCharges(
-                        //     vType: selectedVehicle.toString());
+                        setState(() {});
                       });
                     },
-                    items: vehicleItem.map((String orderitem) {
+                    items: vehicleItem?.data?.map((VehicleData orderitem) {
                       return DropdownMenuItem(
                         value: orderitem,
-                        child: Text(
-                          orderitem.toString(),
-                          style: const TextStyle(color: colors.secondary),
-                        ),
+                        child: Image.network("https://developmentalphawizz.com/hojayega/${orderitem.image}"),
                       );
                     }).toList(),
                     decoration: const InputDecoration(
@@ -1299,7 +1314,7 @@ String? delCharge;
                       },
                       child: Container(
                         height: 30,
-                        width: 120,
+                        width: 140,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(0),
                             color: const Color(0xffE5CB24),
@@ -1307,10 +1322,19 @@ String? delCharge;
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.only(left: 5),
-                            child: finalTotal == null || finalTotal == "" ? Text("0.0"):
-                            Text(
-                              "Total = ${finalTotal.toString()} Rs",
-                              style: const TextStyle(fontSize: 15, color: colors.primary),
+                            child:
+                            Row(
+                              children: [
+                                const Text(
+                                  "SubTotal= ",
+                                  style: TextStyle(fontSize: 15, color: colors.primary),
+                                ),
+                                finalTotal == null || finalTotal == "" ?  Text("$totalPrice RS.", style: const TextStyle(fontSize: 15, color: colors.primary)):
+                                Text(
+                                  "${finalTotal.toString()} Rs.",
+                                  style: const TextStyle(fontSize: 15, color: colors.primary),
+                                ),
+                              ],
                             ),
                           ),
                         ),

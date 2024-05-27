@@ -48,6 +48,8 @@ class ApiServicves{
   static const String getSettings = baseUrl+'general_setting';
   static const String offers = baseUrl+'offer_add';
   static const String completeBookings = baseUrl+'complete_booking';
+  static const String vehicleList = baseUrl+'get_vehicle_list';
+  static const String deliveryChargeByDistance = baseUrl+'get_delivery_charge_distacee';
 }
 
 String? vendor_name;

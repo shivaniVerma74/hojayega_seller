@@ -337,8 +337,8 @@ class _AddProductState extends State<AddProduct> {
       'cat_id': category_Id.toString(),
       'sub_cat_id': subCatId.toString(),
       'child_cat_id': childCatId.toString(),
-      // 'unit': _unitCtr.text,
-      // 'unit_type': unitValue.toString(),
+       // 'unit': _unitCtr.text,
+       // 'unit_type': unitValue.toString(),
       'vid': vendorId.toString(),
     };
     // for (var i = 0; i < (imagePathList.length ?? 0); i++) {
@@ -415,8 +415,8 @@ class _AddProductState extends State<AddProduct> {
   List<String> unitTypes = ['Kg', 'g',];
 
 
-  List<String?> unit = ['']; // List to store selected dropdown values for each row
-  List<String?> unitType = ['Kg']; // List to store text field values for each row
+  List<String?> unit = [''];
+  List<String?> unitType = ['Kg'];
 
   @override
   Widget build(BuildContext context) {
@@ -944,7 +944,7 @@ class _AddProductState extends State<AddProduct> {
                   // ),
                   ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: unit.length,
                     itemBuilder: (context, index){
                     return addonUnit(index);
@@ -1325,7 +1325,7 @@ class _AddProductState extends State<AddProduct> {
                         onPress: () {
                           if (_formKey.currentState!.validate()) {
                             addProductApi();
-                          }
+                           }
                         }),
                   ),
                 ],

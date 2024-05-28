@@ -118,7 +118,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       'discount': disController.text,
       'time': timefrom,
       'promo_code': '1',
-      'final_total': '830',
+      'final_total': overRollAmt.toString(),
        // 'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
       'vehicle_type': vehicleId.toString(),
       // 'total': finalTotal.toString(),
@@ -995,20 +995,18 @@ String? delCharge;
                       Icons.keyboard_arrow_down_sharp,
                       color: colors.primary,
                     ),
-                    onChanged: (VehicleData? newValue) {
-                      setState(() {
-                        selectedVehicle = newValue!;
-                        vehicleId = selectedVehicle?.id.toString();
-                        print(
-                            "===vehicle =======$selectedVehicle===============");
-                        deliveryCharge(vType: selectedVehicle.toString());
-                        double? numericValue = double.parse(discountAmt ?? "0.0");
-                        double? delValue = double.parse(delCharge ?? "0.0");
-                        double? result = double.parse(numericValue.toString()) + delValue;
-                        finalTotal = result.toString();
-                        print("final total is ${finalTotal.toString()}");
-                        setState(() {});
-                      });
+                    onChanged: (VehicleData? newValue) async {
+                      selectedVehicle = newValue!;
+                      vehicleId = selectedVehicle?.id.toString();
+                      await deliveryCharge(vType: selectedVehicle.toString());
+                      double? numericValue = double.parse(discountAmt ?? "0.0");
+                      double? delValue = double.parse(delCharge ?? "0.0");
+                      double? result = numericValue+ delValue;
+                      finalTotal = result.toString();
+                      double? total = double.parse(totalPrice ?? "0.0");
+                      overRollAmt = total + delValue;
+                      setState(() {});
+                      print("final total is ${finalTotal.toString()} total herere $overRollAmt");
                     },
                     items: vehicleItem?.data?.map((VehicleData orderitem) {
                       return DropdownMenuItem(
@@ -1018,9 +1016,9 @@ String? delCharge;
                     }).toList(),
                     decoration: const InputDecoration(
                         contentPadding: EdgeInsets.all(10),
-                        border: OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(10))),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10),
+                          ),
+                        ),
                         hintText: 'Select Vehicle Type',
                         hintStyle: TextStyle(color: colors.primary),
                         filled: true,
@@ -1277,7 +1275,7 @@ String? delCharge;
                         "Delivery Charge as per Km = ",
                         style: TextStyle(color: colors.primary),
                       ),
-                      delCharge == null || delCharge== "" ? const Text("0.0") :
+                      delCharge == null || delCharge == "" ? const Text("0.0") :
                       Text(
                         "${delCharge.toString()}Rs",
                         style: const TextStyle(color: colors.primary, fontWeight: FontWeight.bold),
@@ -1329,9 +1327,9 @@ String? delCharge;
                                   "SubTotal= ",
                                   style: TextStyle(fontSize: 15, color: colors.primary),
                                 ),
-                                finalTotal == null || finalTotal == "" ?  Text("$totalPrice RS.", style: const TextStyle(fontSize: 15, color: colors.primary)):
+                                finalTotal == null || finalTotal == "" || finalTotal == "0.0" ?  Text("$totalPrice RS.", style: const TextStyle(fontSize: 15, color: colors.primary)):
                                 Text(
-                                  "${finalTotal.toString()} Rs.",
+                                  "${overRollAmt.toString()} Rs.",
                                   style: const TextStyle(fontSize: 15, color: colors.primary),
                                 ),
                               ],
@@ -1389,6 +1387,7 @@ String? delCharge;
 
   String? discountAmt;
   String? finalTotal;
+  double? overRollAmt;
   void _showEditDialog(TextEditingController controller, String fieldName) {
     showDialog(
       context: context,

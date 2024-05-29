@@ -1312,7 +1312,7 @@ class _AddProductState extends State<AddProduct> {
                   //     )
                   //   ],
                   // ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   uploadMultiImmage(),
                   const SizedBox(
                     height: 30,

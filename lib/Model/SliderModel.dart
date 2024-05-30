@@ -1,76 +1,101 @@
+/// error : false
+/// message : "Banners Found"
+/// data : [{"id":"1","image":"https://developmentalphawizz.com/hojayega/uploads/documents/65b124e6289d4.png","create_at":"2024-02-12 19:56:00","banner_type":"Shop"},{"id":"2","image":"https://developmentalphawizz.com/hojayega/uploads/documents/65b12590313aa.png","create_at":"2024-02-12 20:05:17","banner_type":"Shop"},{"id":"3","image":"https://developmentalphawizz.com/hojayega/uploads/documents/65c47c6aca28b.jpeg","create_at":"2024-02-12 19:56:04","banner_type":"Service"}]
 
-class SliderMOdel {
-  bool error;
-  String message;
-  List<BannerListModel> data;
-  String image;
-
-  SliderMOdel({
-    required this.error,
-    required this.message,
-    required this.data,
-    required this.image,
-  });
-
-  factory SliderMOdel.fromJson(Map<String, dynamic> json) => SliderMOdel(
-    error: json["error"],
-    message: json["message"],
-    data: List<BannerListModel>.from(json["data"].map((x) => BannerListModel.fromJson(x))),
-    image: json["image"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "error": error,
-    "message": message,
-    "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    "image": image,
-  };
+class SliderModel {
+  SliderModel({
+      bool? error, 
+      String? message, 
+      List<BannerListModel>? data,}){
+    _error = error;
+    _message = message;
+    _data = data;
 }
 
+  SliderModel.fromJson(dynamic json) {
+    _error = json['error'];
+    _message = json['message'];
+    if (json['data'] != null) {
+      _data = [];
+      json['data'].forEach((v) {
+        _data?.add(BannerListModel.fromJson(v));
+      });
+    }
+  }
+  bool? _error;
+  String? _message;
+  List<BannerListModel>? _data;
+SliderModel copyWith({  bool? error,
+  String? message,
+  List<BannerListModel>? data,
+}) => SliderModel(  error: error ?? _error,
+  message: message ?? _message,
+  data: data ?? _data,
+);
+  bool? get error => _error;
+  String? get message => _message;
+  List<BannerListModel>? get data => _data;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['error'] = _error;
+    map['message'] = _message;
+    if (_data != null) {
+      map['data'] = _data?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+
+}
+
+/// id : "1"
+/// image : "https://developmentalphawizz.com/hojayega/uploads/documents/65b124e6289d4.png"
+/// create_at : "2024-02-12 19:56:00"
+/// banner_type : "Shop"
+
 class BannerListModel {
-  String id;
-  String bannersName;
-  String image;
-  String roleType;
-  String bannerType;
-  DateTime startDate;
-  DateTime endDate;
-  String vendorId;
-  String totalDay;
-
   BannerListModel({
-    required this.id,
-    required this.bannersName,
-    required this.image,
-    required this.roleType,
-    required this.bannerType,
-    required this.startDate,
-    required this.endDate,
-    required this.vendorId,
-    required this.totalDay,
-  });
+      String? id, 
+      String? image, 
+      String? createAt, 
+      String? bannerType,}){
+    _id = id;
+    _image = image;
+    _createAt = createAt;
+    _bannerType = bannerType;
+}
 
-  factory BannerListModel.fromJson(Map<String, dynamic> json) => BannerListModel(
-    id: json["id"],
-    bannersName: json["banners_name"],
-    image: json["image"],
-    roleType: json["role_type"],
-    bannerType: json["banner_type"],
-    startDate: DateTime.parse(json["start_date"]),
-    endDate: DateTime.parse(json["end_date"]),
-    vendorId: json["vendor_id"],
-    totalDay: json["total_day"],
-  );
+  BannerListModel.fromJson(dynamic json) {
+    _id = json['id'];
+    _image = json['image'];
+    _createAt = json['create_at'];
+    _bannerType = json['banner_type'];
+  }
+  String? _id;
+  String? _image;
+  String? _createAt;
+  String? _bannerType;
+  BannerListModel copyWith({  String? id,
+  String? image,
+  String? createAt,
+  String? bannerType,
+}) => BannerListModel(  id: id ?? _id,
+  image: image ?? _image,
+  createAt: createAt ?? _createAt,
+  bannerType: bannerType ?? _bannerType,
+);
+  String? get id => _id;
+  String? get image => _image;
+  String? get createAt => _createAt;
+  String? get bannerType => _bannerType;
 
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "banners_name": bannersName,
-    "image": image,
-    "role_type": roleType,
-    "banner_type": bannerType,
-    "start_date": "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
-    "end_date": "${endDate.year.toString().padLeft(4, '0')}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
-    "vendor_id": vendorId,
-    "total_day": totalDay,
-  };
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = _id;
+    map['image'] = _image;
+    map['create_at'] = _createAt;
+    map['banner_type'] = _bannerType;
+    return map;
+  }
+
 }

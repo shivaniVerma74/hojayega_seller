@@ -50,6 +50,7 @@ class ApiServicves{
   static const String completeBookings = baseUrl+'complete_booking';
   static const String vehicleList = baseUrl+'get_vehicle_list';
   static const String deliveryChargeByDistance = baseUrl+'get_delivery_charge_distacee';
+  static const String getAllAddProduct = baseUrl+'get_vendor_all_products';
 }
 
 String? vendor_name;

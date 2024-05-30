@@ -75,12 +75,12 @@ getData() async {
   }
 
 
-  SliderMOdel? sliderModel;
+  SliderModel? sliderModel;
   List<BannerListModel> sliderList1 = [];
   List sliderList = [];
   bool isLoading = false;
 
-  SliderMOdel? sliderMOdel;
+  SliderModel? sliderMOdel;
 
   getBanner() async {
     setState(() {
@@ -91,7 +91,7 @@ getData() async {
     };
     var request =
     http.MultipartRequest('POST', Uri.parse(ApiServicves.getBanners));
-    request.fields.addAll({'banner_type': 'shop'});
+    // request.fields.addAll({'banner_type': 'shop'});
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     print("get banner=======${request.fields}===============");
@@ -101,17 +101,18 @@ getData() async {
       var result = await response.stream.bytesToString();
       var finalresult = jsonDecode(result);
       if (finalresult['error'] == false) {
-        sliderMOdel = SliderMOdel.fromJson(json.decode(result));
-        sliderList1 = SliderMOdel.fromJson(json.decode(result)).data ?? [];
+        sliderMOdel = SliderModel.fromJson(json.decode(result));
+        sliderList1 = SliderModel.fromJson(json.decode(result)).data ?? [];
         if (sliderList1.isNotEmpty) {
           setState(() {
             for (int i = 0; i < sliderList1.length; i++) {
               sliderList.add(sliderList1[i].image);
+              print("banner $sliderList sssd $sliderList1");
             }
           });
         } else {
           setState(() {
-            sliderList.add("${sliderMOdel?.image.toString()}");
+            // sliderList.add("${sliderMOdel?.data?[i].image}");
           });
         }
         setState(() {
@@ -644,359 +645,360 @@ getData() async {
       //     ),
       //   ]),
       // ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 20,
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 4,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List<Widget>.generate(roll == "2"? arrNames2.length:arrNames.length, (index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 8),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: List<Widget>.generate(roll == "2"? arrNames2.length:arrNames.length, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 8),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5,
+                                  ),
+                                  color: colors.primary),
+                              child: Image.asset(roll == "2"? iconsNames2[index]: iconsNames[index]),
+                            ),
+                            Text(roll == "2"? arrNames2[index]: arrNames[index]),
+                          ],
+                        ),
+                      );
+                    }),),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const Calender(isFromBottom: false,)));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 5),
                       child: Column(
                         children: [
                           Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5,
-                                ),
-                                color: colors.primary),
-                            child: Image.asset(roll == "2"? iconsNames2[index]: iconsNames[index]),
-                          ),
-                          Text(roll == "2"? arrNames2[index]: arrNames[index]),
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: colors.whiteTemp),
+                              child: Image.asset('assets/images/calender.png')),
+                          const Text("Calender")
                         ],
                       ),
-                    );
-                  }),),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => const Calender(isFromBottom: false,)));
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Column(
-                      children: [
-                        Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: colors.whiteTemp),
-                            child: Image.asset('assets/images/calender.png')),
-                        const Text("Calender")
-                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
-            child: Text(
-              "Today's Order Status",
-              style: TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20),
-            ),
-          ),
-          Center(
-            child: Table(
-              border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
-              columnWidths: const <int, TableColumnWidth>{
-                0: FixedColumnWidth(125.0),
-                1: FixedColumnWidth(125.0),
-                2: FixedColumnWidth(90.0),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: [
-                // Header Row
-                TableRow(
-                  children: [
-                    headerCell('Time Slot'),
-                    headerCell('Region'),
-                    headerCell('Order Status'),
-                  ],
-                ),
-                // Data Rows
-                ...orders.map((order) {
-                  return TableRow(
-                    children: [
-                      dataCell(order.timeSlot),
-                      dataCell(order.region),
-                      statusCell(order.status),
-                    ],
-                  );
-                }).toList(),
               ],
             ),
-          ),
-
-          // Container(
-          //   height: 100,
-          //   width: 200,
-          //   child: homepageimagemodel == null
-          //       ? Center(child: CircularProgressIndicator())
-          //       : CarouselSlider(
-          //     options: CarouselOptions(
-          //       autoPlay: true,
-          //       aspectRatio: 2,
-          //       viewportFraction: 1,
-          //     ),
-          //     items: homepageimagemodel!.data!.map((item) {
-          //       return Builder(
-          //         builder: (BuildContext context) {
-          //           return Container(
-          //             width: MediaQuery.of(context).size.width,
-          //             margin: EdgeInsets.symmetric(horizontal: 5.0),
-          //             child: Image.network(item.image!, fit: BoxFit.cover),
-          //           );
-          //         },
-          //       );
-          //     }).toList(),
-          //   ),
-          // ),
-
-          // Padding(
-          //   padding: const EdgeInsets.only(top:10),
-          //   child: CarouselSlider(
-          //     items: imageList.map((item) {
-          //       return ClipRRect(
-          //         borderRadius: BorderRadius.circular(10.0), // Border radius
-          //         child: Image.asset(
-          //
-          //           item[imageUrl]!,
-          //           fit: BoxFit.cover,
-          //           width: double.infinity,
-          //         ),
-          //       );
-          //     }).toList(), // Convert to List<Widget>
-          //     carouselController: carouselController,
-          //     options: CarouselOptions(
-          //       scrollPhysics: const BouncingScrollPhysics(),
-          //       autoPlay: true,
-          //       aspectRatio: 2,
-          //       viewportFraction: 1,
-          //       onPageChanged: (index, reason) {
-          //         setState(() {
-          //           currentIndex = index;
-          //         });
-          //       },
-          //     ),
-          //   ),
-          // ),
-          Column(
-            children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  height: MediaQuery.of(context).size.height * 0.22,
-                  aspectRatio: 16 / 9,
-                  viewportFraction: 1.0,
-                  initialPage: 0,
-                  enableInfiniteScroll: true,
-                  reverse: false,
-                  autoPlay: true,
-                  autoPlayInterval: const Duration(seconds: 3),
-                  autoPlayAnimationDuration:
-                  const Duration(milliseconds: 800),
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  enlargeCenterPage: false,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
-                ),
-                items: sliderList.map((item) => Padding(
-                    padding: const EdgeInsets.only(left: 5, right: 5),
-                    child: item == null || item == ""
-                        ? Container(
-                       width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        image: const DecorationImage(
-                            image: AssetImage(
-                              "assets/images/placeholder.png",
-                            ),
-                            fit: BoxFit.fill),
-                      ),
-                    ): Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        borderRadius:
-                        BorderRadius.circular(8),
-                        image: DecorationImage(
-                            image: NetworkImage("$item"),
-                            fit: BoxFit.fill),
-                      ),
-                    ),
+            const Padding(
+              padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
+              child: Text(
+                "Today's Order Status",
+                style: TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
+              ),
+            ),
+            Center(
+              child: Table(
+                border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
+                columnWidths: const <int, TableColumnWidth>{
+                  0: FixedColumnWidth(125.0),
+                  1: FixedColumnWidth(125.0),
+                  2: FixedColumnWidth(90.0),
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: [
+                  // Header Row
+                  TableRow(
+                    children: [
+                      headerCell('Time Slot'),
+                      headerCell('Region'),
+                      headerCell('Order Status'),
+                    ],
                   ),
-                ).toList(),
+                  // Data Rows
+                  ...orders.map((order) {
+                    return TableRow(
+                      children: [
+                        dataCell(order.timeSlot),
+                        dataCell(order.region),
+                        statusCell(order.status),
+                      ],
+                    );
+                  }).toList(),
+                ],
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              Center(
-                child: SizedBox(
-                  width: 100,
-                  height: 6,
-                  child: Center(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: sliderList.length ?? 0,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          height: 6,
-                          width: 6,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: index == currentIndex
-                                ? colors.primary
-                                : Colors.grey,
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return const SizedBox(
-                          width: 5,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.only(
-          //     top: 10.0,
-          //   ),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: List.generate(
-          //       3,
-          //       (index) => Container(
-          //         width: 8.0,
-          //         height: 8.0,
-          //         margin: EdgeInsets.symmetric(horizontal: 4.0),
-          //         decoration: BoxDecoration(
-          //           shape: BoxShape.circle,
-          //           color:
-          //               currentIndex == index ? Color(0xff6EE2F5) : Colors.grey,
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            ),
+           SizedBox(height: 10,),
+            // Container(
+            //   height: 100,
+            //   width: 200,
+            //   child: homepageimagemodel == null
+            //       ? Center(child: CircularProgressIndicator())
+            //       : CarouselSlider(
+            //     options: CarouselOptions(
+            //       autoPlay: true,
+            //       aspectRatio: 2,
+            //       viewportFraction: 1,
+            //     ),
+            //     items: homepageimagemodel!.data!.map((item) {
+            //       return Builder(
+            //         builder: (BuildContext context) {
+            //           return Container(
+            //             width: MediaQuery.of(context).size.width,
+            //             margin: EdgeInsets.symmetric(horizontal: 5.0),
+            //             child: Image.network(item.image!, fit: BoxFit.cover),
+            //           );
+            //         },
+            //       );
+            //     }).toList(),
+            //   ),
+            // ),
+
+            // Padding(
+            //   padding: const EdgeInsets.only(top:10),
+            //   child: CarouselSlider(
+            //     items: imageList.map((item) {
+            //       return ClipRRect(
+            //         borderRadius: BorderRadius.circular(10.0), // Border radius
+            //         child: Image.asset(
+            //
+            //           item[imageUrl]!,
+            //           fit: BoxFit.cover,
+            //           width: double.infinity,
+            //         ),
+            //       );
+            //     }).toList(), // Convert to List<Widget>
+            //     carouselController: carouselController,
+            //     options: CarouselOptions(
+            //       scrollPhysics: const BouncingScrollPhysics(),
+            //       autoPlay: true,
+            //       aspectRatio: 2,
+            //       viewportFraction: 1,
+            //       onPageChanged: (index, reason) {
+            //         setState(() {
+            //           currentIndex = index;
+            //         });
+            //       },
+            //     ),
+            //   ),
+            // ),
+            Column(
               children: [
-                InkWell(
-                  onTap: () async {
-                   await Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => DeliveryCard(walletAmount: deliveryCardBalance ?? card_limit.toString(),))).then((value) async {
-                          await getProfile();
-                    });
-                  },
-                  child: Container(
-                    height: 100,
-                    width: 170,
-                    decoration: BoxDecoration(
-                        image: const DecorationImage(
-                          image: AssetImage("assets/images/homered.png"),
-                          fit: BoxFit.cover,
+                CarouselSlider(
+                  options: CarouselOptions(
+                    height: MediaQuery.of(context).size.height * 0.22,
+                    aspectRatio: 16 / 9,
+                    viewportFraction: 1.0,
+                    initialPage: 0,
+                    enableInfiniteScroll: true,
+                    reverse: false,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 3),
+                    autoPlayAnimationDuration:
+                    const Duration(milliseconds: 800),
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    enlargeCenterPage: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        currentIndex = index;
+                      });
+                    },
+                  ),
+                  items: sliderList.map((item) => Padding(
+                      padding: const EdgeInsets.only(left: 5, right: 5),
+                      child: item == null || item == ""
+                          ? Container(
+                         width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          image: const DecorationImage(
+                              image: AssetImage(
+                                "assets/images/placeholder.png",
+                              ),
+                              fit: BoxFit.fill),
                         ),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 25),
-                      child: Column(
-                        children: [
-                          const Text(
-                            "Delivery Card",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: colors.whiteTemp,
-                                fontSize: 18),
-                          ),
-                          Text("₹ ${deliveryCardBalance ?? card_limit}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.whiteTemp,
-                                  fontSize: 18),
-                          ),
-                        ],
+                      ): Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          image: DecorationImage(
+                              image: NetworkImage("$item"),
+                              fit: BoxFit.fill),
+                        ),
+                      ),
+                    ),
+                  ).toList(),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: SizedBox(
+                    width: 100,
+                    height: 6,
+                    child: Center(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: sliderList.length ?? 0,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            height: 6,
+                            width: 6,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: index == currentIndex
+                                  ? colors.primary
+                                  : Colors.grey,
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return const SizedBox(
+                            width: 5,
+                          );
+                        },
                       ),
                     ),
                   ),
                 ),
-                InkWell(
-                  onTap:() async {
-                   await Navigator.push(
-                        context, MaterialPageRoute(
-                            builder: (context) => BusinessCard(walletAmount: businessCardBalance ?? card_limit.toString()))).then((value) async {
-                       await getProfile();
-                    });
-                  },
-                  child: Container(
-                    height: 100,
-                    width: 170,
-                    decoration: BoxDecoration(
-                        image: const DecorationImage(
-                          image: AssetImage("assets/images/homeblue.png"),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 25),
-                      child: Column(
-                        children: [
-                          const Text("Business Card",
+              ],
+            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(
+            //     top: 10.0,
+            //   ),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: List.generate(
+            //       3,
+            //       (index) => Container(
+            //         width: 8.0,
+            //         height: 8.0,
+            //         margin: EdgeInsets.symmetric(horizontal: 4.0),
+            //         decoration: BoxDecoration(
+            //           shape: BoxShape.circle,
+            //           color:
+            //               currentIndex == index ? Color(0xff6EE2F5) : Colors.grey,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(
+                    onTap: () async {
+                     await Navigator.push(
+                          context, MaterialPageRoute(builder: (context) => DeliveryCard(walletAmount: deliveryCardBalance ?? card_limit.toString(),))).then((value) async {
+                            await getProfile();
+                      });
+                    },
+                    child: Container(
+                      height: 100,
+                      width: 170,
+                      decoration: BoxDecoration(
+                          image: const DecorationImage(
+                            image: AssetImage("assets/images/homered.png"),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 25),
+                        child: Column(
+                          children: [
+                            const Text(
+                              "Delivery Card",
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: colors.whiteTemp,
-                                  fontSize: 18)),
-                          Text("₹ ${businessCardBalance?? card_limit}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.whiteTemp,
                                   fontSize: 18),
-                          ),
-                        ],
+                            ),
+                            Text("₹ ${deliveryCardBalance ?? card_limit}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.whiteTemp,
+                                    fontSize: 18),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                // Container(
-                //   width: 150,
-                //   child: Image.asset('assets/images/homeblue.png'),
-                // ),
-                //   Container(
-                //   width: 150,
-                //   child: Image.asset('assets/images/homered.png'),
-                // ),
-              ],
+                  InkWell(
+                    onTap:() async {
+                     await Navigator.push(
+                          context, MaterialPageRoute(
+                              builder: (context) => BusinessCard(walletAmount: businessCardBalance ?? card_limit.toString()))).then((value) async {
+                         await getProfile();
+                      });
+                    },
+                    child: Container(
+                      height: 100,
+                      width: 170,
+                      decoration: BoxDecoration(
+                          image: const DecorationImage(
+                            image: AssetImage("assets/images/homeblue.png"),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 25),
+                        child: Column(
+                          children: [
+                            const Text("Business Card",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.whiteTemp,
+                                    fontSize: 18)),
+                            Text("₹ ${businessCardBalance?? card_limit}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.whiteTemp,
+                                    fontSize: 18),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Container(
+                  //   width: 150,
+                  //   child: Image.asset('assets/images/homeblue.png'),
+                  // ),
+                  //   Container(
+                  //   width: 150,
+                  //   child: Image.asset('assets/images/homered.png'),
+                  // ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

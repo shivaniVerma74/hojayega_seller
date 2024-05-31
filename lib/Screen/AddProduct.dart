@@ -18,6 +18,7 @@ import '../Model/CategoryModel.dart';
 import '../Model/ChildCategoryModel.dart';
 import '../Model/GetAddProductModel.dart';
 import '../Model/SubCategoryModel.dart';
+import '../Model/UnitTypeModel.dart';
 import 'HomeScreen.dart';
 
 class AddProduct extends StatefulWidget {
@@ -81,12 +82,13 @@ class _AddProductState extends State<AddProduct> {
     super.initState();
     // TODO: implement initState
     // fetchData();
-    count=0;
+    unitTypes.add(selectedValue);
+    count = 0;
     // getData();
+    getUnits();
     getCategory("");
     getAddProduct();
-    getSubCategory("","");
-
+    getSubCategory(" "," ");
   }
 
   onclick() async {
@@ -95,6 +97,27 @@ class _AddProductState extends State<AddProduct> {
       hintText: 'Paste Youtube/video link',
     );
   }
+
+  List<Unitdata> unitList = [];
+  getUnits() async {
+    var headers = {
+      'Cookie': 'ci_session=232493a0eb7c4997f470f700c8a4a4303b973e5d'
+    };
+    var request = http.Request('POST', Uri.parse(ApiServicves.unitsAPi));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final jsonResponse = UnitTypeModel.fromJson(json.decode(finalResponse));
+      setState(() {
+        unitList = jsonResponse.data!.toList();
+      });
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
 
   CategoryModel? getCatModel;
   getCategory(service_Id) async {
@@ -401,9 +424,9 @@ class _AddProductState extends State<AddProduct> {
       unittList.add(unitData);
     }
     int k = 0;
-    for (int i = 0; i < unitType.length; i++) {
+    for (int i = 0; i < unitTypes.length; i++) {
       Map<String, String> unitTypeData = {
-        'unit_type': unitType.join(","),
+        'unit_type': unitTypes.join(","),
       };
       unittList.add(unitTypeData);
     }
@@ -480,9 +503,9 @@ class _AddProductState extends State<AddProduct> {
       unittList.add(unitData);
     }
     int k = 0;
-    for (int i = 0; i < unitType.length; i++) {
+    for (int i = 0; i < unitTypes.length; i++) {
       Map<String, String> unitTypeData = {
-        'unit_type': unitType.join(","),
+        'unit_type': unitTypes.join(","),
       };
       unittList.add(unitTypeData);
     }
@@ -535,11 +558,13 @@ class _AddProductState extends State<AddProduct> {
   String? subCatId;
   String? childCatId;
   String? unitValue = 'Kg';
-  List<String> unitTypes = ['Kg', 'g',];
+  // List<String> unitTypes = ['Kg', 'g',];
+  List<String?> unitTypes = [];
 
+  String? selectedValue;
 
   List<String?> unit = [''];
-  List<String?> unitType = ['Kg'];
+
 
   @override
   Widget build(BuildContext context) {
@@ -1495,7 +1520,7 @@ class _AddProductState extends State<AddProduct> {
       child: Column(
         children: [
           Custom_Text(
-            text: 'Unit',
+            text: 'Unit(Price)',
             text2: '*',
           ),
           const SizedBox(
@@ -1508,7 +1533,7 @@ class _AddProductState extends State<AddProduct> {
               });
             },
             // initialValue : unit[j],
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
             cursorHeight: 25,
             // controller: _unitCtr,
             decoration:  InputDecoration(
@@ -1614,7 +1639,7 @@ class _AddProductState extends State<AddProduct> {
                   onTap: () {
                     setState(() {
                       unit.add("");
-                      unitType.add("Kg");
+                      unitTypes.add("Kg");
                     });
                   },
                   child: const Icon(
@@ -1634,7 +1659,7 @@ class _AddProductState extends State<AddProduct> {
                     onTap: () {
                       setState(() {
                         unit.remove("");
-                        unitType.remove("Kg");
+                        unitTypes.last;
                       });
                     },
                     child: const Icon(
@@ -1667,7 +1692,7 @@ class _AddProductState extends State<AddProduct> {
         child: Column(
           children: [
             Custom_Text(
-              text: 'Unit',
+              text: 'Unit(Price)',
               text2: '*',
             ),
             const SizedBox(
@@ -1680,7 +1705,7 @@ class _AddProductState extends State<AddProduct> {
                 });
               },
               initialValue : unit[index],
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
               cursorHeight: 25,
               // controller: _unitCtr,
               decoration: const InputDecoration(
@@ -1708,72 +1733,91 @@ class _AddProductState extends State<AddProduct> {
             const SizedBox(
               height: 10,
             ),
-            DropdownButton<String?>(
+            DropdownButton(
               isExpanded: true,
-              hint: const Text(
-                'Select Unit',
-                style: TextStyle(
-                    color: colors.text,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15),
-              ),
-              // dropdownColor: colors.primary,
-              value: unitType[index],
-              icon: const Padding(
-                padding: EdgeInsets.only(left: 10.0, top: 5),
-                child: Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: Colors.grey,
-                  size: 25,
-                ),
-              ),
-              // elevation: 16,
-              style: const TextStyle(
-                  color: colors.secondary,
-                  fontWeight: FontWeight.bold),
-              underline: Padding(
-                padding: const EdgeInsets.only(left: 0, right: 0),
-                child: Container(
-                  // height: 2,
-                  color: Colors.white,
-                ),
-              ),
-              onChanged: (String? value) {
-                print("=====unit typee is ==========${unitType[index]}===========");
-                // This is called when the user selects an item.
-                setState(() {
-                  unitType[index] = value ?? unitType[index] ;
-                });
-              },
-              items: unitTypes.map((items) {
+              value: unitTypes[index],
+              hint: const Text('Select Unit'),
+              icon: const Icon(Icons.keyboard_arrow_down),
+              items: unitList.map((items) {
                 return DropdownMenuItem(
-                  value: items.toString(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Container(
-                          width:
-                          MediaQuery.of(context).size.width/1.42,
-                          child: Padding(
-                            padding:
-                            const EdgeInsets.only(top: 5),
-                            child: Text(
-                              items.toString(),
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  color: colors.text),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  value: items.id,
+                  child: Container(
+                      child: Text(items.name.toString())),
                 );
               }).toList(),
+              onChanged: (dynamic value) {
+                setState(() {
+                  unitTypes[index] = value;
+                });
+              },
+              underline: Container(),
             ),
+            // DropdownButton<Unitdata>(
+            //   isExpanded: true,
+            //   hint: const Text(
+            //     'Select Unit',
+            //     style: TextStyle(
+            //         color: colors.text,
+            //         fontWeight: FontWeight.w500,
+            //         fontSize: 15),
+            //   ),
+            //   // dropdownColor: colors.primary,
+            //   value: unitType[index],
+            //   icon: const Padding(
+            //     padding: EdgeInsets.only(left: 10.0, top: 5),
+            //     child: Icon(
+            //       Icons.keyboard_arrow_down_rounded,
+            //       color: Colors.grey,
+            //       size: 25,
+            //     ),
+            //   ),
+            //   // elevation: 16,
+            //   style: const TextStyle(
+            //       color: colors.secondary,
+            //       fontWeight: FontWeight.bold),
+            //   underline: Padding(
+            //     padding: const EdgeInsets.only(left: 0, right: 0),
+            //     child: Container(
+            //       // height: 2,
+            //       color: Colors.white,
+            //     ),
+            //   ),
+            //   onChanged: (dynamic value) {
+            //     print("=====unit typee is ==========${unitType[index]}===========");
+            //     // This is called when the user selects an item.
+            //     setState(() {
+            //       unitType[index] = value ?? unitType[index] ;
+            //     });
+            //   },
+            //   items: unitTypes.data.map((items) {
+            //     return DropdownMenuItem(
+            //       value: items.toString(),
+            //       child: Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           Padding(
+            //             padding: const EdgeInsets.only(top: 5),
+            //             child: Container(
+            //               width:
+            //               MediaQuery.of(context).size.width/1.42,
+            //               child: Padding(
+            //                 padding:
+            //                 const EdgeInsets.only(top: 5),
+            //                 child: Text(
+            //                   items.toString(),
+            //                   overflow: TextOverflow.ellipsis,
+            //                   style: const TextStyle(
+            //                       color: colors.text),
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     );
+            //   }).toList(),
+            // ),
             const Divider(color: Colors.grey,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1786,7 +1830,7 @@ class _AddProductState extends State<AddProduct> {
                     onTap: () {
                       setState(() {
                         unit.add("");
-                        unitType.add("Kg");
+                        unitTypes.add(selectedValue);
                       });
                     },
                     child: const Icon(
@@ -1806,7 +1850,7 @@ class _AddProductState extends State<AddProduct> {
                       onTap: () {
                         setState(() {
                           unit.remove("");
-                          unitType.remove("Kg");
+                          unitTypes.last;
                         });
                       },
                       child: const Icon(
@@ -1819,7 +1863,7 @@ class _AddProductState extends State<AddProduct> {
                 ),
               ],
             ),
-            const SizedBox(height: 5,),
+            const SizedBox(height: 5),
           ],
         ),
       ),

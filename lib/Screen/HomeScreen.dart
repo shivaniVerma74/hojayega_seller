@@ -137,18 +137,22 @@ getData() async {
 
 
   var arrNames = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop', 'Track \nOrder'];
+
   var arrNames2 = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop'];
+
   var iconsNames = [
     'assets/images/Manageads.png',
     'assets/images/Reports.png',
     'assets/images/Pickdrop.png',
     'assets/images/trackorder.png'
   ];
+
   var iconsNames2 = [
     'assets/images/Manageads.png',
     'assets/images/Reports.png',
     'assets/images/Pickdrop.png',
   ];
+
   final List<Order> orders = [
     Order('10:00 to 12:00 pm', 'Indore', 'Pending'),
     Order('10:00 to 12:00 pm', 'Ujjain', 'Approved'),
@@ -204,6 +208,7 @@ getData() async {
   }
 
   String? card_limit;
+
   getSetting() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var headers = {

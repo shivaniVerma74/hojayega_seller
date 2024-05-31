@@ -51,6 +51,7 @@ class ApiServicves{
   static const String vehicleList = baseUrl+'get_vehicle_list';
   static const String deliveryChargeByDistance = baseUrl+'get_delivery_charge_distacee';
   static const String getAllAddProduct = baseUrl+'get_vendor_all_products';
+  static const String unitsAPi = baseUrl+'get_unit_list';
 }
 
 String? vendor_name;

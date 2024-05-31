@@ -13,7 +13,8 @@ import 'package:hojayega_seller/Screen/addServicesScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ServicesDetails extends StatefulWidget {
-  ServicesDetails({Key? key}) : super(key: key);
+  String? ParentId;
+  ServicesDetails({Key? key, this.ParentId}) : super(key: key);
 
   @override
   State<ServicesDetails> createState() => _ServicesDetailsState();
@@ -25,14 +26,13 @@ class _ServicesDetailsState extends State<ServicesDetails> {
 
   CategoryModel? categoryModel;
   getCat() async {
-
     var headers = {
       'Cookie': 'ci_session=2af0bd20724524e1ebfba0e830885dbff718f536'
     };
     var request =
     http.MultipartRequest('POST', Uri.parse(ApiServicves.getCategories));
-    request.fields.addAll({'roll': '2'});
-    print("=========roll in get category======${request.fields}===========");
+    request.fields.addAll({'roll': '2', 'parent_id': '${widget.ParentId}'});
+    print("=========roll in get${request.fields}===========");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -657,7 +657,7 @@ class _ServicesDetailsState extends State<ServicesDetails> {
               getVendorServices(categoryModel?.data?[selectedItemIndex!].id);
             });
           }
-          else{
+          else {
             Fluttertoast.showToast(msg: "Please Select Category");
           }
 

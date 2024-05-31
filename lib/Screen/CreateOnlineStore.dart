@@ -501,7 +501,8 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                                   "https://developmentalphawizz.com/hojayega/${categoryModel!.data![index].img.toString()}",
                                                                   fit: BoxFit
                                                                       .fill,
-                                                                )),
+                                                                ),
+                                                        ),
                                                         Flexible(
                                                             child: Text(
                                                           categoryModel!
@@ -513,7 +514,8 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                                   fontSize: 10),
                                                           overflow: TextOverflow
                                                               .ellipsis,
-                                                        ))
+                                                          ),
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
@@ -754,7 +756,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                         keyboardType: TextInputType.number,
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
-                                            return 'Enter  Your Visting Charges';
+                                            return 'Enter  Your Visiting Charges';
                                           }
                                           return null;
                                         },
@@ -771,7 +773,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                   ),
                                 )
                               : SizedBox.shrink(),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Center(
@@ -782,25 +784,19 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 //     categoriesSelectedValues.where((element) => element==true)
                                 // );
                                 //
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
                                 if (categoriesSelectedValues.contains(true)) {
                                   for (var i = 0;
                                       i < categoriesSelectedValues.length;
                                       i++) {
                                     if (categoriesSelectedValues[i] == true) {
-                                      categoriesIdSelected
-                                          .add(categoryModel?.data?[i].id);
+                                      categoriesIdSelected.add(categoryModel?.data?[i].id);
+                                      print("categoriesss $categoriesIdSelected valueee $categoriesSelectedValues" );
                                       selectedCategoryIndex.add(i);
                                     }
                                   }
-                                  prefs.setString("selectedCategoryIndex",
-                                      selectedCategoryIndex.toString());
-                                  prefs.setString(
-                                      "selectedShopType",
-                                      shopModel!.data![selectedIndex].id
-                                          .toString());
+                                  prefs.setString("selectedCategoryIndex", selectedCategoryIndex.toString());
+                                  prefs.setString("selectedShopType", shopModel!.data![selectedIndex].id.toString());
                                   log("selectedindex $selectedCategoryIndex");
                                   if (roll_id == "1") {
                                     // print(getData());
@@ -814,7 +810,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                     if (_formKey.currentState!.validate()) {
                                       print(getData());
                                       saveCatDetails();
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => ServicesDetails()));
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => ServicesDetails(ParentId: parentId.toString())));
                                     }
                                   }
                                 } else {

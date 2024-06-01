@@ -12,6 +12,7 @@ import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/appButton.dart';
 import '../Helper/color.dart';
+import 'Earning.dart';
 import 'HomeScreen.dart';
 import 'Orders.dart';
 import 'PendingOrders.dart';
@@ -120,7 +121,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   text: selectedIndex == 0
                       ? "Home" : selectedIndex == 3
                       ? "Pending Order" : selectedIndex == 4
-                      ? "Pick & Drop": roll == "2"? selectedIndex==2? "Pending Orders":
+                      ? "Pick & Drop": roll == "2"? selectedIndex==2 ? "Pending Orders":
                        "My Bookings":"My Orders"
               ),
             ),
@@ -317,10 +318,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   ),
                   InkWell(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => const mySubscription()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Earning()),
+                      );
                       setState(() {
                         currentIndex = 7;
                       });

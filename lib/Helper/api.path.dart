@@ -33,6 +33,8 @@ class ApiServicves{
   static const String vendorOrders = baseUrl+'get_vendor_orders';
   static const String getVendorBookings = baseUrl+'get_bookings';
   static const String timeSlots = baseUrl+'get_time_slot';
+  static const String requestForSettlement = baseUrl+'request_settlement_amount';
+  static const String vendorEarning = baseUrl+'get_vendor_earning';
   static const String acceptRejectOrder = baseUrl+'accept_reject_order';
   static const String notifications = baseUrl+'notifications';
   static const String clearNotification = baseUrl+'clear_all';

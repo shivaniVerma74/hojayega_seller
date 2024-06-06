@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
+import '../Model/VendorTodayOrder.dart';
 import 'Calender.dart';
 import 'Orders.dart';
 
@@ -34,6 +35,7 @@ getData() async {
  await getProfile();
  await  getSetting();
  await getBanner();
+ await getCurrentorder();
 }
   @override
   void initState() {
@@ -64,7 +66,6 @@ getData() async {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = GetProfileModel.fromJson(json.decode(finalResponse));
       print("profile data responsee $finalResult");
-
         profileData = finalResult;
           deliveryCardBalance = profileData?.data?.first.dCard;
           businessCardBalance = profileData?.data?.first.bCard;
@@ -74,6 +75,32 @@ getData() async {
     }
   }
 
+  VendorTodayOrder? vendorTodayOrder;
+  getCurrentorder() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    roll=  prefs.getString('roll');
+    print("${prefs.getString('roll')}+++++++++++++++++++++++");
+    var headers = {
+      'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorOrder));
+    request.fields.addAll({
+      'user_id': vendorId.toString()
+    });
+    debugPrint("get current parametersssss ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = VendorTodayOrder.fromJson(json.decode(finalResponse));
+      print("profile data responsee $finalResult");
+      vendorTodayOrder = finalResult;
+      setState(() {});
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
 
   SliderModel? sliderModel;
   List<BannerListModel> sliderList1 = [];
@@ -136,7 +163,7 @@ getData() async {
   int _pageIndex = 0;
 
 
-  var arrNames = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop', 'Track \nOrder'];
+  var arrNames = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop'];
 
   var arrNames2 = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop'];
 
@@ -144,7 +171,7 @@ getData() async {
     'assets/images/Manageads.png',
     'assets/images/Reports.png',
     'assets/images/Pickdrop.png',
-    'assets/images/trackorder.png'
+    // 'assets/images/trackorder.png'
   ];
 
   var iconsNames2 = [
@@ -674,9 +701,7 @@ getData() async {
                             Container(
                               width: 40,
                               height: 40,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5,
-                                  ),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
                                   color: colors.primary),
                               child: Image.asset(roll == "2"? iconsNames2[index]: iconsNames[index]),
                             ),
@@ -687,30 +712,30 @@ getData() async {
                     }),),
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => const Calender(isFromBottom: false,)));
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: Column(
-                        children: [
-                          Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: colors.whiteTemp),
-                              child: Image.asset('assets/images/calender.png')),
-                          const Text("Calender")
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                // Expanded(
+                //   flex: 1,
+                //   child: InkWell(
+                //     onTap: () {
+                //       Navigator.push(context,
+                //           MaterialPageRoute(builder: (context) => const Calender(isFromBottom: false,)));
+                //     },
+                //     child: Padding(
+                //       padding: const EdgeInsets.only(right: 5),
+                //       child: Column(
+                //         children: [
+                //           Container(
+                //               width: 40,
+                //               height: 40,
+                //               decoration: BoxDecoration(
+                //                   borderRadius: BorderRadius.circular(5),
+                //                   color: colors.whiteTemp),
+                //               child: Image.asset('assets/images/calender.png')),
+                //           const Text("Calender")
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             const Padding(
@@ -742,19 +767,22 @@ getData() async {
                     ],
                   ),
                   // Data Rows
-                  ...orders.map((order) {
+                  ...?vendorTodayOrder?.orders?.map((VendorOrders) {
                     return TableRow(
                       children: [
-                        dataCell(order.timeSlot),
-                        dataCell(order.region),
-                        statusCell(order.status),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 3),
+                          child: dataCell(VendorOrders.time.toString().replaceAll(":00", "")),
+                        ),
+                        dataCell(VendorOrders.pickRegion.toString()),
+                        statusCell(VendorOrders.orderStatus.toString()),
                       ],
                     );
                   }).toList(),
                 ],
               ),
             ),
-           SizedBox(height: 10,),
+           const SizedBox(height: 10),
             // Container(
             //   height: 100,
             //   width: 200,

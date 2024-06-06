@@ -425,6 +425,7 @@ class _OrdersState extends State<Orders> {
                             ),
                           ),
                           const SizedBox(width: 6,),
+                          vendorOrderModel?.orders?[i].orderStatus == "1" ? SizedBox():
                           InkWell(
                             onTap: () {
                               acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
@@ -466,7 +467,7 @@ class _OrdersState extends State<Orders> {
       child: Center(
         child: Text(
           text,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );

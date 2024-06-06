@@ -160,7 +160,7 @@ Widget commonAppBar(BuildContext context,
                 // margin: EdgeInsets.all(10),
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                    color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                    color: colors.primary, borderRadius: BorderRadius.circular(10)),
                 child: const Icon(
                   Icons.arrow_back,
                   color: colors.primary,

@@ -1642,7 +1642,7 @@ class _MyProfileState extends State<MyProfile> {
                                                           fit: BoxFit.fill,
                                                         )
                                                       : Image.network(
-                                                          selfiImage!,
+                                                      "https://developmentalphawizz.com/hojayega${selfiImage!}",
                                                           fit: BoxFit.fill,
                                                         )),
                                             ),
@@ -1799,7 +1799,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                                panImage!,
+                                              "https://developmentalphawizz.com/hojayega${panImage!}",
                                                 fit: BoxFit.fill,
                                               )),
                                   ),
@@ -1837,7 +1837,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                                adhaarFront!,
+                                             "https://developmentalphawizz.com/hojayega$adhaarFront",
                                                 fit: BoxFit.fill,
                                               )),
                                   ),
@@ -1875,9 +1875,10 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                                adhaarBack!,
+                                          "https://developmentalphawizz.com/hojayega${adhaarBack!}",
                                                 fit: BoxFit.fill,
-                                              )),
+                                              ),
+                                    ),
                                   ),
                                 ),
                                 const Padding(
@@ -1945,7 +1946,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                                customerLocationImage!,
+                                            "https://developmentalphawizz.com/hojayega${customerLocationImage!}",
                                                 fit: BoxFit.fill)),
                                   ),
                                 ),
@@ -1993,7 +1994,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                                selfiImage!,
+                                          "https://developmentalphawizz.com/hojayega${selfiImage!}",
                                                 fit: BoxFit.fill,
                                               )),
                                   ),
@@ -2006,14 +2007,6 @@ class _MyProfileState extends State<MyProfile> {
                                     child: InkWell(
                                       onTap: () {},
                                       child: Container(
-                                        child: Center(
-                                          child: Text(
-                                            'Update Profile',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
                                         decoration: BoxDecoration(
                                           color: colors.secondary,
                                           borderRadius:
@@ -2027,6 +2020,14 @@ class _MyProfileState extends State<MyProfile> {
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 .6,
+                                        child: Center(
+                                          child: Text(
+                                            'Update Profile',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),

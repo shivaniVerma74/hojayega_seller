@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/color.dart';
+import '../Model/BannerHistory.dart';
 import '../Model/PromotionAdsList.dart';
 import '../Model/Sec15ModelList.dart';
 import '15SecAdds.dart';
@@ -88,6 +89,36 @@ class _PromotionAddsState extends State<PromotionAdds> {
       print(response.reasonPhrase);
     }
   }
+
+
+  BannerHistory? historyList;
+  getHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    var headers = {
+      'Cookie': 'ci_session=3e77e7aa026a5d8de1e1559474dae89c2d280f6c'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getHistory));
+    request.fields.addAll({
+      'vendor_id': '68'
+    });
+    print("vendor id inn history add ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      print("");
+      var finalResponse = await response.stream.bytesToString();
+      final jsonResponse = BannerHistory.fromJson(json.decode(finalResponse));
+      print("response $jsonResponse");
+      setState(() {
+        historyList = jsonResponse;
+      });
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
 
   int selected = 0;
   @override
@@ -202,6 +233,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
                         onTap: () {
                           setState(() {
                             selected = 2;
+                            getHistory();
                           });
                         },
                         child: Container(
@@ -228,7 +260,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
                 ),
               ),
             ),
-            selected == 0 ? getFirstTap() : getsecondTapFields()
+            selected == 0 ? getFirstTap() : selected == 1 ? getsecondTapFields() : getHitsoryFields(),
           ],
         ),
       ),
@@ -487,15 +519,15 @@ class _PromotionAddsState extends State<PromotionAdds> {
         return Wrap(
           children: <Widget>[
             ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Gallery'),
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
               onTap: () {
                 getImageGallery();
               },
             ),
             ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text('Camera'),
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
               onTap: () {
                 _getImageFromCamera();
                 // _getImage(ImageSource.camera);
@@ -513,7 +545,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
     return sec15List!.data!.isEmpty ? const Padding(
       padding: EdgeInsets.only(top: 10),
       child: Center(child: Text("Banners Not Found", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),)),
-     ): sec15List?.data?.length == null || sec15List?.data?.length == "" ? CircularProgressIndicator(color: colors.primary,):
+     ): sec15List?.data?.length == null || sec15List?.data?.length == "" ? const CircularProgressIndicator(color: colors.primary,):
       ListView.builder(
         itemCount: sec15List?.data?.length ?? 0,
         physics: const NeverScrollableScrollPhysics(),
@@ -540,7 +572,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
                   width: 70,
                   height: 30,
                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
-                  child: Center(child: const Text("Pending", style: TextStyle(color: colors.whiteTemp),)),
+                  child: const Center(child: Text("Pending", style: TextStyle(color: colors.whiteTemp),)),
                 ),
               ):  const SizedBox(),
               sec15List?.data?[i].status == "1" ?
@@ -571,5 +603,62 @@ class _PromotionAddsState extends State<PromotionAdds> {
             ],
           );
         });
+  }
+
+
+  getHitsoryFields() {
+    return historyList!.data!.isEmpty ? const Padding(
+      padding: EdgeInsets.only(top: 10),
+      child: Center(child: Text("Banners Not Found", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),)),
+    ): historyList?.data?.length == null || historyList?.data?.length == "" ? CircularProgressIndicator(color: colors.primary,):
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView.builder(
+          itemCount: historyList?.data?.length ?? 0,
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemBuilder: (c,i) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                historyList?.data?[i].status == "0" ?
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Container(
+                    width: 70,
+                    height: 30,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+                    child: const Center(child: Text("Pending", style: TextStyle(color: colors.whiteTemp),)),
+                  ),
+                ):  const SizedBox(),
+                historyList?.data?[i].status == "1" ?
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Container(
+                    width: 70,
+                    height: 30,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+                    child: const Center(child: Text("Active", style: TextStyle(color: colors.whiteTemp),)),
+                  ),
+                ): SizedBox(),
+                historyList?.data?[i].status == "2" ?
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Container(
+                    width: 70,
+                    height: 30,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
+                    child: const Center(child: Text("Reject", style: TextStyle(color: colors.whiteTemp),)),
+                  ),
+                ): const SizedBox.shrink(),
+                const SizedBox(height: 5),
+                Container(
+                    height: 150,
+                    width: MediaQuery.of(context).size.width,
+                    child: Image.network("https://developmentalphawizz.com/hojayega/${historyList?.data?[i].image}", fit: BoxFit.fill,)),
+              ],
+            );
+          }),
+    );
   }
 }

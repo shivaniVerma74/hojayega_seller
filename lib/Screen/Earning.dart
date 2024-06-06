@@ -19,16 +19,15 @@ class Earning extends StatefulWidget {
 }
 
 class _EarningState extends State<Earning> {
-  @override
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getEarnings();
   }
 
   EarningsModel? earningData;
-  getEarnings() async {
+  getEarnings(String? type,) async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String? vendorId = preferences.getString('vendor_id');
     var headers = {
@@ -38,9 +37,9 @@ class _EarningState extends State<Earning> {
         http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorEarning));
     request.fields.addAll({
       'vendor_id': vendorId.toString(),
-      'start_date': '2024-06-01',
-      'end_date': '2024-06-05',
-      'type': _selectedIndex == 0 ? "Earrning" : "Acc"
+      'start_date': _selectedIndex == 0 ? _startDateController.text : _startAccDateController.text,
+      'end_date': _selectedIndex == 0 ? _endDateController.text : _endDateAccController.text,
+      'type': type.toString()
     });
     print("earningss para ${request.fields}");
     request.headers.addAll(headers);
@@ -147,6 +146,10 @@ TextEditingController amtCtr = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
+
+  final TextEditingController _startAccDateController = TextEditingController();
+  final TextEditingController _endDateAccController = TextEditingController();
+
   final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -158,9 +161,54 @@ TextEditingController amtCtr = TextEditingController();
     );
     if (picked != null) {
       setState(() {
-        controller.text = _dateFormat.format(picked);
+        _startDateController.text = _dateFormat.format(picked);
       });
     }
+  }
+
+  Future<void> _selectEndDate(BuildContext context, TextEditingController controller) async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        _endDateController.text = _dateFormat.format(picked);
+      });
+    }
+    getEarnings("Earrning");
+  }
+
+
+  Future<void> _selectAccDate(BuildContext context, TextEditingController controller) async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        _startAccDateController.text = _dateFormat.format(picked);
+      });
+    }
+  }
+
+  Future<void> _selectAccEndDate(BuildContext context, TextEditingController controller) async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        _endDateAccController.text = _dateFormat.format(picked);
+      });
+    }
+    getEarnings("Acc");
   }
 
   @override
@@ -187,396 +235,212 @@ TextEditingController amtCtr = TextEditingController();
           ),
           title: const Text('Earnings'),
           backgroundColor: colors.primary),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Container(
-              height: 40,
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          selected = 0;
-                        });
-                        getEarnings();
-                      },
-                      child: Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: selected == 0
-                                ? colors.primary
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: colors.primary)),
-                        child: Center(
-                          child: Text(
-                            'Earnings',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: selected == 0
-                                    ? Colors.white
-                                    : colors.primary),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Container(
+                height: 40,
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            selected = 0;
+                          });
+                          // getEarnings("Earning");
+                        },
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                              color: selected == 0
+                                  ? colors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(color: colors.primary)),
+                          child: Center(
+                            child: Text(
+                              'Earnings',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: selected == 0
+                                      ? Colors.white
+                                      : colors.primary,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          selected = 1;
-                        });
-                        getEarnings();
-                      },
-                      child: Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: selected == 1
-                                ? colors.primary
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: colors.primary)),
-                        child: Center(
-                          child: Text(
-                            'Acc Summary',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: selected == 1
-                                    ? Colors.white
-                                    : colors.primary),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            selected = 1;
+                          });
+                          getEarnings("Acc");
+                        },
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                              color: selected == 1
+                                  ? colors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(color: colors.primary),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Acc Summary',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: selected == 1
+                                      ? Colors.white
+                                      : colors.primary,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          selected == 0
-              ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, right: 15),
-                        child: Form(
-                          key: _formKey,
+            selected == 0
+                ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                      children:[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15, right: 15),
                           child: Column(
                             children: <Widget>[
-                              Container(
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), ),
+                              Card(
+                                elevation: 5,
                                 child: TextFormField(
                                   controller: _startDateController,
                                   decoration: InputDecoration(
-                                    icon: Icon(Icons.calendar_today),
-                                    labelText: "Select Start Date",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                    counterText: "",
+                                    hintText: "Select Start Date",
+                                    isDense: true,
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100 ,
+                                    suffixIcon: InkWell(
+                                        onTap: () {
+                                          _selectDate(context, _startDateController);
+                                        },
+                                        child: const Icon(Icons.calendar_month, color: colors.primary,)),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(color: Colors.grey.shade100)
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(color: Colors.grey.shade100)
                                     ),
                                   ),
-                                  readOnly: true,
-                                  onTap: () {
-                                    _selectDate(context, _startDateController);
-                                  },
                                 ),
                               ),
-                              SizedBox(height: 16.0),
-                              TextFormField(
-                                controller: _endDateController,
-                                decoration: InputDecoration(
-                                  icon: const Icon(Icons.calendar_today),
-                                  labelText: "Select End Date",
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
+                              const SizedBox(height: 10),
+                              Card(
+                                elevation: 5,
+                                child: TextFormField(
+                                  controller: _endDateController,
+                                  decoration: InputDecoration(
+                                    counterText: "",
+                                    hintText: "Select End Date",
+                                    isDense: true,
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100 ,
+                                    suffixIcon: InkWell(
+                                      onTap: () async {
+                                        _selectEndDate(context, _endDateController);
+                                        // await getEarnings("Earning");
+                                      },
+                                        child: const Icon(Icons.calendar_month, color: colors.primary),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(color: Colors.grey.shade100)
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(color: Colors.grey.shade100)
+                                    ),
                                   ),
                                 ),
-                                readOnly: true,
-                                onTap: () {
-                                  _selectDate(context, _endDateController);
-                                },
                               ),
-                              SizedBox(height: 20.0),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                  }
-                                },
-                                child: Text('Submit'),
-                              ),
+                              const SizedBox(height: 20.0),
+                              // ElevatedButton(
+                              //   onPressed: () {
+                              //     if (_formKey.currentState!.validate()) {
+                              //     }
+                              //   },
+                              //   child: Text('Submit'),
+                              // ),
                             ],
                           ),
                         ),
-                      ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(
-                      //     top: 0,
-                      //     left: 13,
-                      //   ),
-                      //   child: Row(
-                      //     children: [
-                      //       const Text(
-                      //         'Date:',
-                      //         style: TextStyle(
-                      //             color: colors.primary,
-                      //             fontWeight: FontWeight.bold,
-                      //             fontSize: 24),
-                      //       ),
-                      //       const SizedBox(
-                      //         width: 10,
-                      //       ),
-                      //       Text(
-                      //         date1 ?? " Select date",
-                      //         style: const TextStyle(
-                      //             color: colors.primary,
-                      //             fontWeight: FontWeight.bold,
-                      //             fontSize: 16),
-                      //       ),
-                      //       Text(
-                      //         date2 != null ? " to $date2 " : " to Select date",
-                      //         style: const TextStyle(
-                      //             color: colors.primary,
-                      //             fontWeight: FontWeight.bold,
-                      //             fontSize: 16),
-                      //       ),
-                      //       showDate
-                      //           ? IconButton(
-                      //               onPressed: () async {
-                      //                 DateTime? selectedDate1 =
-                      //                     await showDatePicker(
-                      //                         context: context,
-                      //                         initialDate: DateTime.now(),
-                      //                         firstDate: DateTime.now(),
-                      //                         lastDate: DateTime(2023, 12, 31));
-                      //                 if (selectedDate1 != null) {
-                      //                   setState(() {
-                      //                     initialDate = selectedDate1.add(const Duration(days: 1));
-                      //                     date1 = "${selectedDate1.day}/${selectedDate1.month}/${selectedDate1.year}";
-                      //                     showDate = false;
-                      //                   });
-                      //                 }
-                      //               },
-                      //               icon: const Icon(
-                      //                 Icons.calendar_month_outlined,
-                      //                 color: colors.primary,
-                      //               ))
-                      //           : IconButton(
-                      //               onPressed: () async {
-                      //                 DateTime? selectedDate =
-                      //                     await showDatePicker(
-                      //                         context: context,
-                      //                         initialDate: initialDate,
-                      //                         firstDate: initialDate,
-                      //                         lastDate: DateTime(2023, 12, 31));
-                      //                 if (selectedDate != null) {
-                      //                   setState(() {
-                      //                     date2 =
-                      //                         "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
-                      //                     showDate = true;
-                      //                   });
-                      //                 }
-                      //               },
-                      //               icon: const Icon(
-                      //                 Icons.calendar_month_outlined,
-                      //                 color: colors.primary,
-                      //               ),
-                      //             ),
-                      //     ],
-                      //   ),
-                      // ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(left: 10),
-                      //   child: Container(
-                      //     height: 65,
-                      //     // color: Colors.blue[50],
-                      //     // padding: EdgeInsets.symmetric(vertical: 10.0),
-                      //     child: ListView.builder(
-                      //       scrollDirection: Axis.horizontal,
-                      //       itemCount: _daysOfWeek.length,
-                      //       itemBuilder: (context, index) {
-                      //         final day = _daysOfWeek[index];
-                      //         final bool isSelected = index == _selectedIndex;
-                      //         return GestureDetector(
-                      //           onTap: () {
-                      //             setState(() {
-                      //               _selectedIndex = index;
-                      //             });
-                      //           },
-                      //           child: Container(
-                      //             margin: EdgeInsets.symmetric(horizontal: 5.0),
-                      //             padding: EdgeInsets.symmetric(
-                      //                 vertical: 10.0, horizontal: 15.0),
-                      //             decoration: BoxDecoration(
-                      //               color: isSelected ? Colors.green : Colors.white,
-                      //               borderRadius: BorderRadius.circular(20.0),
-                      //             ),
-                      //             child: Column(
-                      //               mainAxisSize: MainAxisSize.min,
-                      //               children: [
-                      //                 Text(
-                      //                   day['day']!,
-                      //                   style: TextStyle(
-                      //                     color: isSelected
-                      //                         ? Colors.white
-                      //                         : Colors.black,
-                      //                     fontWeight: FontWeight.bold,
-                      //                   ),
-                      //                 ),
-                      //                 SizedBox(height: 5),
-                      //                 Text(
-                      //                   day['label']!,
-                      //                   style: TextStyle(
-                      //                     color: isSelected
-                      //                         ? Colors.white
-                      //                         : Colors.black,
-                      //                   ),
-                      //                 ),
-                      //               ],
-                      //             ),
-                      //           ),
-                      //         );
-                      //       },
-                      //     ),
-                      //   ),
-                      // ),
-                      earningData?.products?.length == null || earningData?.products?.length == ""
-                          ? const Center(
-                        child: Text("Data Not Found", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
-                      ):
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: earningData?.products?.length?? 0,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              Card(
-                                margin: EdgeInsets.all(10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Row(
-                                    children: [
-                                      earningData?.products?[index].productImage == null || earningData?.products?[index].productImage == "" ?
-                                      const CircleAvatar(
-                                        backgroundImage: NetworkImage("assets/images/placeholder.png",),
-                                        radius: 30,
-                                      ):
-                                      CircleAvatar(
-                                        backgroundImage: NetworkImage("${ApiServicves.imageUrl}${earningData?.products?[index].productImage}"),
-                                        radius: 30,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Order No. - ${earningData?.products?[index].orderId}',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            "${earningData?.products?[index].paymentMode}",
-                                            style: const TextStyle(
-                                              color: Colors.red,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text("${earningData?.products?[index].createdAt}"),
-                                        ],
-                                      ),
-                                      Spacer(),
-                                      Text(
-                                        '+${"${earningData?.products?[index].amount}"}',
-                                        style: const TextStyle(
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: Column(
-                          children: [
-                            Row(
+                        earningData?.products?.length == null || earningData?.products?.length == ""
+                            ? const Center(
+                          child: Text("Data Not Found", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
+                        ):
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: earningData?.products?.length?? 0,
+                          itemBuilder: (context, index) {
+                            return Column(
                               children: [
-                                Container(
-                                  height: 50,
-                                  width: 150,
-                                  padding: const EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFF112c48),
-                                      borderRadius: BorderRadius.circular(4),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                            color: Colors.grey,
-                                            blurRadius: 2,
-                                            offset: Offset(0, 1))
-                                      ]),
-                                  child: Center(
-                                    child: Column(
+                                Card(
+                                  margin: EdgeInsets.all(10),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Row(
                                       children: [
-                                        const Text(
-                                          'Total Earning',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
+                                        earningData?.products?[index].productImage == null || earningData?.products?[index].productImage == "" ?
+                                        const CircleAvatar(
+                                          backgroundImage: NetworkImage("assets/images/placeholder.png",),
+                                          radius: 30,
+                                        ):
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage("${ApiServicves.imageUrl}${earningData?.products?[index].productImage}"),
+                                          radius: 30,
                                         ),
+                                        const SizedBox(width: 10),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Order No. - ${earningData?.products?[index].orderId}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              "${earningData?.products?[index].paymentMode}",
+                                              style: const TextStyle(
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text("${earningData?.products?[index].createdAt}"),
+                                          ],
+                                        ),
+                                        const Spacer(),
                                         Text(
-                                          '₹ ${earningData?.totalEarning}',
+                                          '+${"${earningData?.products?[index].amount}"}',
                                           style: const TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Container(
-                                  height: 50,
-                                  width: 150,
-                                  padding: const EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFF112c48),
-                                      borderRadius: BorderRadius.circular(4),
-                                      boxShadow:  const [
-                                        BoxShadow(
-                                            color: Colors.grey,
-                                            blurRadius: 2,
-                                            offset: Offset(0, 1))
-                                      ]),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        const Text(
-                                          'COD',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          '₹ ${earningData?.cod}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ],
@@ -584,255 +448,250 @@ TextEditingController amtCtr = TextEditingController();
                                   ),
                                 ),
                               ],
-                            ),
-                            SizedBox(height: 10,),
-                            InkWell(
-                              onTap: () {
-                                _showInputDialog(context);
-                              },
-                              child: Container(
-                                height: 50,
-                                width: 150,
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                    color: const Color(0xFF112c48),
-                                    borderRadius: BorderRadius.circular(4),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 2,
-                                          offset: Offset(0, 1),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                        color: colors.primary,
+                                        borderRadius: BorderRadius.circular(4),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                              color: Colors.grey,
+                                              blurRadius: 2,
+                                              offset: Offset(0, 1),
+                                          )
+                                        ]),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          const Text(
+                                            'Total Earning',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            '₹ ${earningData?.totalEarning}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ]),
-                                child: const Center(
-                                  child: Text(
-                                    'Request For COD\n       Amount',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
+                                    ),
                                   ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                        color: colors.primary,
+                                        borderRadius: BorderRadius.circular(4),
+                                        boxShadow:  const [
+                                          BoxShadow(
+                                              color: Colors.grey,
+                                              blurRadius: 2,
+                                              offset: Offset(0, 1))
+                                        ]),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          const Text(
+                                            'COD',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            '₹ ${earningData?.cod}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10,),
+                              InkWell(
+                                onTap: () {
+                                  _showInputDialog(context);
+                                },
+                                child: Container(
+                                  height: 50,
+                                  width: 150,
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                      color:  colors.primary,
+                                      borderRadius: BorderRadius.circular(4),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius: 2,
+                                            offset: Offset(0, 1),
+                                        ),
+                                      ]),
+                                  child: const Center(
+                                    child: Text(
+                                      'Request For COD\n       Amount',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                ):
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, right: 15),
+                      child: Column(
+                        children: <Widget>[
+                          Card(
+                            elevation: 5,
+                            child: TextFormField(
+                              controller: _startAccDateController,
+                              decoration: InputDecoration(
+                                counterText: "",
+                                hintText: "Select Start Date",
+                                isDense: true,
+                                filled: true,
+                                fillColor: Colors.grey.shade100 ,
+                                suffixIcon: InkWell(
+                                    onTap: () {
+                                      _selectAccDate(context, _startDateController);
+                                    },
+                                    child: const Icon(Icons.calendar_month, color: colors.primary)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.shade100)
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.shade100)
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Card(
+                            elevation: 5,
+                            child: TextFormField(
+                              controller: _endDateAccController,
+                              decoration: InputDecoration(
+                                counterText: "",
+                                hintText: "Select End Date",
+                                isDense: true,
+                                filled: true,
+                                fillColor: Colors.grey.shade100 ,
+                                suffixIcon: InkWell(
+                                  onTap: () async {
+                                    _selectAccEndDate(context, _endDateController);
+                                    // await getEarnings("Acc");
+                                  },
+                                  child: const Icon(Icons.calendar_month, color: colors.primary),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.shade100)
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey.shade100)
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20.0),
+                        ],
+                      ),
+                    ),
+                    earningData?.products?.length == null || earningData?.products?.length == ""
+                        ? const Center(
+                      child: Text("Data Not Found", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
+                    ):
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: earningData?.products?.length?? 0,
+                      itemBuilder: (context, index) {
+                        return Column(
+                          children: [
+                            Card(
+                              margin: EdgeInsets.all(10),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Row(
+                                  children: [
+                                    earningData?.products?[index].productImage == null || earningData?.products?[index].productImage == "" ?
+                                    const CircleAvatar(
+                                      backgroundImage: NetworkImage("assets/images/placeholder.png",),
+                                      radius: 30,
+                                    ):
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage("${ApiServicves.imageUrl}${earningData?.products?[index].productImage}"),
+                                      radius: 30,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Order No. - ${earningData?.products?[index].orderId}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          "${earningData?.products?[index].paymentMode}",
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text("${earningData?.products?[index].createdAt}"),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      '+${"${earningData?.products?[index].amount}"}',
+                                      style: const TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                    ],
-                  ),
-              ): Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 0,
-                  left: 13,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 100,
-                      child: TextFormField(
-                        controller: _startDateController,
-                        decoration: InputDecoration(
-                          icon: Icon(Icons.calendar_today),
-                          labelText: "Start Date",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                        readOnly: true,
-                        onTap: () {
-                          _selectDate(context, _startDateController);
-                        },
-                      ),
+                        );
+                      },
                     ),
-                    // const Text(
-                    //   'Date:',
-                    //   style: TextStyle(
-                    //       color: colors.primary,
-                    //       fontWeight: FontWeight.bold,
-                    //       fontSize: 24),
-                    // ),
-                    // const SizedBox(
-                    //   width: 10,
-                    // ),
-                    // Text(
-                    //   date1 ?? " Select date",
-                    //   style: const TextStyle(
-                    //       color: colors.primary,
-                    //       fontWeight: FontWeight.bold,
-                    //       fontSize: 16),
-                    // ),
-                    // Text(
-                    //   date2 != null ? " to $date2 " : " to Select date",
-                    //   style: const TextStyle(
-                    //       color: colors.primary,
-                    //       fontWeight: FontWeight.bold,
-                    //       fontSize: 16),
-                    // ),
-                    // showDate
-                    //     ? IconButton(
-                    //     onPressed: () async {
-                    //       DateTime? selectedDate1 =
-                    //       await showDatePicker(
-                    //           context: context,
-                    //           initialDate: DateTime.now(),
-                    //           firstDate: DateTime.now(),
-                    //           lastDate: DateTime(2023, 12, 31));
-                    //       if (selectedDate1 != null) {
-                    //         setState(() {
-                    //           initialDate = selectedDate1.add(const Duration(days: 1));
-                    //           date1 = "${selectedDate1.day}/${selectedDate1.month}/${selectedDate1.year}";
-                    //           showDate = false;
-                    //         });
-                    //       }
-                    //     },
-                    //     icon: const Icon(
-                    //       Icons.calendar_month_outlined,
-                    //       color: colors.primary,
-                    //     ))
-                    //     : IconButton(
-                    //   onPressed: () async {
-                    //     DateTime? selectedDate =
-                    //     await showDatePicker(
-                    //         context: context,
-                    //         initialDate: initialDate,
-                    //         firstDate: initialDate,
-                    //         lastDate: DateTime(2023, 12, 31));
-                    //     if (selectedDate != null) {
-                    //       setState(() {
-                    //         date2 =
-                    //         "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
-                    //         showDate = true;
-                    //       });
-                    //     }
-                    //   },
-                    //   icon: const Icon(
-                    //     Icons.calendar_month_outlined,
-                    //     color: colors.primary,
-                    //   ),
-                    // ),
                   ],
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Container(
-                  height: 65,
-                  // color: Colors.blue[50],
-                  // padding: EdgeInsets.symmetric(vertical: 10.0),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _daysOfWeek.length,
-                    itemBuilder: (context, index) {
-                      final day = _daysOfWeek[index];
-                      final bool isSelected = index == _selectedIndex;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedIndex = index;
-                          });
-                        },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 5.0),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 15.0),
-                          decoration: BoxDecoration(
-                            color: isSelected ? Colors.green : Colors.white,
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                day['day']!,
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                day['label']!,
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              earningData?.products?.length == null || earningData?.products?.length == ""
-                  ? const Center(
-                child: Text("Data Not Found", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
-              ):
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: earningData?.products?.length?? 0,
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      Card(
-                        margin: const EdgeInsets.all(10),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: [
-                              earningData?.products?[index].productImage == null || earningData?.products?[index].productImage == "" ?
-                              const CircleAvatar(
-                                backgroundImage: NetworkImage("assets/images/placeholder.png",),
-                                radius: 30,
-                              ):
-                              CircleAvatar(
-                                backgroundImage: NetworkImage("${ApiServicves.imageUrl}${earningData?.products?[index].productImage}"),
-                                radius: 30,
-                              ),
-                              SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Order No. - ${earningData?.products?[index].orderId}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    "${earningData?.products?[index].paymentMode}",
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text("${earningData?.products?[index].createdAt}"),
-                                ],
-                              ),
-                              Spacer(),
-                              Text(
-                                '+${"${earningData?.products?[index].amount}"}',
-                                style: const TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

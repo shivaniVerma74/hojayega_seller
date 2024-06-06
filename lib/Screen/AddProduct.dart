@@ -1491,12 +1491,13 @@ class _AddProductState extends State<AddProduct> {
                         width: 150,
                         title:
                         isLodding ? "please wait..." :
-                            widget.isEdit == true ?
-                        "Add Product": "Edit Product",
+                            // widget.isEdit == true ?
+                        "Add Product",
                         onPress: () {
                           if (_formKey.currentState!.validate()) {
-                            widget.isEdit == true ?
-                            addProductApi(): editProductApi();
+                            // widget.isEdit == true ?
+                            addProductApi();
+                          // : editProductApi();
                            }
                         }),
                   ),

@@ -5,18 +5,24 @@ import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hojayega_seller/Screen/AllCategory.dart';
+import 'package:hojayega_seller/Screen/BusinessCard.dart';
 import 'package:hojayega_seller/Screen/Calender.dart';
+import 'package:hojayega_seller/Screen/DeliveryCard.dart';
 import 'package:hojayega_seller/Screen/MyProfile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/appButton.dart';
 import '../Helper/color.dart';
+import '../Model/GetProfileModel.dart';
 import 'Earning.dart';
+import 'Help.dart';
 import 'HomeScreen.dart';
 import 'Orders.dart';
 import 'PendingOrders.dart';
+import 'Pick&Drop.dart';
 import 'PromotionAdds.dart';
+import 'Settings.dart';
 import 'notificationScreen.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,9 +41,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   void initState() {
     int? index=0;
-
     if (index ==0) {
-
       setState(() {
         selectedIndex =0;
       });
@@ -49,6 +53,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     }
     super.initState();
     getData();
+    getProfile();
     // if (widget.dIndex != null) {
     //   selectedIndex = widget.dIndex!;
     //   _child = widget.dIndex == 1
@@ -64,15 +69,47 @@ class _BottomNavBarState extends State<BottomNavBar> {
   String? vendorName;
   String? vendorEmail;
   String? roll;
+
   getData() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     vendorName = preferences.getString('vendor_name');
     vendorEmail = preferences.getString('vendor_email');
-    roll=  preferences.getString('roll');
-    print("===============$vendorEmail $vendorName $roll===========");
+    // roll =  preferences.getString('roll');
+    print("===============  $vendorEmail $vendorName $roll===========");
   }
-  var onOf = true ;
+
   String? vendorId;
+  GetProfileModel? profileData;
+  getProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    var headers = {
+      'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
+    };
+    var request =
+    http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
+    request.fields.addAll({'user_id': vendorId.toString()});
+    debugPrint("get profile parametersssss ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = GetProfileModel.fromJson(json.decode(finalResponse));
+      print("profile data responsee $finalResult");
+      setState(() {
+        profileData = finalResult;
+        vendorEmail = profileData?.data?.first.email.toString();
+        vendorName = profileData?.data?.first.shopName.toString();
+        roll = profileData?.data?.first.roll.toString();
+        print("roll herer $roll shop nae $vendorName");
+        setState(() {});
+      });
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  var onOf = true ;
 
   Future<void> shopStatus() async {
      SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -121,7 +158,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   text: selectedIndex == 0
                       ? "Home" : selectedIndex == 3
                       ? "Pending Order" : selectedIndex == 4
-                      ? "Pick & Drop": roll == "2"? selectedIndex==2 ? "Pending Orders":
+                      ? "Pick & Drop": roll == "2"? selectedIndex == 2 ? "Pending Orders":
                        "My Bookings":"My Orders"
               ),
             ),
@@ -159,9 +196,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Text(
-                                    'Hello!',
-                                    style: TextStyle(
+                                   Text(
+                                    '$vendorName',
+                                    style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white),
@@ -169,10 +206,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
                                   vendorEmail == null || vendorEmail == ""
                                       ? const Text(
                                     'Demo',
-                                    style: TextStyle(fontSize: 15, color: Colors.white))
-                                      : Text(
-                                    '$vendorEmail',
                                     style: TextStyle(fontSize: 15, color: Colors.white),
+                                  ): Text(
+                                    '$vendorEmail',
+                                    style: const TextStyle(fontSize: 15, color: Colors.white),
                                   ),
                                 ],
                               ),
@@ -185,7 +222,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                             onOf ? const Text("Online", style: TextStyle(color: colors.whiteTemp, fontSize: 15),) :
                             const Text("Offline",style: TextStyle(color: colors.whiteTemp, fontSize: 15)),
                             CupertinoSwitch(
-                                trackColor: Colors.green,
+                                trackColor: onOf == true? Colors.green: Colors.red,
                                 value: onOf,
                                 onChanged: (value) {
                                   setState(() {
@@ -216,44 +253,44 @@ class _BottomNavBarState extends State<BottomNavBar> {
                       indexx: currentIndex,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
-                  InkWell(
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const  OfferJobWidget()),
-                        // );
-                        setState(() {
-                          currentIndex = 2;
-                        });
-                      },
-                      child: DrawerIconTab(
-                          titlee: 'Product Portfolio',
-                          icon: Icons.file_present_outlined,
-                          tabb: 2,
-                          indexx: currentIndex)),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(builder: (context) => const CoursesPage()),
-                        // );
-                        setState(() {
-                          currentIndex = 3;
-                        });
-                      },
-                      child: DrawerIconTab(
-                          titlee: 'Switch User',
-                          icon: Icons.file_copy,
-                          tabb: 3,
-                          indexx: currentIndex)),
-                  SizedBox(
+                  // InkWell(
+                  //     onTap: () {
+                  //       // Navigator.push(
+                  //       //   context,
+                  //       //   MaterialPageRoute(
+                  //       //       builder: (context) => const  OfferJobWidget()),
+                  //       // );
+                  //       setState(() {
+                  //         currentIndex = 2;
+                  //       });
+                  //     },
+                  //     child: DrawerIconTab(
+                  //         titlee: 'Product Portfolio',
+                  //         icon: Icons.file_present_outlined,
+                  //         tabb: 2,
+                  //         indexx: currentIndex)),
+                  // SizedBox(
+                  //   height: 5,
+                  // ),
+                  // InkWell(
+                  //     onTap: () {
+                  //       // Navigator.push(
+                  //       //   context,
+                  //       //   MaterialPageRoute(builder: (context) => const CoursesPage()),
+                  //       // );
+                  //       setState(() {
+                  //         currentIndex = 3;
+                  //       });
+                  //     },
+                  //     child: DrawerIconTab(
+                  //         titlee: 'Switch User',
+                  //         icon: Icons.file_copy,
+                  //         tabb: 3,
+                  //         indexx: currentIndex)),
+                  const SizedBox(
                     height: 5,
                   ),
                   InkWell(
@@ -293,29 +330,29 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         tabb: 5,
                         indexx: currentIndex,
                       )),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const PaymentHistoryPage()),
-                        // );
-                        setState(() {
-                          currentIndex = 6;
-                        });
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Coupons',
-                        icon: Icons.payment,
-                        tabb: 6,
-                        indexx: currentIndex,
-                      )),
-                  SizedBox(
-                    height: 5,
-                  ),
+                  // SizedBox(
+                  //   height: 5,
+                  // ),
+                  // InkWell(
+                  //     onTap: () {
+                  //       // Navigator.push(
+                  //       //   context,
+                  //       //   MaterialPageRoute(
+                  //       //       builder: (context) => const PaymentHistoryPage()),
+                  //       // );
+                  //       setState(() {
+                  //         currentIndex = 6;
+                  //       });
+                  //     },
+                  //     child: DrawerIconTab(
+                  //       titlee: 'Coupons',
+                  //       icon: Icons.payment,
+                  //       tabb: 6,
+                  //       indexx: currentIndex,
+                  //     )),
+                  // SizedBox(
+                  //   height: 5,
+                  // ),
                   InkWell(
                     onTap: () {
                       Navigator.push(
@@ -345,90 +382,90 @@ class _BottomNavBarState extends State<BottomNavBar> {
                       },
                       child: DrawerIconTab(
                         titlee: 'Order history/Reports',
-                        icon: Icons.file_copy_sharp,
+                        icon: Icons.history,
                         tabb: 8,
                         indexx: currentIndex,
                       )),
                   const SizedBox(
                     height: 5,
                   ),
-                  InkWell(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => PrivacyPolicy()),
-                      // );
-                      setState(() {
-                        currentIndex = 9;
-                      });
-                    },
-                    child: DrawerIconTab(
-                      titlee: 'Library',
-                      icon: Icons.privacy_tip,
-                      tabb: 9,
-                      indexx: currentIndex,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
+                  // InkWell(
+                  //   onTap: () {
+                  //     // Navigator.push(
+                  //     //   context,
+                  //     //   MaterialPageRoute(builder: (context) => PrivacyPolicy()),
+                  //     // );
+                  //     setState(() {
+                  //       currentIndex = 9;
+                  //     });
+                  //   },
+                  //   child: DrawerIconTab(
+                  //     titlee: 'Library',
+                  //     icon: Icons.privacy_tip,
+                  //     tabb: 9,
+                  //     indexx: currentIndex,
+                  //   ),
+                  // ),
+                  // const SizedBox(
+                  //   height: 5,
+                  // ),
+                  // InkWell(
+                  //     onTap: () {
+                  //       // Navigator.push(
+                  //       //   context,
+                  //       //   MaterialPageRoute(
+                  //       //       builder: (context) => const TermsConditionsWidget()),
+                  //       // );
+                  //       setState(() {
+                  //         currentIndex = 10;
+                  //       });
+                  //       // share();
+                  //     },
+                  //     child: DrawerIconTab(
+                  //       titlee: 'Automatic Booking',
+                  //       icon: Icons.confirmation_num,
+                  //       tabb: 10,
+                  //       indexx: currentIndex,
+                  //     )),
+                  // SizedBox(
+                  //   height: 5,
+                  // ),
+                  // InkWell(
+                  //     onTap: () {
+                  //       // Navigator.push(
+                  //       //   context,
+                  //       //   MaterialPageRoute(
+                  //       //       builder: (context) => const FaqPage()),
+                  //       // );
+                  //
+                  //       setState(() {
+                  //         currentIndex = 11;
+                  //       });
+                  //     },
+                  //     child: DrawerIconTab(
+                  //       titlee: 'Track Order',
+                  //       icon: Icons.question_answer,
+                  //       tabb: 11,
+                  //       indexx: currentIndex,
+                  //     ),
+                  // ),
+                  // SizedBox(
+                  //   height: 5,
+                  // ),
                   InkWell(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const TermsConditionsWidget()),
-                        // );
-                        setState(() {
-                          currentIndex = 10;
-                        });
-                        // share();
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Automatic Booking',
-                        icon: Icons.confirmation_num,
-                        tabb: 10,
-                        indexx: currentIndex,
-                      )),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const FaqPage()),
-                        // );
-
-                        setState(() {
-                          currentIndex = 11;
-                        });
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Track Order',
-                        icon: Icons.question_answer,
-                        tabb: 11,
-                        indexx: currentIndex,
-                      )),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const LoginPage()),
-                        // );
-
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const BusinessCard(walletAmount: "")),
+                        );
                         setState(() {
                           currentIndex = 12;
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'Business Card/Delivery Card',
-                        icon: Icons.question_answer,
+                        titlee: 'Business Card',
+                        icon: Icons.credit_card,
                         tabb: 12,
                         indexx: currentIndex,
                       )),
@@ -437,34 +474,38 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   ),
                   InkWell(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const LoginPage()),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DeliveryCard(walletAmount: "")),
+                        );
                         setState(() {
                           currentIndex = 13;
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'Settings',
-                        icon: Icons.question_answer,
+                        titlee: 'Delivery Card',
+                        icon: Icons.credit_card,
                         tabb: 13,
                         indexx: currentIndex,
                       )),
-                  const SizedBox(
+                  SizedBox(
                     height: 5,
                   ),
                   InkWell(
                       onTap: () {
-                        // Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutUS()),);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Settings()),
+                        );
                         setState(() {
                           currentIndex = 14;
                         });
                       },
                       child: DrawerIconTab(
-                        titlee: 'Help',
-                        icon: Icons.question_answer,
+                        titlee: 'Settings',
+                        icon: Icons.settings,
                         tabb: 14,
                         indexx: currentIndex,
                       )),
@@ -473,15 +514,31 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   ),
                   InkWell(
                       onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ContactUsScreen()),);
                         setState(() {
                           currentIndex = 15;
+                        });
+                      },
+                      child: DrawerIconTab(
+                        titlee: 'Help',
+                        icon: Icons.help,
+                        tabb: 15,
+                        indexx: currentIndex,
+                      )),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  InkWell(
+                      onTap: () {
+                        setState(() {
+                          currentIndex = 16;
                         });
                         logout(context);
                       },
                       child: DrawerIconTab(
                         titlee: 'Log Out',
                         icon: Icons.logout_outlined,
-                        tabb: 15,
+                        tabb: 16,
                         indexx: currentIndex,
                       )),
                   const SizedBox(
@@ -490,7 +547,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 ]),
           ),
           bottomNavigationBar: FluidNavBar(
-            icons: roll == "2"?[
+            icons: roll == "2" ? [
               FluidNavBarIcon(
                   icon: Icons.home,
                   // unselectedForegroundColor: Colors.grey,
@@ -516,7 +573,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   unselectedForegroundColor: Colors.white,
                   //  selectedIndex == 1 ? colors.primary : colors.white10,
                   extras: {"label": "Pending "}),
-            ]:[
+            ]:
+            [
               FluidNavBarIcon(
                   icon: Icons.home,
                   // unselectedForegroundColor: Colors.grey,
@@ -550,14 +608,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   unselectedForegroundColor: Colors.white,
                   //  selectedIndex == 1 ? colors.primary : colors.white10,
                   extras: {"label": "Pending "}),
-              // FluidNavBarIcon(
-              //     icon: Icons.wheelchair_pickup,
-              //     // unselectedForegroundColor: Colors.grey,
-              //     selectedForegroundColor: Colors.white,
-              //     unselectedForegroundColor: Colors.white,
-              //     backgroundColor: colors.primary,
-              //     //  selectedIndex == 1 ? colors.primary : colors.white10,
-              //     extras: {"label": "Pick & Drop"}),
+              FluidNavBarIcon(
+                  icon: Icons.wheelchair_pickup,
+                  // unselectedForegroundColor: Colors.grey,
+                  selectedForegroundColor: Colors.white,
+                  unselectedForegroundColor: Colors.white,
+                  backgroundColor: colors.primary,
+                  //  selectedIndex == 1 ? colors.primary : colors.white10,
+                  extras: {"label": "Pick & Drop"}),
             ],
             onChange: _handleNavigationChange,
             style: const FluidNavBarStyle(
@@ -590,7 +648,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
               ),
             ),
           ),
-        ));
+        ),
+    );
   }
 
   // Future<void> share() async {
@@ -600,6 +659,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
   //       linkUrl: 'https://developmentalphawizz.com/dr_booking/',
   //       chooserTitle: 'HoJayega');
   // }
+
+  Future<void> removeSession() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("vendor_id");
+    prefs.remove("roll");
+    prefs.remove("isLogIn");
+  }
 
   logout(context) async {
     return showDialog(
@@ -612,20 +678,18 @@ class _BottomNavBarState extends State<BottomNavBar> {
             actions: <Widget>[
               ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: colors.primary),
-                child: Text("YES"),
+                child: const Text("YES"),
                 onPressed: () async {
-                  // setState(() {
-                  //   removesession();
-                  // });
-                  // Navigator.pop(context);
+                  setState(() {
+                    removeSession();
+                  });
+                  Navigator.pop(context);
                   // SystemNavigator.pop();
                   SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.setBool("isLogIn", false);
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginPage(),
-                      ));
+                  prefs.clear();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                  // Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
                 },
               ),
               ElevatedButton(
@@ -649,13 +713,16 @@ class _BottomNavBarState extends State<BottomNavBar> {
           break;
         case 1:
           // _child = roll=="2"? Calender(isFromBottom: true,) :Orders();
-          _child = roll=="2"? Calender(isFromBottom: true,) : Orders();
+          _child = roll== "2" ? Calender() : Orders();
           break;
         case 2:
           _child =roll=="2"? PendingOrders(): AllCategory();
           break;
         case 3:
           _child = PendingOrders();
+          break;
+        case 4:
+          _child = PickDrop();
           break;
       }
       _child = AnimatedSwitcher(

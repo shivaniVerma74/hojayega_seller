@@ -11,9 +11,9 @@ import 'package:http/http.dart'as http;
 import 'BottomBar.dart';
 
 class Calender extends StatefulWidget {
-  final bool isFromBottom;
+  // final bool isFromBottom;
 
-  const Calender({super.key, required this.isFromBottom});
+  const Calender({super.key});
 
   @override
   State<Calender> createState() => _CalenderState();
@@ -90,43 +90,44 @@ class _CalenderState extends State<Calender> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colors.appbarColor,
-      appBar: roll== "2" && widget.isFromBottom?AppBar(
-        backgroundColor: Colors.transparent,
-        toolbarHeight: 0,
-        elevation: 0,
-      ):AppBar(
-        leading: Container(
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(5)),
-          margin: const EdgeInsets.all(8), // Adjust padding inside container
-          child: const Icon(Icons.arrow_back),
-        ),
-        centerTitle: true,
-        backgroundColor: colors.primary,
-        foregroundColor: Colors.white, //(0xff112C48),
-        iconTheme: const IconThemeData(color: colors.secondary),
-        title: const Text("Calendar"),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(25.0)),
-        ),
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.only(right: 15),
-        //     child: Container(
-        //       height: 40,
-        //       width: 40,
-        //       decoration: BoxDecoration(
-        //           borderRadius: BorderRadius.circular(5), color: Colors.white),
-        //       child: IconButton(
-        //         icon: const Icon(Icons.notifications),
-        //         onPressed: () {
-        //           // Add your notification icon tap logic here
-        //         },
-        //     ),  ),
-        //
-        //   ),
-        // ],
-      ),
+      // appBar: roll== "2" && widget.isFromBottom?AppBar(
+      //   backgroundColor: Colors.transparent,
+      //   toolbarHeight: 0,
+      //   elevation: 0,
+      // ):
+      // appBar: AppBar(
+      //   leading: Container(
+      //     decoration: BoxDecoration(
+      //         color: Colors.white, borderRadius: BorderRadius.circular(5)),
+      //     margin: const EdgeInsets.all(8), // Adjust padding inside container
+      //     child: const Icon(Icons.arrow_back),
+      //   ),
+      //   centerTitle: true,
+      //   backgroundColor: colors.primary,
+      //   foregroundColor: Colors.white, //(0xff112C48),
+      //   iconTheme: const IconThemeData(color: colors.secondary),
+      //   title: const Text("Calendar"),
+      //   shape: const RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.vertical(bottom: Radius.circular(25.0)),
+      //   ),
+      //   // actions: [
+      //   //   Padding(
+      //   //     padding: const EdgeInsets.only(right: 15),
+      //   //     child: Container(
+      //   //       height: 40,
+      //   //       width: 40,
+      //   //       decoration: BoxDecoration(
+      //   //           borderRadius: BorderRadius.circular(5), color: Colors.white),
+      //   //       child: IconButton(
+      //   //         icon: const Icon(Icons.notifications),
+      //   //         onPressed: () {
+      //   //           // Add your notification icon tap logic here
+      //   //         },
+      //   //     ),  ),
+      //   //
+      //   //   ),
+      //   // ],
+      // ),
       body:
       isLoading? const Center(child: CircularProgressIndicator(),):getVendorBookingModel?.msg == "No Booking found"?const Center(child: Text("No Booking found"),):ListView.builder(
         itemCount:getVendorBookingModel?.data.length ?? 0,

@@ -132,18 +132,18 @@ class _ServicesDetailsState extends State<ServicesDetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(left: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  Text(
-                    'Beauty Parlour',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 5),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.start,
+            //     children: const [
+            //       Text(
+            //         'Beauty Parlour',
+            //         style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             SizedBox(
               height: 140,
               child: ListView.builder(

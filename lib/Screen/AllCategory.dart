@@ -1444,52 +1444,51 @@ class _AllCategoryState extends State<AllCategory> {
                                                                             decoration: TextDecoration.lineThrough,
                                                                             fontSize: 16)),
                                                                     Spacer(),
-                                                                    InkWell(
-                                                                      onTap: () async {
-                                                                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                                        log(prefs.get('category').toString());
-                                                                        log(prefs.get('catId').toString());
-                                                                        log(prefs.get('sunCatId').toString());
-                                                                        log("subid$subcatid");
-                                                                        print(prefs.get('sub'));
-                                                                        print(prefs.get('child'));
-
-                                                                        if (Selectcat == null ||
-                                                                            Selectcat == "" ||
-                                                                            subcatid == null ||
-                                                                            subcatid!.isEmpty ||
-                                                                            chidcatId == null ||
-                                                                            chidcatId!.isEmpty) {
-                                                                          Fluttertoast.showToast(msg: "Please select Categories");
-                                                                        } else {
-                                                                          print("dklsdskds ${productList[index].productId}");
-                                                                          Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct(isEdit: true, productId:productList[index].productId))).then((value) {
-                                                                            setState(() {
-                                                                              subcatid = null;
-                                                                              chidcatId = null;
-                                                                              getAll();
-                                                                            });
-                                                                          });
-                                                                        }
-                                                                      },
-
-                                                                      child: Container(
-                                                                        alignment: Alignment.bottomRight,
-                                                                        height: 20,
-                                                                        width: 50,
-                                                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),
-                                                                            color: colors.secondary),
-                                                                        child: const Center(
-                                                                          child:
-                                                                              Text(
-                                                                            'Edit',
-                                                                            style: TextStyle(
-                                                                                color:
-                                                                                    Colors.white),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
+                                                                    // InkWell(
+                                                                    //   onTap: () async {
+                                                                    //     SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                                    //     log(prefs.get('category').toString());
+                                                                    //     log(prefs.get('catId').toString());
+                                                                    //     log(prefs.get('sunCatId').toString());
+                                                                    //     log("subid$subcatid");
+                                                                    //     print(prefs.get('sub'));
+                                                                    //     print(prefs.get('child'));
+                                                                    //     if (Selectcat == null ||
+                                                                    //         Selectcat == "" ||
+                                                                    //         subcatid == null ||
+                                                                    //         subcatid!.isEmpty ||
+                                                                    //         chidcatId == null ||
+                                                                    //         chidcatId!.isEmpty) {
+                                                                    //       Fluttertoast.showToast(msg: "Please select Categories");
+                                                                    //     } else {
+                                                                    //       print("dklsdskds ${productList[index].productId}");
+                                                                    //       Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct(isEdit: true, productId:productList[index].productId))).then((value) {
+                                                                    //         setState(() {
+                                                                    //           subcatid = null;
+                                                                    //           chidcatId = null;
+                                                                    //           getAll();
+                                                                    //         });
+                                                                    //       });
+                                                                    //     }
+                                                                    //   },
+                                                                    //
+                                                                    //   child: Container(
+                                                                    //     alignment: Alignment.bottomRight,
+                                                                    //     height: 20,
+                                                                    //     width: 50,
+                                                                    //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),
+                                                                    //         color: colors.secondary),
+                                                                    //     child: const Center(
+                                                                    //       child:
+                                                                    //           Text(
+                                                                    //         'Edit',
+                                                                    //         style: TextStyle(
+                                                                    //             color:
+                                                                    //                 Colors.white),
+                                                                    //       ),
+                                                                    //     ),
+                                                                    //   ),
+                                                                    // ),
                                                                   ],
                                                                 ),
                                                               ],

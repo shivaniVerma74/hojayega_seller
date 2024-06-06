@@ -86,9 +86,12 @@ class VendorOrder {
   VendorOrder.fromJson(Map<String, dynamic> json) {
     if (json['driver_data'] != null) {
       driverData = <DriverData>[];
-      json['driver_data'].forEach((v) {
-        driverData!.add(new DriverData.fromJson(v));
-      });
+      try {
+        json['driver_data'].forEach((v) {
+          driverData!.add(new DriverData.fromJson(v));});
+      } catch (e) {
+        print(e);
+      }
     }
     orderId = json['order_id'];
     total = json['total'];

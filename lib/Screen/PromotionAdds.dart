@@ -100,7 +100,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getHistory));
     request.fields.addAll({
-      'vendor_id': '68'
+      'vendor_id': '${vendorId.toString()}'
     });
     print("vendor id inn history add ${request.fields}");
     request.headers.addAll(headers);
@@ -268,13 +268,14 @@ class _PromotionAddsState extends State<PromotionAdds> {
   }
 
   getFirstTap() {
-    return promotionAdsList!.data!.isEmpty ? Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Center(child: const Text("Banners Not Found", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),)),
+    return promotionAdsList!.data!.isEmpty ?
+    const Padding(
+      padding: EdgeInsets.only(top: 10),
+      child: Center(child: Text("Banners Not Found", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),)),
     ):
       ListView.builder(
       itemCount: promotionAdsList?.data?.length ?? 0,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
         itemBuilder: (c,i) {
       return Column(
@@ -290,7 +291,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
               ],
             ),
           ),
-          const SizedBox(height: 5,),
+          const SizedBox(height: 5),
           promotionAdsList?.data?[i].status == "0"?
           Padding(
             padding: const EdgeInsets.only(left: 5),
@@ -298,7 +299,7 @@ class _PromotionAddsState extends State<PromotionAdds> {
               width: 70,
               height: 30,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: colors.primary),
-              child: Center(child: const Text("Pending", style: TextStyle(color: colors.whiteTemp),)),
+              child: const Center(child: Text("Pending", style: TextStyle(color: colors.whiteTemp),)),
             ),
           ):  const SizedBox(),
           promotionAdsList?.data?[i].status == "1" ?

@@ -32,8 +32,6 @@ class _OrdersState extends State<Orders> {
     return getVendorOrder();
   }
 
-
-
   GetVendorOrderModel? vendorOrderModel;
   getVendorOrder() async {
     var headers = {
@@ -41,7 +39,7 @@ class _OrdersState extends State<Orders> {
     };
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorOrders));
     request.fields.addAll({'user_id': vendorId.toString(), 'status': selected == 1 ? "3" : ""});
-    print("get orderss parameterr ${request.fields}");
+    print("get orders parameter ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -112,7 +110,7 @@ class _OrdersState extends State<Orders> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-              )
+              ),
             ],
           );
         });
@@ -391,19 +389,17 @@ class _OrdersState extends State<Orders> {
                                 const SizedBox(
                                   width: 100,
                                 ),
-                                item?.unitType == "" || item?.unitType == null ?
+                                item?.unit == "" || item?.unit == null ?
                                 const Text("-", style: TextStyle(color: colors.primary)) :
-                                 Text("${item?.unitType}", style: const TextStyle(color: colors.primary),),
+                                 Text("${item?.unit}", style: const TextStyle(color: colors.primary),),
                                 const SizedBox(
                                   width:35,
                                 ),
                                  Text("${item?.productPrice} Rs.",style: const TextStyle(color: colors.primary, fontSize:12),),
-                                const SizedBox(
-                                  width: 10,
-                                ),
+                                const SizedBox(width: 10),
                                 // Text("${int.parse(item?.qty.toString() ?? "0")* double.parse(item?.productPrice.toString()??"0.0")}rs", style: const TextStyle(color: colors.primary, fontSize:12),)
                               ],
-                            )
+                            ),
                           ],
                         ),
                       );

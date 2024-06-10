@@ -7,14 +7,18 @@ import 'package:hojayega_seller/Model/GetProfileModel.dart';
 import 'package:hojayega_seller/Model/SliderModel.dart';
 import 'package:hojayega_seller/Screen/BusinessCard.dart';
 import 'package:hojayega_seller/Screen/DeliveryCard.dart';
+import 'package:hojayega_seller/Screen/Pick&Drop.dart';
+import 'package:hojayega_seller/Screen/PromotionAdds.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
+import '../Model/TodayBooking.dart';
 import '../Model/VendorTodayOrder.dart';
 import 'Calender.dart';
 import 'Orders.dart';
+import 'Reports.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,6 +40,7 @@ getData() async {
  await  getSetting();
  await getBanner();
  await getCurrentorder();
+ await getCurrenBooking();
 }
   @override
   void initState() {
@@ -102,6 +107,36 @@ getData() async {
     }
   }
 
+
+  TodayBooking? vendorTodayBooking;
+  getCurrenBooking() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    roll=  prefs.getString('roll');
+    print("${prefs.getString('roll')}+++++++++++++++++++++++");
+    var headers = {
+      'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorOrder));
+    request.fields.addAll({
+      'user_id': vendorId.toString()
+    });
+    debugPrint("get current parametersssss ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = TodayBooking.fromJson(json.decode(finalResponse));
+      print("profile data responsee $finalResult");
+      vendorTodayBooking = finalResult;
+      setState(() {});
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
+
+
   SliderModel? sliderModel;
   List<BannerListModel> sliderList1 = [];
   List sliderList = [];
@@ -163,9 +198,9 @@ getData() async {
   int _pageIndex = 0;
 
 
-  var arrNames = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop'];
+  var arrNames = ['Manage\nAds', 'Reports', 'PickDrop'];
 
-  var arrNames2 = ['Manage\nAds', 'Reports', 'Pick\n & \nDrop'];
+  var arrNames2 = ['Manage\nAds', 'Reports', 'PickDrop'];
 
   var iconsNames = [
     'assets/images/Manageads.png',
@@ -688,7 +723,7 @@ getData() async {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 4,
+                  flex: 3,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -698,18 +733,29 @@ getData() async {
                         padding: const EdgeInsets.only(left: 20, right: 8),
                         child: Column(
                           children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
-                                  color: colors.primary),
-                              child: Image.asset(roll == "2"? iconsNames2[index]: iconsNames[index]),
+                            InkWell(
+                              onTap:() {
+                                if(index == 0){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PromotionAdds()));
+                                } else if(index == 1){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Reports()));
+                                } else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PickDrop()));
+                                }
+                              },
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.primary),
+                                child: Image.asset(roll == "2"? iconsNames2[index]: iconsNames[index], height: 10, width: 10,),
+                              ),
                             ),
-                            Text(roll == "2"? arrNames2[index]: arrNames[index]),
+                            Text(roll == "2"? arrNames2[index]: arrNames[index], textAlign: TextAlign.center),
                           ],
                         ),
                       );
-                    }),),
+                    }),
+                    ),
                   ),
                 ),
                 // Expanded(
@@ -738,6 +784,56 @@ getData() async {
                 // ),
               ],
             ),
+            roll == "2"?
+           Column(
+             children: [
+               const Padding(
+                 padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
+                 child: Text(
+                   "Today's Booking Status",
+                   style: TextStyle(
+                       color: Colors.black54,
+                       fontWeight: FontWeight.bold,
+                       fontSize: 20),
+                 ),
+               ),
+               Center(
+                 child: Table(
+                   border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
+                   columnWidths: const <int, TableColumnWidth>{
+                     0: FixedColumnWidth(125.0),
+                     1: FixedColumnWidth(125.0),
+                     2: FixedColumnWidth(90.0),
+                   },
+                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                   children: [
+                     // Header Row
+                     TableRow(
+                       children: [
+                         headerCell('Time Slot'),
+                         headerCell('Region'),
+                         headerCell('Status'),
+                       ],
+                     ),
+                     // Data Rows
+                     ...?vendorTodayBooking?.data?.map((TodayBookingData) {
+                       return TableRow(
+                         children: [
+                           Padding(
+                             padding: const EdgeInsets.only(left: 3),
+                             child: dataCell(TodayBookingData.slot.toString().replaceAll(":00", "")),
+                           ),
+                           dataCell(TodayBookingData.address.toString()),
+                           statusCell(TodayBookingData.bookingStatus.toString()),
+                         ],
+                       );
+                     }).toList(),
+                   ],
+                 ),
+               ),
+               const SizedBox(height: 10),
+             ],
+           ):
             const Padding(
               padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
               child: Text(
@@ -1043,7 +1139,7 @@ logout(context) async {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Confirm Sign Out"),
+          title: const Text("Confirm Log Out"),
           content: const Text("Are you sure to log out?"),
           actions: <Widget>[
             ElevatedButton(

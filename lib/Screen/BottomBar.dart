@@ -19,6 +19,7 @@ import 'Earning.dart';
 import 'Help.dart';
 import 'HomeScreen.dart';
 import 'Orders.dart';
+import 'PendingBooking.dart';
 import 'PendingOrders.dart';
 import 'Pick&Drop.dart';
 import 'PromotionAdds.dart';
@@ -156,10 +157,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
               child: commonAppBar(
                   context,
                   text: selectedIndex == 0
-                      ? "Home" : selectedIndex == 3
-                      ? "Pending Order" : selectedIndex == 4
-                      ? "Pick & Drop": roll == "2"? selectedIndex == 2 ? "Pending Orders":
-                       "My Bookings":"My Orders"
+                      ? "Home" :
+                  roll == "2" ? selectedIndex == 3 ? "Pick & Drop": "Pending Order" : selectedIndex == 4 ? "Pick & Drop": roll == "2"?
+                  selectedIndex == 2 ? "Pending Booking": "My Bookings":"My Orders"
               ),
             ),
           ),
@@ -373,22 +373,22 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   SizedBox(
                     height: 5,
                   ),
-                  InkWell(
-                      onTap: () {
-                        // Navigator.push(context, MaterialPageRoute(builder: (context) => const MyProfile()),);
-                        setState(() {
-                          currentIndex = 8;
-                        });
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Order history/Reports',
-                        icon: Icons.history,
-                        tabb: 8,
-                        indexx: currentIndex,
-                      )),
-                  const SizedBox(
-                    height: 5,
-                  ),
+                  // InkWell(
+                  //     onTap: () {
+                  //       // Navigator.push(context, MaterialPageRoute(builder: (context) => const MyProfile()),);
+                  //       setState(() {
+                  //         currentIndex = 8;
+                  //       });
+                  //     },
+                  //     child: DrawerIconTab(
+                  //       titlee: 'Order history/Reports',
+                  //       icon: Icons.history,
+                  //       tabb: 8,
+                  //       indexx: currentIndex,
+                  //     )),
+                  // const SizedBox(
+                  //   height: 5,
+                  // ),
                   // InkWell(
                   //   onTap: () {
                   //     // Navigator.push(
@@ -573,6 +573,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   unselectedForegroundColor: Colors.white,
                   //  selectedIndex == 1 ? colors.primary : colors.white10,
                   extras: {"label": "Pending "}),
+              FluidNavBarIcon(
+                  icon: Icons.wheelchair_pickup,
+                  // unselectedForegroundColor: Colors.grey,
+                  selectedForegroundColor: Colors.white,
+                  unselectedForegroundColor: Colors.white,
+                  backgroundColor: colors.primary,
+                  //  selectedIndex == 1 ? colors.primary : colors.white10,
+                  extras: {"label": "Pick & Drop"}),
             ]:
             [
               FluidNavBarIcon(
@@ -587,19 +595,19 @@ class _BottomNavBarState extends State<BottomNavBar> {
               FluidNavBarIcon(
                   // unselectedForegroundColor: Colors.grey,
                     selectedForegroundColor: Colors.white,
-                    icon: Icons.shopping_cart,
+                    icon: Icons.list_alt_sharp,
                     backgroundColor: colors.primary,
                     unselectedForegroundColor: Colors.white,
                     //  selectedIndex == 1 ? colors.primary : colors.white10,
-                    extras: {"label": "My Cart"}),
+                    extras: {"label": "My Orders"}),
               FluidNavBarIcon(
-                  icon: Icons.list_alt_sharp,
+                  icon: Icons.shopping_cart,
                   // unselectedForegroundColor: Colors.grey,
                   selectedForegroundColor: Colors.white,
                   unselectedForegroundColor: Colors.white,
                   backgroundColor: colors.primary,
                   //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "My Orders"}),
+                  extras: {"label": "My Cart"}),
               FluidNavBarIcon(
                   icon: Icons.calendar_month,
                   // unselectedForegroundColor: Colors.grey,
@@ -716,10 +724,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
           _child = roll== "2" ? Calender() : Orders();
           break;
         case 2:
-          _child =roll=="2"? PendingOrders(): AllCategory();
+          _child = roll=="2"? const PendingBooking(): AllCategory();
           break;
         case 3:
-          _child = PendingOrders();
+          _child =  roll=="2"? PickDrop(): PendingOrders();
           break;
         case 4:
           _child = PickDrop();

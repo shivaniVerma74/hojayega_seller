@@ -534,11 +534,7 @@ class _AllCategoryState extends State<AllCategory> {
     String? value = prefs.getString("selectedCategoryIndex");
     selectedShopId = prefs.getString('selectedShopType');
     selectedCategoryIndex = value != null
-        ? value
-            .replaceAll('[', '')
-            .replaceAll(']', '')
-            .split(',')
-            .map<int>((e) {
+        ? value.replaceAll('[', '').replaceAll(']', '').split(',').map<int>((e) {
             return int.parse(e);
           }).toList()
         : null;

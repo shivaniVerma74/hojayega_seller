@@ -6,17 +6,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
 import '../Model/GetVendorOrderModel.dart';
+import '../Model/PendingBooking.dart';
 import 'HomeScreen.dart';
 
-class PendingOrders extends StatefulWidget {
-  const PendingOrders({Key? key}) : super(key: key);
+class PendingBooking extends StatefulWidget {
+  const PendingBooking({Key? key}) : super(key: key);
 
   @override
-  State<PendingOrders> createState() => _PendingOrdersState();
+  State<PendingBooking> createState() => _PendingBookingState();
 }
 
-class _PendingOrdersState extends State<PendingOrders> {
- @override
+class _PendingBookingState extends State<PendingBooking> {
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -24,29 +25,29 @@ class _PendingOrdersState extends State<PendingOrders> {
   }
 
 
- String? vendorId;
- getData() async {
-   final SharedPreferences preferences = await SharedPreferences.getInstance();
-   vendorId = preferences.getString('vendor_id');
-   return getVendorOrder();
- }
+  String? vendorId;
+  getData() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    vendorId = preferences.getString('vendor_id');
+    return getVendorBooking();
+  }
 
-  GetVendorOrderModel? vendorOrderModel;
-  getVendorOrder() async {
+  PendingBookingModel? pendingBookingModel;
+  getVendorBooking() async {
     print("wokirngggg");
     var headers = {
       'Cookie': 'ci_session=6430902524c1703efd1eeb4c66d3537c73dbe375'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorOrders));
-    request.fields.addAll({'user_id': vendorId.toString(), 'status': "1"});
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.pendingBooking));
+    request.fields.addAll({'user_id': vendorId.toString(), 'status': "Pending"});
     print("parameterr ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
-      final finalResult = GetVendorOrderModel.fromJson(json.decode(finalResponse));
+      final finalResult = PendingBookingModel.fromJson(json.decode(finalResponse));
       print("get vendor order responsee $finalResult $finalResponse");
-      vendorOrderModel = finalResult;
+      pendingBookingModel = finalResult;
       setState(() {});
     } else {
       print(response.reasonPhrase);
@@ -56,21 +57,21 @@ class _PendingOrdersState extends State<PendingOrders> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-          // Text("Pending Orders", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: colors.primary),),
-          const SizedBox(height: 10),
-         // ListView.builder(
-         //   shrinkWrap: true,
-         //   physics: NeverScrollableScrollPhysics(),
-         //   itemCount: vendorOrderModel?.orders?.length??0,
-         //   itemBuilder: (context, index) {
-         //   return getPendingOrders(context,index);
-         // },)
-          getPendingOrders(context),
-        ],
-       ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Text("Pending Orders", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: colors.primary),),
+            const SizedBox(height: 10),
+            // ListView.builder(
+            //   shrinkWrap: true,
+            //   physics: NeverScrollableScrollPhysics(),
+            //   itemCount: vendorOrderModel?.orders?.length??0,
+            //   itemBuilder: (context, index) {
+            //   return getPendingBooking(context,index);
+            // },)
+            getPendingBooking(context),
+          ],
+        ),
       ),
     );
   }
@@ -92,10 +93,10 @@ class _PendingOrdersState extends State<PendingOrders> {
     Order('10:00 to 12:00 pm', 'Ujjain', 'Approved'),
   ];
 
- Widget  getPendingOrders(BuildContext context,) {
+  Widget  getPendingBooking(BuildContext context,) {
     return Column(
       children: [
-        vendorOrderModel?.orders?.isNotEmpty ?? false ?
+        pendingBookingModel?.data?.isNotEmpty ?? false ?
         Center(
           child: Padding(
             padding: const EdgeInsets.all(5.0),
@@ -118,26 +119,28 @@ class _PendingOrdersState extends State<PendingOrders> {
                   ],
                 ),
                 // Data Rows
-                ...?vendorOrderModel?.orders?.map((order) {
+                ...?pendingBookingModel?.data?.map((booking) {
                   return TableRow(
                     children: [
                       Container(
                         height: 50,
-                        child:  Center(child: Text(order.orderId.toString())),
-                      ),
-                      Container(
-                          height: 50,
-                          child: Center(
-                              child: Padding(
-                              padding: const EdgeInsets.only(left: 2),
-                              child: Text(order.time.toString().replaceAll(":00", "")),
-                             ),
-                          ),
+                        child:  Center(child: Text(booking.bookingId.toString())),
                       ),
                       Container(
                         height: 50,
                         child: Center(
-                            child: Text(order.address.toString())),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 2),
+                            child: Text(booking.slot.toString().replaceAll(":00", "")),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 50,
+                        child: Center(
+                            child: Text(booking.address.toString(),
+                            ),
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 4, right: 4),

@@ -548,6 +548,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     );
   }
 
+  bool isPasswordValid = true;
+
   Widget _getStepCard(String step) {
     switch (step) {
       case '1':
@@ -938,42 +940,56 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(10),
                                           color: colors.lightgray),
-                                      child: TextFormField(
-                                        controller: passwordController,
-                                        maxLength: 15,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please Enter password';
-                                          }
-                                          return null;
-                                        },
-                                        obscureText: isVisible ? false : true,
-                                        decoration: InputDecoration(
-                                          counterText: "",
-                                            isDense : true,
-                                            suffixIcon: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  isVisible
-                                                      ? isVisible = false
-                                                      : isVisible = true;
-                                                });
-                                              },
-                                              icon: Icon(
-                                                isVisible
-                                                    ? Icons.remove_red_eye
-                                                    : Icons.visibility_off,
-                                                color: colors.secondary,
-                                              ),
+                                      child: Column(
+                                        children: [
+                                          TextFormField(
+                                            controller: passwordController,
+                                            maxLength: 15,
+                                            validator: (value) {
+                                              if (value!.isEmpty) {
+                                                return 'Please Enter password';
+                                              }
+                                              return null;
+                                            },
+                                            onChanged: (value) {
+                                              setState(() {
+                                                isPasswordValid = value.length >= 15;
+                                              });
+                                            },
+                                            obscureText: isVisible ? false : true,
+                                            decoration: InputDecoration(
+                                              counterText: "",
+                                                isDense : true,
+                                                suffixIcon: IconButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      isVisible ? isVisible = false : isVisible = true;
+                                                    });
+                                                  },
+                                                  icon: Icon(
+                                                    isVisible ? Icons.remove_red_eye : Icons.visibility_off,
+                                                    color: colors.secondary,
+                                                  ),
+                                                ),
+                                                hintText: 'Password',
+                                                enabledBorder: const OutlineInputBorder(
+                                                    borderSide: BorderSide(color: Colors.white),
+                                                ),
+                                                focusedBorder: const OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors.white),
+                                                ),
                                             ),
-                                            hintText: 'Password',
-                                            enabledBorder: const OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white)),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.white))
-                                        ),
+                                          ),
+                                          if (!isPasswordValid)
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                            child: Text(
+                                              'Minimum 15 characters',
+                                              style: TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -2109,7 +2125,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     const Padding(
                       padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
-                        "Pen Card",
+                        "Pan Card",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: colors.text),
                       ),

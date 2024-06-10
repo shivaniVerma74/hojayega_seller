@@ -28,6 +28,10 @@ class _EarningState extends State<Earning> {
 
   EarningsModel? earningData;
   getEarnings(String? type,) async {
+    print("object Tis ${_startDateController.text.toString()}");
+    print("object Tis ${_startAccDateController.text.toString()}");
+    print("object Tis ${_endDateController.text.toString()}");
+    print("object Tis ${_endDateAccController.text.toString()}");
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String? vendorId = preferences.getString('vendor_id');
     var headers = {
@@ -37,11 +41,11 @@ class _EarningState extends State<Earning> {
         http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorEarning));
     request.fields.addAll({
       'vendor_id': vendorId.toString(),
-      'start_date': _selectedIndex == 0 ? _startDateController.text : _startAccDateController.text,
-      'end_date': _selectedIndex == 0 ? _endDateController.text : _endDateAccController.text,
+      'start_date': selected == 0 ? _startDateController.text.toString() : _startAccDateController.text.toString(),
+      'end_date': selected == 0 ? _endDateController.text.toString() : _endDateAccController.text.toString(),
       'type': type.toString()
     });
-    print("earningss para ${request.fields}");
+    print("earningss para ${request.fields} $selected");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -285,7 +289,7 @@ TextEditingController amtCtr = TextEditingController();
                           setState(() {
                             selected = 1;
                           });
-                          getEarnings("Acc");
+                          // getEarnings("Acc");
                         },
                         child: Container(
                           height: 40,
@@ -580,7 +584,7 @@ TextEditingController amtCtr = TextEditingController();
                                 fillColor: Colors.grey.shade100 ,
                                 suffixIcon: InkWell(
                                     onTap: () {
-                                      _selectAccDate(context, _startDateController);
+                                      _selectAccDate(context, _startAccDateController);
                                     },
                                     child: const Icon(Icons.calendar_month, color: colors.primary)),
                                 focusedBorder: OutlineInputBorder(
@@ -607,7 +611,7 @@ TextEditingController amtCtr = TextEditingController();
                                 fillColor: Colors.grey.shade100 ,
                                 suffixIcon: InkWell(
                                   onTap: () async {
-                                    _selectAccEndDate(context, _endDateController);
+                                    _selectAccEndDate(context, _endDateAccController);
                                     // await getEarnings("Acc");
                                   },
                                   child: const Icon(Icons.calendar_month, color: colors.primary),

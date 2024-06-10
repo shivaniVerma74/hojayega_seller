@@ -836,19 +836,19 @@ class _PickDropState extends State<PickDrop> {
     print("length ${dropnameCtr.length} ${pickupnameCtr.length}");
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-            foregroundColor: colors.whiteTemp,
-            elevation: 0,
-            centerTitle: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(25),
-                bottomRight: Radius.circular(25),
-              ),
-            ),
-
-            title: const Text('Pick & Drop'),
-            backgroundColor: colors.primary),
+        // appBar: AppBar(
+        //     foregroundColor: colors.whiteTemp,
+        //     elevation: 0,
+        //     centerTitle: true,
+        //     shape: const RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.only(
+        //         bottomLeft: Radius.circular(25),
+        //         bottomRight: Radius.circular(25),
+        //       ),
+        //     ),
+        //
+        //     title: const Text('Pick & Drop'),
+        //     backgroundColor: colors.primary),
         backgroundColor: Color(0xffE2EBFE), //colors.bgColor,
         body: SingleChildScrollView(
           child: Padding(
@@ -907,6 +907,7 @@ class _PickDropState extends State<PickDrop> {
                           ),
                         ),
                       ),
+                      pickupnameCtr.length == 1 ? SizedBox():
                       InkWell(
                         onTap: () {
                           setState(() {
@@ -988,6 +989,7 @@ class _PickDropState extends State<PickDrop> {
                           ),
                         ),
                       ),
+                      dropnameCtr.length ==1 ? SizedBox():
                       InkWell(
                         onTap: () {
                           setState(() {

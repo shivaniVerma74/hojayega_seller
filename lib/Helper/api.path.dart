@@ -35,6 +35,7 @@ class ApiServicves{
   static const String typeofShops = baseUrl+'type_shops';
   static const String addProducts = '${baseUrl}add_product';
   static const String vendorOrders = baseUrl+'get_vendor_orders';
+  static const String pendingBooking = baseUrl+'get_booking_vendor';
   static const String getVendorBookings = baseUrl+'get_bookings';
   static const String timeSlots = baseUrl+'get_time_slot';
   static const String requestForSettlement = baseUrl+'request_settlement_amount';

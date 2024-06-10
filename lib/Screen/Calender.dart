@@ -72,6 +72,7 @@ class _CalenderState extends State<Calender> {
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.completeBookings));
     request.fields.addAll({
       'id': bookingID.toString(),
+      'payment_type': "Cod"
     });
     print("booking complete ${request.fields}");
     request.headers.addAll(headers);
@@ -85,6 +86,8 @@ class _CalenderState extends State<Calender> {
       print(response.reasonPhrase);
     }
   }
+  int _value = 1;
+  bool isCash = false;
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +163,10 @@ class _CalenderState extends State<Calender> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children:  [
                                 Text(
+                                  "ID: ${data?.bookingId}",
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
                                   "Date: ${data?.date}".replaceAll("00:00:00.000", ''),
                                   style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
@@ -194,7 +201,7 @@ class _CalenderState extends State<Calender> {
                                 const Text('Pending',
                                     style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)): SizedBox(),
                                 data?.status == "Complete" ?
-                                const Text('Complete',
+                                const Text('Completed',
                                     style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)): SizedBox(),
                                 const SizedBox(height: 5,),
                                 Container(
@@ -243,6 +250,65 @@ class _CalenderState extends State<Calender> {
                               fontSize: 12, color: colors.grad1Color),
                         ),
                       ),
+                      // Row(
+                      //   children: [
+                      //     Expanded(
+                      //       child: Container(
+                      //         child: Row(
+                      //           children: [
+                      //             Radio(
+                      //               value: 1,
+                      //               fillColor:
+                      //               MaterialStateColor.resolveWith(
+                      //                       (states) => colors.primary),
+                      //               activeColor: Colors.white,
+                      //               groupValue: _value,
+                      //               onChanged: (int? value) {
+                      //                 setState(() {
+                      //                   _value = value!;
+                      //                   isCash = false;
+                      //                 });
+                      //               },
+                      //             ),
+                      //             const Text(
+                      //               "Cash",
+                      //               style: TextStyle(
+                      //                   color: colors.blackTemp,
+                      //                   fontSize: 14),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     Expanded(
+                      //       child: Container(
+                      //         child: Row(
+                      //           children: [
+                      //             Radio(
+                      //                 value: 2,
+                      //                 fillColor:
+                      //                 MaterialStateColor.resolveWith((states) => colors.primary),
+                      //                 groupValue: _value,
+                      //                 onChanged: (int? value) {
+                      //                   setState(() {
+                      //                     _value = value!;
+                      //                     isCash = true;
+                      //                   });
+                      //                 }),
+                      //             // SizedBox(width: 10.0,),
+                      //             const Text(
+                      //               "Online",
+                      //               style: TextStyle(
+                      //                   color: colors.blackTemp,
+                      //                   fontSize: 14),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      data?.status == "Complete" ? SizedBox():
                       Padding(
                         padding: const EdgeInsets.only(bottom: 2, right: 2),
                         child: Row(

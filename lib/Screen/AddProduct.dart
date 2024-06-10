@@ -1480,8 +1480,9 @@ class _AddProductState extends State<AddProduct> {
                   //   ],
                   // ),
                   const SizedBox(height: 10),
-                  widget.isEdit == true ?
-                  uploadMultiImmageEdit(): uploadMultiImmage(),
+                  // widget.isEdit == true ?
+                  // uploadMultiImmageEdit():
+                  uploadMultiImmage(),
                   const SizedBox(
                     height: 30,
                   ),
@@ -1495,8 +1496,12 @@ class _AddProductState extends State<AddProduct> {
                         "Add Product",
                         onPress: () {
                           if (_formKey.currentState!.validate()) {
+                            if(imagePathList.isEmpty){
+                              Fluttertoast.showToast(msg: "Please Select Images");
+                            } else{
+                              addProductApi();
+                            }
                             // widget.isEdit == true ?
-                            addProductApi();
                           // : editProductApi();
                            }
                         }),
@@ -1737,16 +1742,17 @@ class _AddProductState extends State<AddProduct> {
             DropdownButton(
               isExpanded: true,
               value: unitTypes[index],
-              hint: const Text('Select Unit'),
-              icon: const Icon(Icons.keyboard_arrow_down),
+              hint:  Text('Select Unit'),
+              icon:  Icon(Icons.keyboard_arrow_down),
               items: unitList.map((items) {
                 return DropdownMenuItem(
-                  value: items.id,
+                  value: items.name,
                   child: Container(
                       child: Text(items.name.toString())),
                 );
               }).toList(),
               onChanged: (dynamic value) {
+                print("unit select value $value");
                 setState(() {
                   unitTypes[index] = value;
                 });
@@ -1819,7 +1825,7 @@ class _AddProductState extends State<AddProduct> {
             //     );
             //   }).toList(),
             // ),
-            const Divider(color: Colors.grey,),
+            const Divider(color: Colors.grey),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1841,12 +1847,13 @@ class _AddProductState extends State<AddProduct> {
                     ),
                   ),
                 ),
+                unit.length == 1 ? const SizedBox():
                 Padding(
                   padding: const EdgeInsets.only(right: 5),
                   child: Container(
                     height: 40,
                     width: 40,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color:colors.primary),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color: colors.primary),
                     child: InkWell(
                       onTap: () {
                         setState(() {

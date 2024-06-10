@@ -468,7 +468,7 @@ String? delCharge;
                             style: TextStyle(color: colors.primary),
                           ),
                           SizedBox(
-                            width: 50,
+                            width: 70,
                           ),
                           Text(
                             "Rs.",
@@ -523,10 +523,10 @@ String? delCharge;
                                 ],
                               ),
                               const SizedBox(
-                                width: 80,
+                                width: 70,
                               ),
                               Text(
-                                "${widget.model?.orderItems?[i].unitType}",
+                                "${widget.model?.orderItems?[i].unit}",
                                 // rows[i][0].toString() == 'u_R${i + 1}'
                                 //     ? "${widget.model?.orderItems?[i].unitType}"
                                 //     : rows[i][0],
@@ -535,7 +535,7 @@ String? delCharge;
                               ),
                               // ["u_R1", "p_R1", "s_R1"],
                               const SizedBox(
-                                width: 40,
+                                width: 20,
                               ),
                               Text(
                                 // rows[i][1].toString() == 'p_R${i + 1}'

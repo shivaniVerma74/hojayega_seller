@@ -346,7 +346,13 @@ class _LoginPageState extends State<LoginPage> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  vendorLogin();
+                                  if(isChecked == false){
+                                    Fluttertoast.showToast(
+                                        msg: "Please Select Check Box");
+                                  }
+                                  else {
+                                    vendorLogin();
+                                  }
                                   // Navigator.push(context, MaterialPageRoute(builder:(context)=> SignUpPersonal()));
                                 }
                               },

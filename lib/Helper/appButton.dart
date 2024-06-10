@@ -176,20 +176,24 @@ Widget commonAppBar(BuildContext context,
                     fontWeight: FontWeight.bold),
               ),
             ),
-            isActionButton == false
+             isActionButton == false
                 ? Container(
               width: 40,
-              ): Container(
-              // margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10)),
-              child: const Icon(
-                Icons.notifications_active_rounded,
-                color: colors.primary,
+              ): InkWell(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationScreen()));
+                  },
+                child: Container(
+                // margin: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                child: const Icon(
+                  Icons.notifications_active_rounded,
+                  color: colors.primary,
+                     ),
+                  ),
               ),
-            ),
           ],
         ),
     );

@@ -12,7 +12,7 @@ class Custom_Text extends StatelessWidget {
       children: [
         Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 16,
               color: Colors.black

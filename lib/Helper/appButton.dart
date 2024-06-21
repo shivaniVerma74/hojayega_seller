@@ -181,8 +181,7 @@ Widget commonAppBar(BuildContext context,
               width: 40,
               ): InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationScreen()));
-                  },
+                Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationScreen()));},
                 child: Container(
                 // margin: EdgeInsets.all(10),
                 padding: const EdgeInsets.all(10),

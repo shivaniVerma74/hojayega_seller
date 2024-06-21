@@ -302,7 +302,7 @@ class _ReportsState extends State<Reports> {
                     ],
                   ),
                 ),
-                earningData?.products?.length == null || earningData?.products?.length == ""
+                earningData?.status == "0" || (earningData?.products!.isEmpty) == false
                     ? const Center(
                   child: Text("Data Not Found", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
                 ):

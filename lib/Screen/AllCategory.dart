@@ -547,7 +547,6 @@ class _AllCategoryState extends State<AllCategory> {
     String? s1 = selectedCategoryIndex != null
         ? categoryList1[selectedCategoryIndex!.first].cName
         : null;
-
     prefs.setString('category', s1!);
     prefs.setString("catId", Selectcat!);
   }
@@ -556,10 +555,8 @@ class _AllCategoryState extends State<AllCategory> {
     var headers = {
       'Cookie': 'ci_session=70c618f5670ba3cd3a735fde130cab16e002a8af'
     };
-    var request =
-        http.MultipartRequest('POST', Uri.parse(ApiServicves.getCategories));
-    request.fields
-        .addAll({'parent_id': selectedShopId.toString() ?? "0", 'roll': '1'});
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getCategories));
+    request.fields.addAll({'parent_id': selectedShopId.toString() ?? "0", 'roll': '1'});
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     print("===my technic=======${request.fields}===============");
@@ -756,11 +753,9 @@ class _AllCategoryState extends State<AllCategory> {
                         onTap: () async {
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
-
                           setState(() {
                             Selectcat = categoryList1[index].id;
-
-                            String? s1 = categoryList1[index].cName;
+                            String? s1= categoryList1[index].cName;
 
                             parent_id = categoryList1[index].serviceType;
                             print(s1);
@@ -1166,14 +1161,13 @@ class _AllCategoryState extends State<AllCategory> {
                                     ],
                                   ),
                                   Container(
-                                      height: 40,
+                                      height: 50,
                                       child: childCategoryModel?.data?.isNotEmpty ?? false
                                           ? ListView.builder(
                                               shrinkWrap: true,
                                               scrollDirection: Axis.horizontal,
                                               itemCount: childCategoryModel
-                                                      ?.data?.length ??
-                                                  0,
+                                                      ?.data?.length ?? 0,
                                               itemBuilder: (context, index) {
                                                 return InkWell(
                                                   onTap: () async {
@@ -1193,8 +1187,8 @@ class _AllCategoryState extends State<AllCategory> {
                                                     child: Column(
                                                       children: [
                                                         Container(
-                                                          height: 30,
-                                                          width: 90,
+                                                          height: 35,
+                                                          width: 100,
                                                           decoration: BoxDecoration(
                                                             borderRadius: BorderRadius.circular(5),
                                                             border: Border.all(
@@ -1207,7 +1201,7 @@ class _AllCategoryState extends State<AllCategory> {
                                                             child: Text(
                                                               '${childCategoryModel?.data?[index].cName}',
                                                               style: const TextStyle(
-                                                                  fontSize: 16,
+                                                                  fontSize: 12,
                                                                   color: Colors
                                                                       .white),
                                                             ),
@@ -1501,6 +1495,7 @@ class _AllCategoryState extends State<AllCategory> {
                                   const SizedBox(
                                     height: 93,
                                   ),
+
                                   Center(
                                     child: Container(
                                       height: 40,

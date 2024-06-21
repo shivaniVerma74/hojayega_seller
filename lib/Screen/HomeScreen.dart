@@ -46,6 +46,7 @@ getData() async {
   void initState() {
     super.initState();
     // getWalletAmount();
+    getProfile();
     getData();
   }
 
@@ -158,7 +159,6 @@ getData() async {
     http.StreamedResponse response = await request.send();
     print("get banner=======${request.fields}===============");
     print("===my technic=======${request.url}===============");
-
     if (response.statusCode == 200) {
       var result = await response.stream.bytesToString();
       var finalresult = jsonDecode(result);
@@ -833,7 +833,8 @@ getData() async {
                ),
                const SizedBox(height: 10),
              ],
-           ):
+            ):SizedBox(),
+            roll =="1" ?
             const Padding(
               padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
               child: Text(
@@ -843,7 +844,7 @@ getData() async {
                     fontWeight: FontWeight.bold,
                     fontSize: 20),
               ),
-            ),
+            ): SizedBox(),
             Center(
               child: Table(
                 border: TableBorder.all(borderRadius: BorderRadius.circular(10)),

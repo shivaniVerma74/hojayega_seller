@@ -125,7 +125,9 @@ class _PromotionAddsState extends State<PromotionAdds> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colors.appbarColor,
-      floatingActionButton: InkWell(
+      floatingActionButton:
+      selected == 2 ?  SizedBox():
+      InkWell(
         onTap: () {
           selected == 0 ?
           Navigator.push(context, MaterialPageRoute(builder: (context) => const AddPromotionAdds())):

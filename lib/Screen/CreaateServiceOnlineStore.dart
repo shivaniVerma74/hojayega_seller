@@ -226,7 +226,6 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 ),
                               ],
                             ),
-
                             Container(
                              width: double.infinity, // adjust width if needed
                              height: 500, // adjust height if needed

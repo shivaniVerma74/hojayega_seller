@@ -213,7 +213,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                         //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
-                            children: const [
+                            children: [
                               CircleAvatar(
                                   child: Text('1',
                                       style: TextStyle(
@@ -339,8 +339,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                           child: CircularProgressIndicator(
                                             color: colors.primary,
                                           ),
-                                        )
-                                      :
+                                        ) :
                                       // Container(
                                       //         margin:
                                       //             const EdgeInsets.only(left: 2, right: 2),
@@ -801,8 +800,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                   if (roll_id == "1") {
                                     // print(getData());
                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
+                                      context, MaterialPageRoute(
                                         builder: (context) => AllCategory(),
                                       ),
                                     );

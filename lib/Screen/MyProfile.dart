@@ -1,23 +1,21 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hojayega_seller/Helper/color.dart';
 import 'package:hojayega_seller/Model/GetAreaModel.dart';
 import 'package:hojayega_seller/Model/GetCityModel.dart';
 import 'package:hojayega_seller/Model/StateModel.dart';
-// import 'package:ho_jayega_seller/screen/Calender.dart';
-import 'package:http/http.dart';
-import 'dart:io';
-import 'dart:convert';
-import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../AuthView/SignUpPersonal.dart';
 import '../Helper/api.path.dart';
 import '../Model/GetProfileModel.dart';
-import 'Calender.dart';
 
 // import '../utils/utils.dart';
 class MyProfile extends StatefulWidget {
@@ -187,10 +185,14 @@ class _MyProfileState extends State<MyProfile> {
       stateId = profileData?.data?.first.state ?? "";
       cityId = profileData?.data?.first.city ?? "";
       countryId = profileData?.data?.first.region ?? "";
-      banknameController.text = profileData?.data?.first.bandDetails ?? "";
+      banknameController.text = profileData?.data?.first.bankName ?? "";
+      accountNumberController.text =
+          profileData?.data?.first.accountNumber ?? "";
+      ifscController.text = profileData?.data?.first.ifscCode ?? "";
       selfiImage = profileData?.data?.first.selfiImage;
       adhaarBack = profileData?.data?.first.adharBack;
       adhaarFront = profileData?.data?.first.adharFront;
+      upiidContoler.text = profileData!.data!.first.upiId ?? "";
       customerLocationImage = profileData?.data?.first.customerLocation;
       panImage = profileData?.data?.first.panImage;
       shopImage = profileData?.data?.first.shopImage;
@@ -762,7 +764,7 @@ class _MyProfileState extends State<MyProfile> {
                                         child: TextFormField(
                                           controller: refferalcodeController,
                                           decoration: const InputDecoration(
-                                              hintText: 'Refferal Code',
+                                              hintText: 'Referral Code',
                                               enabledBorder: OutlineInputBorder(
                                                   borderSide: BorderSide(
                                                       color: Colors.white)),
@@ -892,7 +894,7 @@ class _MyProfileState extends State<MyProfile> {
                                           Card(
                                             child: Container(
                                               width: 220,
-                                              height: 50,
+                                              height: 60,
                                               // color: Colors.black,
                                               decoration: BoxDecoration(
                                                   borderRadius:
@@ -1192,102 +1194,102 @@ class _MyProfileState extends State<MyProfile> {
                                           ),
                                         ],
                                       ),
-                                      Row(
-                                        children: [
-                                          Card(
-                                            child: Container(
-                                                width: 50,
-                                                height: 50,
-                                                // color: Colors.black,
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    color: colors.lightgray),
-                                                child: Image.asset(
-                                                    'assets/images/pincode.png')),
-                                          ),
-                                          Card(
-                                            child: Container(
-                                              width: 220,
-                                              height: 50,
-                                              // color: Colors.black,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  color: colors.lightgray),
-                                              child: TextFormField(
-                                                controller: pincodeController,
-                                                decoration: const InputDecoration(
-                                                    hintText: 'Pincode',
-                                                    enabledBorder:
-                                                        OutlineInputBorder(
-                                                            borderSide:
-                                                                BorderSide(
-                                                                    color: Colors
-                                                                        .white)),
-                                                    focusedBorder:
-                                                        OutlineInputBorder(
-                                                            borderSide: BorderSide(
-                                                                color: Colors
-                                                                    .white))),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Card(
-                                            child: Container(
-                                                width: 50,
-                                                height: 80,
-                                                // color: Colors.black,
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    color: colors.lightgray),
-                                                child: Image.asset(
-                                                    'assets/images/uploadcurrentlocation.png')),
-                                          ),
-                                          InkWell(
-                                            onTap: () {
-                                              imageCode = 7;
-                                              //  getImageGallery();
-                                              _showPickerOptions();
-                                            },
-                                            child: Card(
-                                              child: Container(
-                                                height: 80,
-                                                width: 220,
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    color: Colors.white,
-                                                    border: Border.all(
-                                                        color: colors.primary)
-                                                    // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                                    ),
-                                                child: _currentlocationimage !=
-                                                        null
-                                                    ? Image.file(
-                                                        _currentlocationimage!
-                                                            .absolute,
-                                                        fit: BoxFit.fill,
-                                                      )
-                                                    : const Icon(
-                                                        Icons
-                                                            .file_upload_outlined,
-                                                        color: colors.secondary,
-                                                        size: 50,
-                                                      ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                      // Row(
+                                      //   children: [
+                                      //     Card(
+                                      //       child: Container(
+                                      //           width: 50,
+                                      //           height: 50,
+                                      //           // color: Colors.black,
+                                      //           decoration: BoxDecoration(
+                                      //               borderRadius:
+                                      //                   BorderRadius.circular(
+                                      //                       10),
+                                      //               color: colors.lightgray),
+                                      //           child: Image.asset(
+                                      //               'assets/images/pincode.png')),
+                                      //     ),
+                                      //     Card(
+                                      //       child: Container(
+                                      //         width: 220,
+                                      //         height: 50,
+                                      //         // color: Colors.black,
+                                      //         decoration: BoxDecoration(
+                                      //             borderRadius:
+                                      //                 BorderRadius.circular(10),
+                                      //             color: colors.lightgray),
+                                      //         child: TextFormField(
+                                      //           controller: pincodeController,
+                                      //           decoration: const InputDecoration(
+                                      //               hintText: 'Pincode',
+                                      //               enabledBorder:
+                                      //                   OutlineInputBorder(
+                                      //                       borderSide:
+                                      //                           BorderSide(
+                                      //                               color: Colors
+                                      //                                   .white)),
+                                      //               focusedBorder:
+                                      //                   OutlineInputBorder(
+                                      //                       borderSide: BorderSide(
+                                      //                           color: Colors
+                                      //                               .white))),
+                                      //         ),
+                                      //       ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      // Row(
+                                      //   children: [
+                                      //     Card(
+                                      //       child: Container(
+                                      //           width: 50,
+                                      //           height: 80,
+                                      //           // color: Colors.black,
+                                      //           decoration: BoxDecoration(
+                                      //               borderRadius:
+                                      //                   BorderRadius.circular(
+                                      //                       10),
+                                      //               color: colors.lightgray),
+                                      //           child: Image.asset(
+                                      //               'assets/images/uploadcurrentlocation.png')),
+                                      //     ),
+                                      //     InkWell(
+                                      //       onTap: () {
+                                      //         imageCode = 7;
+                                      //         //  getImageGallery();
+                                      //         _showPickerOptions();
+                                      //       },
+                                      //       child: Card(
+                                      //         child: Container(
+                                      //           height: 80,
+                                      //           width: 220,
+                                      //           decoration: BoxDecoration(
+                                      //               borderRadius:
+                                      //                   BorderRadius.circular(
+                                      //                       10),
+                                      //               color: Colors.white,
+                                      //               border: Border.all(
+                                      //                   color: colors.primary)
+                                      //               // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                      //               ),
+                                      //           child: _currentlocationimage !=
+                                      //                   null
+                                      //               ? Image.file(
+                                      //                   _currentlocationimage!
+                                      //                       .absolute,
+                                      //                   fit: BoxFit.fill,
+                                      //                 )
+                                      //               : const Icon(
+                                      //                   Icons
+                                      //                       .file_upload_outlined,
+                                      //                   color: colors.secondary,
+                                      //                   size: 50,
+                                      //                 ),
+                                      //         ),
+                                      //       ),
+                                      //     ),
+                                      //   ],
+                                      // ),
                                       // Card(
                                       //   child: InkWell(
                                       //     onTap: (){
@@ -1642,7 +1644,7 @@ class _MyProfileState extends State<MyProfile> {
                                                           fit: BoxFit.fill,
                                                         )
                                                       : Image.network(
-                                                      "https://developmentalphawizz.com/hojayega${selfiImage!}",
+                                                          "https://developmentalphawizz.com/hojayega${selfiImage!}",
                                                           fit: BoxFit.fill,
                                                         )),
                                             ),
@@ -1761,7 +1763,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                                "https://developmentalphawizz.com/hojayega${shopImage!}",
+                                                "https://developmentalphawizz.com/hojayega/${shopImage!}",
                                                 fit: BoxFit.fill,
                                               )),
                                   ),
@@ -1799,7 +1801,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                              "https://developmentalphawizz.com/hojayega${panImage!}",
+                                                "https://developmentalphawizz.com/hojayega${panImage!}",
                                                 fit: BoxFit.fill,
                                               )),
                                   ),
@@ -1837,7 +1839,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                             "https://developmentalphawizz.com/hojayega$adhaarFront",
+                                                "https://developmentalphawizz.com/hojayega$adhaarFront",
                                                 fit: BoxFit.fill,
                                               )),
                                   ),
@@ -1859,25 +1861,25 @@ class _MyProfileState extends State<MyProfile> {
                                   },
                                   child: Card(
                                     child: Container(
-                                        height: 120,
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: colors.primary)
-                                            // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                      height: 120,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white,
+                                          border:
+                                              Border.all(color: colors.primary)
+                                          // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                          ),
+                                      child: _image4 != null
+                                          ? Image.file(
+                                              _image4!.absolute,
+                                              fit: BoxFit.fill,
+                                            )
+                                          : Image.network(
+                                              "https://developmentalphawizz.com/hojayega${adhaarBack!}",
+                                              fit: BoxFit.fill,
                                             ),
-                                        child: _image4 != null
-                                            ? Image.file(
-                                                _image4!.absolute,
-                                                fit: BoxFit.fill,
-                                              )
-                                            : Image.network(
-                                          "https://developmentalphawizz.com/hojayega${adhaarBack!}",
-                                                fit: BoxFit.fill,
-                                              ),
                                     ),
                                   ),
                                 ),
@@ -1946,7 +1948,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                            "https://developmentalphawizz.com/hojayega${customerLocationImage!}",
+                                                "https://developmentalphawizz.com/hojayega/${customerLocationImage!}",
                                                 fit: BoxFit.fill)),
                                   ),
                                 ),
@@ -1994,7 +1996,7 @@ class _MyProfileState extends State<MyProfile> {
                                                 fit: BoxFit.fill,
                                               )
                                             : Image.network(
-                                          "https://developmentalphawizz.com/hojayega${selfiImage!}",
+                                                "https://developmentalphawizz.com/hojayega${selfiImage!}",
                                                 fit: BoxFit.fill,
                                               )),
                                   ),
@@ -2020,7 +2022,7 @@ class _MyProfileState extends State<MyProfile> {
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 .6,
-                                        child: Center(
+                                        child: const Center(
                                           child: Text(
                                             'Update Profile',
                                             style: TextStyle(

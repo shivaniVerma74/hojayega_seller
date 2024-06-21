@@ -849,7 +849,7 @@ class _PickDropState extends State<PickDrop> {
         //
         //     title: const Text('Pick & Drop'),
         //     backgroundColor: colors.primary),
-        backgroundColor: Color(0xffE2EBFE), //colors.bgColor,
+        backgroundColor: const Color(0xffE2EBFE), //colors.bgColor,
         body: SingleChildScrollView(
           child: Padding(
             padding:
@@ -1262,7 +1262,7 @@ class _PickDropState extends State<PickDrop> {
                       setState(() {
                         selectTimeslot = newValue;
                         time_id = newValue?.id.toString();
-                        timefrom ="${newValue?.fromTime.toString()}-${newValue?.toTime.toString()}";
+                        timefrom ="${newValue?.stateTime.toString()}-${newValue?.endTime.toString()}";
                         print("time from=======$timefrom time id is $time_id===============");
                       });
                     },
@@ -1272,7 +1272,7 @@ class _PickDropState extends State<PickDrop> {
                         child: SizedBox(
                             width:
                             MediaQuery.of(context).size.width / 1.5,
-                            child: Text("${orderitem.fromTime.toString()} - ${orderitem.toTime.toString()}",
+                            child: Text("${orderitem.stateTime.toString()} - ${orderitem.endTime.toString()}",
                               style: const TextStyle(
                                   color: colors.secondary),
                               overflow: TextOverflow.ellipsis,

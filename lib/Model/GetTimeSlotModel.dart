@@ -34,28 +34,44 @@ class GetTimeSlotModel {
 
 class TimeSlotListBooking {
   String id;
-  String fromTime;
-  String toTime;
+  String stateTime;
+  String endTime;
+  String price;
+  DateTime createAt;
+  DateTime updateAt;
   String status;
+  String type;
 
   TimeSlotListBooking({
     required this.id,
-    required this.fromTime,
-    required this.toTime,
+    required this.stateTime,
+    required this.endTime,
+    required this.price,
+    required this.createAt,
+    required this.updateAt,
     required this.status,
+    required this.type,
   });
 
   factory TimeSlotListBooking.fromJson(Map<String, dynamic> json) => TimeSlotListBooking(
     id: json["id"],
-    fromTime: json["from_time"],
-    toTime: json["to_time"],
+    stateTime: json["state_time"],
+    endTime: json["end_time"],
+    price: json["price"],
+    createAt: DateTime.parse(json["create_at"]),
+    updateAt: DateTime.parse(json["update_at"]),
     status: json["status"],
+    type: json["type"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
-    "from_time": fromTime,
-    "to_time": toTime,
+    "state_time": stateTime,
+    "end_time": endTime,
+    "price": price,
+    "create_at": createAt.toIso8601String(),
+    "update_at": updateAt.toIso8601String(),
     "status": status,
+    "type": type,
   };
 }

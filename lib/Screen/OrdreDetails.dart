@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
-import 'package:http/http.dart' as http;
 import '../Model/FestivalModel.dart';
 import '../Model/GetTimeSlotModel.dart';
 import '../Model/GetVendorOrderModel.dart';
@@ -24,22 +25,27 @@ class _OrderDetailsState extends State<OrderDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    print("time slott ${widget.model?.vendorLat.toString()}");
     getVehicle();
     addToRow();
     getTimeSlot();
-
-    for (var i = 0; i< (widget.model?.orderItems?.length ?? 0);i++){
-      rows[i][0] = widget.model?.orderItems?[i].qty ??"0";
-      rows[i][1] = widget.model?.orderItems?[i].productPrice ?? "0";
-
+    for (var i = 0; i < (widget.model?.orderItems?.length ?? 0); i++) {
+      rows[i][0] = widget.model?.orderItems?[i].qty ?? "0";
+      rows[i][1] = widget.model?.orderItems?[i].sellingPrice ?? "0";
     }
-    double tempTotal = widget.model?.orderItems?.fold(0.0, (previousValue, element) => previousValue! + double.parse(element.productPrice  ?? '0.0')) ?? 0.0;
+    double tempTotal = widget.model?.orderItems?.fold(
+            0.0,
+            (previousValue, element) =>
+                previousValue! + double.parse(element.sellingPrice ?? '0.0')) ??
+        0.0;
     // double tempTotal = widget.model?.orderItems.
     print("total temp is $tempTotal");
     totalPrice = tempTotal.toStringAsFixed(0);
+    discountAmt = tempTotal.toStringAsFixed(0);
     deliverychargesController.text = widget.model?.deliveryCharge ?? "";
     disController.text = widget.model?.discount ?? "";
-    totalController.text = "${int.parse(widget.model?.orderItems?.first.qty.toString() ?? "0") * double.parse(widget.model?.orderItems?.first.productPrice.toString() ?? "0.0") ?? ""}";
+    totalController.text =
+        "${int.parse(widget.model?.orderItems?.first.qty.toString() ?? "0") * double.parse(widget.model?.orderItems?.first.sellingPrice.toString() ?? "0.0") ?? ""}";
   }
 
   String? vendorId;
@@ -65,12 +71,12 @@ class _OrderDetailsState extends State<OrderDetails> {
     // ... more rows
   ];
 
-   addToRow(){
-     for(var i = 0; i < (widget.model?.orderItems?.length??0); i++){
-       rows.add(["u_R${i+1}","p_R${i+1}", "s_R${i+1}"]);
-     }
-     debugPrint("rows_____ $rows");
-   }
+  addToRow() {
+    for (var i = 0; i < (widget.model?.orderItems?.length ?? 0); i++) {
+      rows.add(["u_R${i + 1}", "p_R${i + 1}", "s_R${i + 1}"]);
+    }
+    debugPrint("rows_____ $rows");
+  }
 
   updateOrderItem(i) async {
     debugPrint("rowssssss ${rows[i]}");
@@ -85,11 +91,11 @@ class _OrderDetailsState extends State<OrderDetails> {
     request.fields.addAll({
       'user_id': vendorId.toString(),
       'type': '1',
-      'product_id': widget.model?.orderItems?[i].productId.toString()?? "",
+      'product_id': widget.model?.orderItems?[i].productId.toString() ?? "",
       'qty': rows[i][0],
       'price': rows[i][1],
       'sub_total': rows[i][2],
-      "order_id": widget.model?.orderId.toString()?? "",
+      "order_id": widget.model?.orderId.toString() ?? "",
     });
     print('update order itemsss para ${request.fields}');
     request.headers.addAll(headers);
@@ -119,7 +125,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       'time': timefrom,
       'promo_code': '1',
       'final_total': overRollAmt.toString(),
-       // 'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
+      // 'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
       'vehicle_type': vehicleId.toString(),
       // 'total': finalTotal.toString(),
       'time_id': time_id.toString(),
@@ -198,11 +204,14 @@ class _OrderDetailsState extends State<OrderDetails> {
   }
 
   FestivalModel? festivalModel;
-  checkFestive() async{
+  checkFestive() async {
     var headers = {
       'Cookie': 'ci_session=357aeaa9c34813410a247f64361084193b7c4337'
     };
-    var request = http.Request('POST', Uri.parse('https://developmentalphawizz.com/hojayega/Vendorapi/check_festival'));
+    var request = http.Request(
+        'POST',
+        Uri.parse(
+            'https://developmentalphawizz.com/hojayega/Vendorapi/check_festival'));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -213,51 +222,51 @@ class _OrderDetailsState extends State<OrderDetails> {
         festivalModel = finalResult;
         setState(() {});
       });
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
 
-String? delCharge;
+  String? delCharge;
   Future<void> deliveryCharge({required String vType}) async {
     try {
-    var headers = {
-      'Cookie': 'ci_session=a4cf635dc882bdf7680025f3bdfc1b0dc4027b0b'
-    };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.deliveryChargeByDistance));
-    request.fields.addAll({
-      'res_lat': '${widget.model?.vendorLat.toString()}',
-      'res_lang': '${widget.model?.vendorLang.toString()}',
-      'latitude': '${widget.model?.lat.toString()}',
-      'longitude': '${widget.model?.lang.toString()}',
-      'vehicle_type': vehicleId.toString(),
-      // 'vehicle_type': (vehicleItem.indexOf(vType) + 1).toString(),
-      'time_slot_id': time_id.toString(),
-      'product_type': (productitem.indexOf(selectproducts.toString()) + 1).toString(),
-      'type': '1',
-      'order_type': (orderitem.indexOf(selectOrders.toString()) + 1).toString(),
-    });
-    print("delivery cahrge para ${request.fields}");
-    request.headers.addAll(headers);
-    http.StreamedResponse response = await request.send();
-    if (response.statusCode == 200) {
-      var result = await response.stream.bytesToString();
-      var finalresult = jsonDecode(result.toString());
-      delCharge = finalresult["data"];
-      setState(() {});
-      print("delivery charge is ${delCharge.toString()}");
-      print("final result  in delivery${finalresult["message"]}");
-      Fluttertoast.showToast(msg: finalresult['message']);
-    }
-    else {
-    print(response.reasonPhrase);
-    }}
-    catch (e) {
-    throw Exception(e);
+      var headers = {
+        'Cookie': 'ci_session=a4cf635dc882bdf7680025f3bdfc1b0dc4027b0b'
+      };
+      var request = http.MultipartRequest(
+          'POST', Uri.parse(ApiServicves.deliveryChargeByDistance));
+      request.fields.addAll({
+        'res_lat': '${widget.model?.vendorLat.toString()}',
+        'res_lang': '${widget.model?.vendorLang.toString()}',
+        'latitude': '${widget.model?.lat.toString()}',
+        'longitude': '${widget.model?.lang.toString()}',
+        'vehicle_type': vehicleId.toString(),
+        // 'vehicle_type': (vehicleItem.indexOf(vType) + 1).toString(),
+        'time_slot_id': time_id.toString(),
+        'product_type':
+            (productitem.indexOf(selectproducts.toString()) + 1).toString(),
+        'type': '1',
+        'order_type': selectVal.toString(),
+        // 'order_type': (orderitem.indexOf(selectOrders.toString()) + 1).toString(),
+      });
+      print("delivery cahrge para ${request.fields}");
+      request.headers.addAll(headers);
+      http.StreamedResponse response = await request.send();
+      if (response.statusCode == 200) {
+        var result = await response.stream.bytesToString();
+        var finalresult = jsonDecode(result.toString());
+        delCharge = finalresult["data"];
+        setState(() {});
+        print("delivery charge is ${delCharge.toString()}");
+        print("final result  in delivery${finalresult["message"]}");
+        Fluttertoast.showToast(msg: finalresult['message']);
+      } else {
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      throw Exception(e);
     }
   }
-
 
   // var vehicleItem = [
   //   'Bike',
@@ -266,7 +275,6 @@ String? delCharge;
   //   'Taxi',
   //   'Truck',
   // ];
-
 
   var selectBikeType;
   var bikeType = [
@@ -283,6 +291,8 @@ String? delCharge;
   String? disAmt;
 
   String? selectproducts;
+  String? selectVal;
+
   var orderitem = [
     'Cake/Fragile',
     'Cooked Meal',
@@ -296,21 +306,22 @@ String? delCharge;
     var headers = {
       'Cookie': 'ci_session=a13b5d98bb1165c193782ed72de9bf712b5ece9e'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vehicleList));
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.vehicleList));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     var json = jsonDecode(await response.stream.bytesToString());
     if (response.statusCode == 200) {
       vehicleItem = VehicleModel.fromJson(json);
       setState(() {});
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
 
   getCurrentOrders() {
-    print("sssss@@@@@@@@@@@@${widget.model?.orderItems?[0].subtotal}===========");
+    print(
+        "sssss@@@@@@@@@@@@${widget.model?.orderItems?[0].subtotal}===========");
     return Column(
       children: [
         // ListView.builder(
@@ -346,7 +357,9 @@ String? delCharge;
                       Container(
                         width: 20,
                         height: 20,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.primary),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: colors.primary),
                         child: Image.asset("assets/images/nmae.png"),
                       ),
                       Text(
@@ -359,7 +372,9 @@ String? delCharge;
                       Container(
                         width: 20,
                         height: 20,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.primary),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: colors.primary),
                         child: Image.asset("assets/images/calenders.png"),
                       ),
                       Text(
@@ -485,7 +500,7 @@ String? delCharge;
 
                 ListView.builder(
                   shrinkWrap: true,
-                  itemCount:widget.model?.orderItems?.length ?? 0,
+                  itemCount: widget.model?.orderItems?.length ?? 0,
                   itemBuilder: (c, i) {
                     return Padding(
                       padding: const EdgeInsets.only(left: 5, right: 2),
@@ -508,7 +523,9 @@ String? delCharge;
                                             ),
                                             color: Colors.white),
                                         child: Image.network(
-                                            "${widget.model?.orderItems?[i].productImage}", fit: BoxFit.fill,)),
+                                          "${widget.model?.orderItems?[i].productImage}",
+                                          fit: BoxFit.fill,
+                                        )),
                                   ),
                                   const SizedBox(
                                     width: 5,
@@ -541,7 +558,7 @@ String? delCharge;
                                 // rows[i][1].toString() == 'p_R${i + 1}'
                                 //     ? "${widget.model?.orderItems?[i].subtotal} Rs."
                                 //     : rows[i][1],
-                                widget.model?.orderItems?[i].productPrice ??'',
+                                widget.model?.orderItems?[i].sellingPrice ?? '',
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(color: colors.primary),
                               ),
@@ -563,8 +580,10 @@ String? delCharge;
                               // ),
                               InkWell(
                                 onTap: () {
-                                   // var sellingPrice = int.parse(widget.model?.orderItems?[i].qty.toString() ?? "0") * double.parse(widget.model?.orderItems?[i].productPrice.toString() ??"0");
-                                    productPriceController.text = widget.model?.orderItems?[i].productPrice ?? "";
+                                  // var sellingPrice = int.parse(widget.model?.orderItems?[i].qty.toString() ?? "0") * double.parse(widget.model?.orderItems?[i].productPrice.toString() ??"0");
+                                  productPriceController.text = widget
+                                          .model?.orderItems?[i].sellingPrice ??
+                                      "";
                                   // unitController.text = rows[i][0].toString() ?? "";
                                   // productPriceController.text =  rows[i][1].toString();
                                   // unitController.clear();
@@ -702,16 +721,17 @@ String? delCharge;
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       // Image.asset("assets/images/edit.png"),
-                      totalPrice == null || totalPrice =="" ?  Text(
-                        "Total = ${totalAmount.toString()}",
-                        style: const TextStyle(color: colors.primary),
-                      ):
-                      Text(
-                        // "Total = ${rows[0][2]}",
-                        // "Total = ${int.parse(widget.model?.orderItems?[0].qty.toString() ?? "0") *double.parse(widget.model?.orderItems?[0].productPrice.toString() ?? "0.0")}",
-                        "Total = ${totalPrice.toString()}Rs",
-                        style: const TextStyle(color: colors.primary),
-                      ),
+                      totalPrice == null || totalPrice == ""
+                          ? Text(
+                              "Total = ${totalAmount.toString()}",
+                              style: const TextStyle(color: colors.primary),
+                            )
+                          : Text(
+                              // "Total = ${rows[0][2]}",
+                              // "Total = ${int.parse(widget.model?.orderItems?[0].qty.toString() ?? "0") *double.parse(widget.model?.orderItems?[0].productPrice.toString() ?? "0.0")}",
+                              "Total = ${totalPrice.toString()}Rs",
+                              style: const TextStyle(color: colors.primary),
+                            ),
                     ],
                   ),
                 ),
@@ -726,7 +746,6 @@ String? delCharge;
                       InkWell(
                         onTap: () {
                           _showEditDialog(disController, "Discount");
-
                         },
                         child: Image.asset("assets/images/edit.png"),
                       ),
@@ -748,14 +767,18 @@ String? delCharge;
                         color: const Color(0xffE5CB24),
                       ),
                       child: Center(
-                        child: discountAmt == null || discountAmt == "" ? const Text("DiscountAmount = 0.0"):
-                        Padding(
-                          padding: const EdgeInsets.only(left: 2),
-                          child: Text(
-                            "DiscountAmount = $discountAmt Rs",
-                            style: const TextStyle(fontSize: 15, color: colors.primary),
-                          ),
-                        ),
+                        child: discountvalue == null ||
+                                discountvalue == "" ||
+                                discountvalue == "0.0"
+                            ? const Text("DiscountAmount = 0.0")
+                            : Padding(
+                                padding: const EdgeInsets.only(left: 2),
+                                child: Text(
+                                  "DiscountAmount = $discountAmt Rs",
+                                  style: const TextStyle(
+                                      fontSize: 13, color: colors.primary),
+                                ),
+                              ),
                       ),
                     ),
                   ],
@@ -771,8 +794,7 @@ String? delCharge;
                     children: const [
                       Text("Time Slot",
                           style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold)),
+                              fontSize: 17, fontWeight: FontWeight.bold)),
                       Text("",
                           style: TextStyle(
                               fontSize: 1, fontWeight: FontWeight.w400))
@@ -787,23 +809,24 @@ String? delCharge;
                       Icons.keyboard_arrow_down_sharp,
                       color: colors.primary,
                     ),
-                    onChanged: ( newValue) {
+                    onChanged: (newValue) {
                       setState(() {
                         selectTimeslot = newValue;
                         time_id = newValue?.id.toString();
-                        timefrom ="From ${newValue?.fromTime.toString()} To ${newValue?.toTime.toString()}";
-                        print("time from=======$timefrom time id is $time_id===============");
+                        timefrom =
+                            "From ${newValue?.stateTime.toString()} To ${newValue?.endTime.toString()}";
+                        print(
+                            "time from=======$timefrom time id is $time_id===============");
                       });
                     },
                     items: timeSlot.map((TimeSlotListBooking orderitem) {
                       return DropdownMenuItem(
                         value: orderitem,
                         child: SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width / 1.5,
-                            child: Text("${orderitem.fromTime.toString()} - ${orderitem.toTime.toString()}",
-                              style: const TextStyle(
-                                  color: colors.secondary),
+                            width: MediaQuery.of(context).size.width / 1.5,
+                            child: Text(
+                              "${orderitem.stateTime.toString()} - ${orderitem.endTime.toString()}",
+                              style: const TextStyle(color: colors.secondary),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             )),
@@ -813,7 +836,7 @@ String? delCharge;
                         contentPadding: EdgeInsets.all(10),
                         border: OutlineInputBorder(
                             borderRadius:
-                            BorderRadius.all(Radius.circular(10))),
+                                BorderRadius.all(Radius.circular(10))),
                         hintText: 'Select Time Slot',
                         hintStyle: TextStyle(color: colors.primary),
                         filled: true,
@@ -867,10 +890,10 @@ String? delCharge;
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
-                      Text("Product Type",
+                      Text(
+                        "Product Type",
                         style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold),
+                            fontSize: 17, fontWeight: FontWeight.bold),
                       ),
                       Text("",
                           style: TextStyle(
@@ -898,8 +921,7 @@ String? delCharge;
                         value: orderitem,
                         child: Text(
                           orderitem.toString(),
-                          style:
-                          const TextStyle(color: colors.secondary),
+                          style: const TextStyle(color: colors.secondary),
                         ),
                       );
                     }).toList(),
@@ -907,7 +929,7 @@ String? delCharge;
                         contentPadding: EdgeInsets.all(10),
                         border: OutlineInputBorder(
                             borderRadius:
-                            BorderRadius.all(Radius.circular(10))),
+                                BorderRadius.all(Radius.circular(10))),
                         hintText: 'Select Product Type',
                         hintStyle: TextStyle(color: colors.primary),
                         filled: true,
@@ -925,8 +947,7 @@ String? delCharge;
                     children: const [
                       Text("Order Type",
                           style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold)),
+                              fontSize: 17, fontWeight: FontWeight.bold)),
                       Text("",
                           style: TextStyle(
                               fontSize: 1, fontWeight: FontWeight.w400))
@@ -944,24 +965,34 @@ String? delCharge;
                     onChanged: (String? newValue) {
                       setState(() {
                         selectproducts = newValue!;
-                        print("===my technic=======$selectOrders===============");
+                        print(
+                            "===my technic ${selectVal}=======$selectOrders ======");
                       });
+                      print("jdddddddddddddddd $selectproducts");
+                      if (selectproducts == "Flexible") {
+                        selectVal = "4";
+                      } else if (selectproducts == "Urgent") {
+                        selectVal = "5";
+                      } else if (selectproducts == "2 Way") {
+                        selectVal = "6";
+                      } else {
+                        selectVal = "7";
+                      }
                     },
                     items: productitem.map((String orderitem) {
                       return DropdownMenuItem(
                         value: orderitem,
                         child: Text(
                           orderitem.toString(),
-                          style:
-                          const TextStyle(color: colors.secondary),
+                          style: const TextStyle(color: colors.secondary),
                         ),
                       );
                     }).toList(),
                     decoration: const InputDecoration(
                         contentPadding: EdgeInsets.all(10),
                         border: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(10),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
                           ),
                         ),
                         hintText: 'Select Order Type',
@@ -979,8 +1010,7 @@ String? delCharge;
                     children: const [
                       Text("Vehicle Type",
                           style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold)),
+                              fontSize: 17, fontWeight: FontWeight.bold)),
                       Text("",
                           style: TextStyle(
                               fontSize: 1, fontWeight: FontWeight.w400))
@@ -1000,23 +1030,29 @@ String? delCharge;
                       vehicleId = selectedVehicle?.id.toString();
                       await deliveryCharge(vType: selectedVehicle.toString());
                       double? numericValue = double.parse(discountAmt ?? "0.0");
+                      double? numericdiscountValue =
+                          double.parse(discountvalue ?? "0.0");
                       double? delValue = double.parse(delCharge ?? "0.0");
-                      double? result = numericValue+ delValue;
+                      double? result = numericValue + delValue;
                       finalTotal = result.toString();
                       double? total = double.parse(totalPrice ?? "0.0");
-                      overRollAmt = total + delValue;
+                      overRollAmt = total + delValue - numericdiscountValue;
                       setState(() {});
-                      print("final total is ${finalTotal.toString()} total herere $overRollAmt");
+                      print(
+                          "final total is ${finalTotal.toString()} total herere $overRollAmt");
                     },
                     items: vehicleItem?.data?.map((VehicleData orderitem) {
                       return DropdownMenuItem(
                         value: orderitem,
-                        child: Image.network("https://developmentalphawizz.com/hojayega/${orderitem.image}"),
+                        child: Image.network(
+                            "https://developmentalphawizz.com/hojayega/${orderitem.image}"),
                       );
                     }).toList(),
                     decoration: const InputDecoration(
                         contentPadding: EdgeInsets.all(10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
                           ),
                         ),
                         hintText: 'Select Vehicle Type',
@@ -1251,23 +1287,23 @@ String? delCharge;
                 Padding(
                   padding: const EdgeInsets.only(left: 8, right: 5),
                   child:
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     InkWell(
-                  //       onTap: () {
-                  //         _showEditDialog(deliverychargesController,
-                  //             "Delivery Charge as per Km ");
-                  //       },
-                  //       child: Image.asset("assets/images/edit.png"),
-                  //     ),
-                  //     Text(
-                  //       "Delivery Charge as per Km = ${deliverychargesController.text}rs",
-                  //       style: const TextStyle(color: colors.primary),
-                  //     ),
-                  //   ],
-                  // ),
-                  Row(
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     InkWell(
+                      //       onTap: () {
+                      //         _showEditDialog(deliverychargesController,
+                      //             "Delivery Charge as per Km ");
+                      //       },
+                      //       child: Image.asset("assets/images/edit.png"),
+                      //     ),
+                      //     Text(
+                      //       "Delivery Charge as per Km = ${deliverychargesController.text}rs",
+                      //       style: const TextStyle(color: colors.primary),
+                      //     ),
+                      //   ],
+                      // ),
+                      Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       // Image.asset("assets/images/edit.png"),
@@ -1275,11 +1311,14 @@ String? delCharge;
                         "Delivery Charge as per Km = ",
                         style: TextStyle(color: colors.primary),
                       ),
-                      delCharge == null || delCharge == "" ? const Text("0.0") :
-                      Text(
-                        "${delCharge.toString()}Rs",
-                        style: const TextStyle(color: colors.primary, fontWeight: FontWeight.bold),
-                      ),
+                      delCharge == null || delCharge == ""
+                          ? const Text("0.0")
+                          : Text(
+                              "${delCharge.toString()}Rs",
+                              style: const TextStyle(
+                                  color: colors.primary,
+                                  fontWeight: FontWeight.bold),
+                            ),
                     ],
                   ),
                 ),
@@ -1314,24 +1353,32 @@ String? delCharge;
                         height: 30,
                         width: 140,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(0),
-                            color: const Color(0xffE5CB24),
+                          borderRadius: BorderRadius.circular(0),
+                          color: const Color(0xffE5CB24),
                         ),
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.only(left: 5),
-                            child:
-                            Row(
+                            child: Row(
                               children: [
                                 const Text(
                                   "SubTotal= ",
-                                  style: TextStyle(fontSize: 15, color: colors.primary),
+                                  style: TextStyle(
+                                      fontSize: 15, color: colors.primary),
                                 ),
-                                finalTotal == null || finalTotal == "" || finalTotal == "0.0" ?  Text("$totalPrice RS.", style: const TextStyle(fontSize: 15, color: colors.primary)):
-                                Text(
-                                  "${overRollAmt.toString()} Rs.",
-                                  style: const TextStyle(fontSize: 15, color: colors.primary),
-                                ),
+                                finalTotal == null ||
+                                        finalTotal == "" ||
+                                        finalTotal == "0.0"
+                                    ? Text("$discountAmt RS.",
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            color: colors.primary))
+                                    : Text(
+                                        "${overRollAmt.toString()} Rs.",
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            color: colors.primary),
+                                      ),
                               ],
                             ),
                           ),
@@ -1345,35 +1392,37 @@ String? delCharge;
                 ),
                 Center(
                   child: InkWell(
-                        onTap: () {
-                          // acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
-                          if(timefrom == null || selectTimeslot == null){
-                            Fluttertoast.showToast(msg: "Please Select Time Slot");
-                          }
-                          else if (selectedVehicle == null){
-                            Fluttertoast.showToast(msg: "Please Select Vehicle Type");
-                          }
-                          else {
-                            setState(() {
-                              updateOrder();
-                            });
-                          }
-                        },
-                        child: Container(
-                          height: 40,
-                          width: 110,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: colors.secondary),
-                          child: const Center(
-                            child: Text(
-                              "Send", style: TextStyle(
-                                fontSize: 16, color: colors.whiteTemp, fontWeight: FontWeight.bold),
-                            ),
-                          ),
+                    onTap: () {
+                      // acceptRejectOrders(vendorOrderModel?.orders?[i].orderId);
+                      if (timefrom == null || selectTimeslot == null) {
+                        Fluttertoast.showToast(msg: "Please Select Time Slot");
+                      } else if (selectedVehicle == null) {
+                        Fluttertoast.showToast(
+                            msg: "Please Select Vehicle Type");
+                      } else {
+                        setState(() {
+                          updateOrder();
+                        });
+                      }
+                    },
+                    child: Container(
+                      height: 40,
+                      width: 110,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: colors.secondary),
+                      child: const Center(
+                        child: Text(
+                          "Send",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: colors.whiteTemp,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
-                   ),
+                    ),
+                  ),
+                ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -1386,6 +1435,7 @@ String? delCharge;
   }
 
   String? discountAmt;
+  String? discountvalue = "0.0";
   String? finalTotal;
   double? overRollAmt;
   void _showEditDialog(TextEditingController controller, String fieldName) {
@@ -1410,29 +1460,33 @@ String? delCharge;
               onPressed: () {
                 double? numericValue = double.tryParse(totalPrice ?? "");
                 double? inputValue = double.tryParse(controller.text);
-                double? result = double.parse(numericValue.toString()) - inputValue!;
+                double? result =
+                    double.parse(numericValue.toString()) - inputValue!;
+                discountvalue = inputValue.toString();
                 discountAmt = result.toString();
+                overRollAmt =
+                    double.parse(numericValue.toString()) - inputValue;
                 print("dis amount is $discountAmt");
-                  setState(() {
-                    // controller.text = controller.text;
-                  });
+                setState(() {
+                  // controller.text = controller.text;
+                });
                 // disController.clear();
-                  // switch(fieldName){
-                  //   case "Total":
-                  //     setState(() {
-                  //       totalPrice = controller.text;
-                  //     });
-                  //     break;
-                  //   case "Discount":
-                  //     setState(() {
-                  //       discount = controller.text;
-                  //     });
-                  //     break;
-                  //   default :
-                  //     setState(() {
-                  //       deliveryChargePerKM = controller.text;
-                  //     });
-                  // }
+                // switch(fieldName){
+                //   case "Total":
+                //     setState(() {
+                //       totalPrice = controller.text;
+                //     });
+                //     break;
+                //   case "Discount":
+                //     setState(() {
+                //       discount = controller.text;
+                //     });
+                //     break;
+                //   default :
+                //     setState(() {
+                //       deliveryChargePerKM = controller.text;
+                //     });
+                // }
                 Navigator.of(context).pop();
               },
               child: const Text('Save'),
@@ -1445,7 +1499,6 @@ String? delCharge;
 
   void _showEditDialog12(
     TextEditingController productPriceController,
-
     int i,
   ) {
     showDialog(
@@ -1466,6 +1519,9 @@ String? delCharge;
                   controller: productPriceController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: "Product Price"),
+                  onChanged: (value) {
+                    print(value);
+                  },
                 ),
                 // TextField(
                 //   controller: sellingPriceController,
@@ -1490,13 +1546,18 @@ String? delCharge;
                   // rows[i][0] = unitController.text;
                   // rows[i][1] = productPriceController.text;
                   //rows[i][2] = (double.parse(unitController.text) * double.parse(productPriceController.text) ).toString();
-                  widget.model?.orderItems?[i].productPrice= productPriceController.text;
-                  double tempTotal = widget.model?.orderItems?.fold(0.0, (previousValue, element) => previousValue! + double.parse(element.productPrice  ?? '0.0')) ?? 0.0;
+                  widget.model?.orderItems?[i].sellingPrice =
+                      productPriceController.text;
+                  double tempTotal = widget.model?.orderItems?.fold(
+                          0.0,
+                          (previousValue, element) =>
+                              previousValue! +
+                              double.parse(element.sellingPrice ?? '0.0')) ??
+                      0.0;
                   // double tempTotal = widget.model?.orderItems.
                   print("total temp is $tempTotal");
-                  
                   totalPrice = tempTotal.toStringAsFixed(0);
-
+                  discountAmt = tempTotal.toStringAsFixed(0);
                   // productPriceController.text=productPriceController.text;
                   // sellingPriceController.text=sellingPriceController.text;
                   // widget.model?.orderItems?[i].unit = unitController.text;

@@ -394,7 +394,7 @@ TextEditingController amtCtr = TextEditingController();
                             ],
                           ),
                         ),
-                        earningData?.products?.length == null || earningData?.products?.length == ""
+                        earningData?.status == "0" || earningData?.products?.length == ""
                             ? const Center(
                           child: Text("Data Not Found", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
                         ):
@@ -484,6 +484,9 @@ TextEditingController amtCtr = TextEditingController();
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),
                                           ),
+                                          earningData?.totalEarning == null || earningData?.totalEarning =="" ? Text("0.0" , style: const TextStyle(
+                                            color: Colors.white,
+                                          ),):
                                           Text(
                                             '₹ ${earningData?.totalEarning}',
                                             style: const TextStyle(
@@ -519,6 +522,9 @@ TextEditingController amtCtr = TextEditingController();
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),
                                           ),
+                                          earningData?.cod == null || earningData?.cod =="" ? Text("0.0", style: TextStyle(
+                                            color: Colors.white,
+                                          ),):
                                           Text(
                                             '₹ ${earningData?.cod}',
                                             style: const TextStyle(

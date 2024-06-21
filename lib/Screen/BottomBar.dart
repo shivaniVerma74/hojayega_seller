@@ -1,15 +1,17 @@
-
 import 'dart:convert';
 
 import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hojayega_seller/Screen/AllCategory.dart';
 import 'package:hojayega_seller/Screen/BusinessCard.dart';
 import 'package:hojayega_seller/Screen/Calender.dart';
 import 'package:hojayega_seller/Screen/DeliveryCard.dart';
 import 'package:hojayega_seller/Screen/MyProfile.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/appButton.dart';
@@ -18,6 +20,7 @@ import '../Model/GetProfileModel.dart';
 import 'Earning.dart';
 import 'Help.dart';
 import 'HomeScreen.dart';
+import 'MyPickDrop.dart';
 import 'Orders.dart';
 import 'PendingBooking.dart';
 import 'PendingOrders.dart';
@@ -25,7 +28,6 @@ import 'Pick&Drop.dart';
 import 'PromotionAdds.dart';
 import 'Settings.dart';
 import 'notificationScreen.dart';
-import 'package:http/http.dart' as http;
 
 class BottomNavBar extends StatefulWidget {
   int? dIndex;
@@ -41,14 +43,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final GlobalKey<ScaffoldState> _key = GlobalKey(); // Create a key
   @override
   void initState() {
-    int? index=0;
-    if (index ==0) {
+    int? index = 0;
+    if (index == 0) {
       setState(() {
-        selectedIndex =0;
+        selectedIndex = 0;
       });
-      _child =  selectedIndex== 0
-          ? HomeScreen():
-      Container();
+      _child = selectedIndex == 0 ? HomeScreen() : Container();
     } else {
       _child = Container();
     }
@@ -88,15 +88,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
       'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
     };
     var request =
-    http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
     request.fields.addAll({'user_id': vendorId.toString()});
-    debugPrint("get profile parametersssss ${request.fields}");
+    debugPrint("get profile parameters ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = GetProfileModel.fromJson(json.decode(finalResponse));
-      print("profile data responsee $finalResult");
+      print("profile data response $finalResult");
       setState(() {
         profileData = finalResult;
         vendorEmail = profileData?.data?.first.email.toString();
@@ -110,18 +110,18 @@ class _BottomNavBarState extends State<BottomNavBar> {
     }
   }
 
-  var onOf = true ;
+  var onOf = true;
 
   Future<void> shopStatus() async {
-     SharedPreferences preferences = await SharedPreferences.getInstance();
-    vendorId = preferences.getString('vendorId');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
     var headers = {
       'Cookie': 'ci_session=f02741f77bb53eeaf1a6be0a045cb6f11b68f1a6'
     };
     var request =
-    http.MultipartRequest('POST', Uri.parse(ApiServicves.onOffStatus));
-    request.fields.addAll(
-        {'user_id': '$vendorId', 'online_status': onOf ? '1' : '0'});
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.onOffStatus));
+    request.fields
+        .addAll({'user_id': '$vendorId', 'online_status': onOf ? '1' : '0'});
     print("=======online========${request.fields}======offline=====");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -134,497 +134,582 @@ class _BottomNavBarState extends State<BottomNavBar> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text("Confirm Exit"),
+                  content: const Text("Are you sure you want to exit?"),
+                  actions: <Widget>[
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: colors.primary),
+                      child: const Text("YES"),
+                      onPressed: () {
+                        SystemNavigator.pop();
+                      },
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: colors.primary),
+                      child: const Text("NO"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              });
+          return true;
+        },
         child: Scaffold(
           key: _key,
           backgroundColor: colors.appbarColor,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(selectedIndex == 4||selectedIndex == 2 ? roll=="2"? 80:0 : 80),
+            preferredSize:
+                Size.fromHeight(selectedIndex == 4 || selectedIndex == 2
+                    ? roll == "2"
+                        ? 80
+                        : 0
+                    : 80),
             child: selectedIndex == 0
                 ? homeAppBar(
-              context,
-              text: "Home",
-              ontap: () {
-                _key.currentState!.openDrawer();
-              },
-            ): selectedIndex == 0
-                ? Container()
-                : PreferredSize(
-              preferredSize: const Size.fromHeight(80),
-              child: commonAppBar(
-                  context,
-                  text: selectedIndex == 0
-                      ? "Home" :
-                  roll == "2" ? selectedIndex == 3 ? "Pick & Drop": "Pending Order" : selectedIndex == 4 ? "Pick & Drop": roll == "2"?
-                  selectedIndex == 2 ? "Pending Booking": "My Bookings":"My Orders"
-              ),
-            ),
+                    context,
+                    text: "Home",
+                    ontap: () {
+                      _key.currentState!.openDrawer();
+                    },
+                  )
+                : selectedIndex == 0
+                    ? Container()
+                    : PreferredSize(
+                        preferredSize: const Size.fromHeight(80),
+                        child: commonAppBar(context,
+                            text: selectedIndex == 0
+                                ? "Home"
+                                : roll == "2"
+                                    ? selectedIndex == 3
+                                        ? "Pick & Drop"
+                                        : "Pending Order"
+                                    : selectedIndex == 4
+                                        ? "Pick & Drop"
+                                        : roll == "2"
+                                            ? selectedIndex == 2
+                                                ? "Pending Booking"
+                                                : "My Bookings"
+                                            : "My Orders"),
+                      ),
           ),
           body: _child,
           drawer: Drawer(
-            child: ListView(
-                children: [
-                  DrawerHeader(
-                    decoration: const BoxDecoration(
-                      // border: Border(bottom: BorderSide(color: Colors.black)),
-                        gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [Color(0xff112C48), Color(0xff112C48)])),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 30),
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 0,
-                              ),
-                              const CircleAvatar(
-                                backgroundImage: AssetImage(
-                                  "assets/images/bike.png",
+            child: ListView(children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  // border: Border(bottom: BorderSide(color: Colors.black)),
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [Color(0xff112C48), Color(0xff112C48)],
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30),
+                      child: Row(
+                        children: [
+                          const SizedBox(
+                            width: 0,
+                          ),
+                          profileData?.data?.first.shopImage == null ||
+                                  profileData?.data?.first.shopImage == ""
+                              ? const CircleAvatar(
+                                  backgroundImage: AssetImage(
+                                    "assets/images/bike.png",
+                                  ),
+                                  radius: 30,
+                                )
+                              : CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                    "https://developmentalphawizz.com/hojayega${profileData?.data?.first.shopImage}",
+                                  ),
+                                  radius: 30,
                                 ),
-                                radius: 30,
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '$vendorName',
+                                style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
                               ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                   Text(
-                                    '$vendorName',
-                                    style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                  ),
-                                  vendorEmail == null || vendorEmail == ""
-                                      ? const Text(
-                                    'Demo',
-                                    style: TextStyle(fontSize: 15, color: Colors.white),
-                                  ): Text(
-                                    '$vendorEmail',
-                                    style: const TextStyle(fontSize: 15, color: Colors.white),
-                                  ),
-                                ],
-                              ),
+                              vendorEmail == null || vendorEmail == ""
+                                  ? const Text(
+                                      'Demo',
+                                      style: TextStyle(
+                                          fontSize: 15, color: Colors.white),
+                                    )
+                                  : Text(
+                                      '$vendorEmail',
+                                      style: const TextStyle(
+                                          fontSize: 15, color: Colors.white),
+                                    ),
                             ],
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            onOf ? const Text("Online", style: TextStyle(color: colors.whiteTemp, fontSize: 15),) :
-                            const Text("Offline",style: TextStyle(color: colors.whiteTemp, fontSize: 15)),
-                            CupertinoSwitch(
-                                trackColor: onOf == true? Colors.green: Colors.red,
-                                value: onOf,
-                                onChanged: (value) {
-                                  setState(() {
-                                    onOf = value;
-                                    shopStatus();
-                                  });
-                                }
-                            ),
-                          ],
-                        )
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        onOf
+                            ? const Text(
+                                "Online",
+                                style: TextStyle(
+                                    color: colors.whiteTemp, fontSize: 15),
+                              )
+                            : const Text("Offline",
+                                style: TextStyle(
+                                    color: colors.whiteTemp, fontSize: 15)),
+                        CupertinoSwitch(
+                            trackColor:
+                                onOf == true ? Colors.green : Colors.red,
+                            value: onOf,
+                            onChanged: (value) {
+                              setState(() {
+                                onOf = value;
+                                shopStatus();
+                              });
+                            }),
                       ],
                     ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
+                  ],
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MyProfile()),
+                  );
+                  setState(() {
+                    currentIndex = 1;
+                  });
+                },
+                child: DrawerIconTab(
+                  titlee: 'Profile',
+                  icon: Icons.person,
+                  tabb: 1,
+                  indexx: currentIndex,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              // InkWell(
+              //     onTap: () {
+              //       // Navigator.push(
+              //       //   context,
+              //       //   MaterialPageRoute(
+              //       //       builder: (context) => const  OfferJobWidget()),
+              //       // );
+              //       setState(() {
+              //         currentIndex = 2;
+              //       });
+              //     },
+              //     child: DrawerIconTab(
+              //         titlee: 'Product Portfolio',
+              //         icon: Icons.file_present_outlined,
+              //         tabb: 2,
+              //         indexx: currentIndex)),
+              // SizedBox(
+              //   height: 5,
+              // ),
+              // InkWell(
+              //     onTap: () {
+              //       // Navigator.push(
+              //       //   context,
+              //       //   MaterialPageRoute(builder: (context) => const CoursesPage()),
+              //       // );
+              //       setState(() {
+              //         currentIndex = 3;
+              //       });
+              //     },
+              //     child: DrawerIconTab(
+              //         titlee: 'Switch User',
+              //         icon: Icons.file_copy,
+              //         tabb: 3,
+              //         indexx: currentIndex)),
+              const SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const NotificationScreen()),
+                    );
+                    setState(() {
+                      currentIndex = 4;
+                    });
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'Notification',
+                    icon: Icons.notifications,
+                    tabb: 4,
+                    indexx: currentIndex,
+                  )),
+              SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                  onTap: () {
+                    setState(() {
+                      currentIndex = 5;
+                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const PromotionAdds()),
+                    );
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'Promotion & Adds',
+                    icon: Icons.file_copy,
+                    tabb: 5,
+                    indexx: currentIndex,
+                  )),
+              // SizedBox(
+              //   height: 5,
+              // ),
+              // InkWell(
+              //     onTap: () {
+              //       // Navigator.push(
+              //       //   context,
+              //       //   MaterialPageRoute(
+              //       //       builder: (context) => const PaymentHistoryPage()),
+              //       // );
+              //       setState(() {
+              //         currentIndex = 6;
+              //       });
+              //     },
+              //     child: DrawerIconTab(
+              //       titlee: 'Coupons',
+              //       icon: Icons.payment,
+              //       tabb: 6,
+              //       indexx: currentIndex,
+              //     )),
+              // SizedBox(
+              //   height: 5,
+              // ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Earning()),
+                  );
+                  setState(() {
+                    currentIndex = 7;
+                  });
+                },
+                child: DrawerIconTab(
+                  titlee: 'Earnings',
+                  icon: Icons.my_library_books_sharp,
+                  tabb: 7,
+                  indexx: currentIndex,
+                ),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              // InkWell(
+              //     onTap: () {
+              //       // Navigator.push(context, MaterialPageRoute(builder: (context) => const MyProfile()),);
+              //       setState(() {
+              //         currentIndex = 8;
+              //       });
+              //     },
+              //     child: DrawerIconTab(
+              //       titlee: 'Order history/Reports',
+              //       icon: Icons.history,
+              //       tabb: 8,
+              //       indexx: currentIndex,
+              //     )),
+              // const SizedBox(
+              //   height: 5,
+              // ),
+              // InkWell(
+              //   onTap: () {
+              //     // Navigator.push(
+              //     //   context,
+              //     //   MaterialPageRoute(builder: (context) => PrivacyPolicy()),
+              //     // );
+              //     setState(() {
+              //       currentIndex = 9;
+              //     });
+              //   },
+              //   child: DrawerIconTab(
+              //     titlee: 'Library',
+              //     icon: Icons.privacy_tip,
+              //     tabb: 9,
+              //     indexx: currentIndex,
+              //   ),
+              // ),
+              // const SizedBox(
+              //   height: 5,
+              // ),
+              // InkWell(
+              //     onTap: () {
+              //       // Navigator.push(
+              //       //   context,
+              //       //   MaterialPageRoute(
+              //       //       builder: (context) => const TermsConditionsWidget()),
+              //       // );
+              //       setState(() {
+              //         currentIndex = 10;
+              //       });
+              //       // share();
+              //     },
+              //     child: DrawerIconTab(
+              //       titlee: 'Automatic Booking',
+              //       icon: Icons.confirmation_num,
+              //       tabb: 10,
+              //       indexx: currentIndex,
+              //     )),
+              // SizedBox(
+              //   height: 5,
+              // ),
+              // InkWell(
+              //     onTap: () {
+              //       // Navigator.push(
+              //       //   context,
+              //       //   MaterialPageRoute(
+              //       //       builder: (context) => const FaqPage()),
+              //       // );
+              //
+              //       setState(() {
+              //         currentIndex = 11;
+              //       });
+              //     },
+              //     child: DrawerIconTab(
+              //       titlee: 'Track Order',
+              //       icon: Icons.question_answer,
+              //       tabb: 11,
+              //       indexx: currentIndex,
+              //     ),
+              // ),
+              // SizedBox(
+              //   height: 5,
+              // ),
+              InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const BusinessCard(walletAmount: "")),
+                    );
+                    setState(() {
+                      currentIndex = 12;
+                    });
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'Business Card',
+                    icon: Icons.credit_card,
+                    tabb: 12,
+                    indexx: currentIndex,
+                  )),
+              SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const DeliveryCard(walletAmount: "")),
+                    );
+                    setState(() {
+                      currentIndex = 13;
+                    });
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'Delivery Card',
+                    icon: Icons.credit_card,
+                    tabb: 13,
+                    indexx: currentIndex,
+                  )),
+              SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MyPickDrop()),
+                    );
+                    setState(() {
+                      currentIndex = 14;
+                    });
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'My Pick Drop',
+                    icon: Icons.my_library_books_sharp,
+                    tabb: 14,
+                    indexx: currentIndex,
+                  )),
+              SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Settings()),
+                    );
+                    setState(() {
+                      currentIndex = 15;
+                    });
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'Settings',
+                    icon: Icons.settings,
+                    tabb: 14,
+                    indexx: currentIndex,
+                  )),
+              const SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const MyProfile()  ),
-                      );
-                      setState(() {
-                        currentIndex = 1;
-                      });
-                    },
-                    child: DrawerIconTab(
-                      titlee: 'Profile',
-                      icon: Icons.person,
-                      tabb: 1,
-                      indexx: currentIndex,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  // InkWell(
-                  //     onTap: () {
-                  //       // Navigator.push(
-                  //       //   context,
-                  //       //   MaterialPageRoute(
-                  //       //       builder: (context) => const  OfferJobWidget()),
-                  //       // );
-                  //       setState(() {
-                  //         currentIndex = 2;
-                  //       });
-                  //     },
-                  //     child: DrawerIconTab(
-                  //         titlee: 'Product Portfolio',
-                  //         icon: Icons.file_present_outlined,
-                  //         tabb: 2,
-                  //         indexx: currentIndex)),
-                  // SizedBox(
-                  //   height: 5,
-                  // ),
-                  // InkWell(
-                  //     onTap: () {
-                  //       // Navigator.push(
-                  //       //   context,
-                  //       //   MaterialPageRoute(builder: (context) => const CoursesPage()),
-                  //       // );
-                  //       setState(() {
-                  //         currentIndex = 3;
-                  //       });
-                  //     },
-                  //     child: DrawerIconTab(
-                  //         titlee: 'Switch User',
-                  //         icon: Icons.file_copy,
-                  //         tabb: 3,
-                  //         indexx: currentIndex)),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const  NotificationScreen()),
-                        );
-                        setState(() {
-                          currentIndex = 4;
-                        });
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Notification',
-                        icon: Icons.notifications,
-                        tabb: 4,
-                        indexx: currentIndex,
-                      )),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        setState(() {
-                          currentIndex = 5;
-                        });
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const  PromotionAdds()),
-                        );
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Promotion & Adds',
-                        icon: Icons.file_copy,
-                        tabb: 5,
-                        indexx: currentIndex,
-                      )),
-                  // SizedBox(
-                  //   height: 5,
-                  // ),
-                  // InkWell(
-                  //     onTap: () {
-                  //       // Navigator.push(
-                  //       //   context,
-                  //       //   MaterialPageRoute(
-                  //       //       builder: (context) => const PaymentHistoryPage()),
-                  //       // );
-                  //       setState(() {
-                  //         currentIndex = 6;
-                  //       });
-                  //     },
-                  //     child: DrawerIconTab(
-                  //       titlee: 'Coupons',
-                  //       icon: Icons.payment,
-                  //       tabb: 6,
-                  //       indexx: currentIndex,
-                  //     )),
-                  // SizedBox(
-                  //   height: 5,
-                  // ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Earning()),
-                      );
-                      setState(() {
-                        currentIndex = 7;
-                      });
-                    },
-                    child: DrawerIconTab(
-                      titlee: 'Earnings',
-                      icon: Icons.my_library_books_sharp,
-                      tabb: 7,
-                      indexx: currentIndex,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  // InkWell(
-                  //     onTap: () {
-                  //       // Navigator.push(context, MaterialPageRoute(builder: (context) => const MyProfile()),);
-                  //       setState(() {
-                  //         currentIndex = 8;
-                  //       });
-                  //     },
-                  //     child: DrawerIconTab(
-                  //       titlee: 'Order history/Reports',
-                  //       icon: Icons.history,
-                  //       tabb: 8,
-                  //       indexx: currentIndex,
-                  //     )),
-                  // const SizedBox(
-                  //   height: 5,
-                  // ),
-                  // InkWell(
-                  //   onTap: () {
-                  //     // Navigator.push(
-                  //     //   context,
-                  //     //   MaterialPageRoute(builder: (context) => PrivacyPolicy()),
-                  //     // );
-                  //     setState(() {
-                  //       currentIndex = 9;
-                  //     });
-                  //   },
-                  //   child: DrawerIconTab(
-                  //     titlee: 'Library',
-                  //     icon: Icons.privacy_tip,
-                  //     tabb: 9,
-                  //     indexx: currentIndex,
-                  //   ),
-                  // ),
-                  // const SizedBox(
-                  //   height: 5,
-                  // ),
-                  // InkWell(
-                  //     onTap: () {
-                  //       // Navigator.push(
-                  //       //   context,
-                  //       //   MaterialPageRoute(
-                  //       //       builder: (context) => const TermsConditionsWidget()),
-                  //       // );
-                  //       setState(() {
-                  //         currentIndex = 10;
-                  //       });
-                  //       // share();
-                  //     },
-                  //     child: DrawerIconTab(
-                  //       titlee: 'Automatic Booking',
-                  //       icon: Icons.confirmation_num,
-                  //       tabb: 10,
-                  //       indexx: currentIndex,
-                  //     )),
-                  // SizedBox(
-                  //   height: 5,
-                  // ),
-                  // InkWell(
-                  //     onTap: () {
-                  //       // Navigator.push(
-                  //       //   context,
-                  //       //   MaterialPageRoute(
-                  //       //       builder: (context) => const FaqPage()),
-                  //       // );
-                  //
-                  //       setState(() {
-                  //         currentIndex = 11;
-                  //       });
-                  //     },
-                  //     child: DrawerIconTab(
-                  //       titlee: 'Track Order',
-                  //       icon: Icons.question_answer,
-                  //       tabb: 11,
-                  //       indexx: currentIndex,
-                  //     ),
-                  // ),
-                  // SizedBox(
-                  //   height: 5,
-                  // ),
-                  InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const BusinessCard(walletAmount: "")),
-                        );
-                        setState(() {
-                          currentIndex = 12;
-                        });
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Business Card',
-                        icon: Icons.credit_card,
-                        tabb: 12,
-                        indexx: currentIndex,
-                      )),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const DeliveryCard(walletAmount: "")),
-                        );
-                        setState(() {
-                          currentIndex = 13;
-                        });
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Delivery Card',
-                        icon: Icons.credit_card,
-                        tabb: 13,
-                        indexx: currentIndex,
-                      )),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Settings()),
-                        );
-                        setState(() {
-                          currentIndex = 14;
-                        });
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Settings',
-                        icon: Icons.settings,
-                        tabb: 14,
-                        indexx: currentIndex,
-                      )),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ContactUsScreen()),);
-                        setState(() {
-                          currentIndex = 15;
-                        });
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Help',
-                        icon: Icons.help,
-                        tabb: 15,
-                        indexx: currentIndex,
-                      )),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        setState(() {
-                          currentIndex = 16;
-                        });
-                        logout(context);
-                      },
-                      child: DrawerIconTab(
-                        titlee: 'Log Out',
-                        icon: Icons.logout_outlined,
-                        tabb: 16,
-                        indexx: currentIndex,
-                      )),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                ]),
+                        MaterialPageRoute(
+                            builder: (context) => ContactUsScreen()));
+                    setState(() {
+                      currentIndex = 16;
+                    });
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'Help',
+                    icon: Icons.help,
+                    tabb: 15,
+                    indexx: currentIndex,
+                  )),
+              const SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                  onTap: () {
+                    setState(() {
+                      currentIndex = 17;
+                    });
+                    logout(context);
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'Log Out',
+                    icon: Icons.logout_outlined,
+                    tabb: 16,
+                    indexx: currentIndex,
+                  )),
+              const SizedBox(
+                height: 20,
+              ),
+            ]),
           ),
           bottomNavigationBar: FluidNavBar(
-            icons: roll == "2" ? [
-              FluidNavBarIcon(
-                  icon: Icons.home,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  //  svgPath: "assets/home.svg",
-                  backgroundColor: colors.primary,
-                  unselectedForegroundColor: Colors.white,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "Home"}),
-              FluidNavBarIcon(
-                  icon: Icons.list_alt_sharp,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  unselectedForegroundColor: Colors.white,
-                  backgroundColor: colors.primary,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "My Bookings"}),
-              FluidNavBarIcon(
-                  icon: Icons.calendar_month,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  backgroundColor: colors.primary,
-                  unselectedForegroundColor: Colors.white,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "Pending "}),
-              FluidNavBarIcon(
-                  icon: Icons.wheelchair_pickup,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  unselectedForegroundColor: Colors.white,
-                  backgroundColor: colors.primary,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "Pick & Drop"}),
-            ]:
-            [
-              FluidNavBarIcon(
-                  icon: Icons.home,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  //  svgPath: "assets/home.svg",
-                  backgroundColor: colors.primary,
-                  unselectedForegroundColor: Colors.white,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "Home"}),
-              FluidNavBarIcon(
-                  // unselectedForegroundColor: Colors.grey,
-                    selectedForegroundColor: Colors.white,
-                    icon: Icons.list_alt_sharp,
-                    backgroundColor: colors.primary,
-                    unselectedForegroundColor: Colors.white,
-                    //  selectedIndex == 1 ? colors.primary : colors.white10,
-                    extras: {"label": "My Orders"}),
-              FluidNavBarIcon(
-                  icon: Icons.shopping_cart,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  unselectedForegroundColor: Colors.white,
-                  backgroundColor: colors.primary,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "My Cart"}),
-              FluidNavBarIcon(
-                  icon: Icons.calendar_month,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  backgroundColor: colors.primary,
-                  unselectedForegroundColor: Colors.white,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "Pending "}),
-              FluidNavBarIcon(
-                  icon: Icons.wheelchair_pickup,
-                  // unselectedForegroundColor: Colors.grey,
-                  selectedForegroundColor: Colors.white,
-                  unselectedForegroundColor: Colors.white,
-                  backgroundColor: colors.primary,
-                  //  selectedIndex == 1 ? colors.primary : colors.white10,
-                  extras: {"label": "Pick & Drop"}),
-            ],
+            icons: roll == "2"
+                ? [
+                    FluidNavBarIcon(
+                        icon: Icons.home,
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        //  svgPath: "assets/home.svg",
+                        backgroundColor: colors.primary,
+                        unselectedForegroundColor: Colors.white,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "Home"}),
+                    FluidNavBarIcon(
+                        icon: Icons.list_alt_sharp,
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        unselectedForegroundColor: Colors.white,
+                        backgroundColor: colors.primary,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "My Bookings"}),
+                    FluidNavBarIcon(
+                        icon: Icons.calendar_month,
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        backgroundColor: colors.primary,
+                        unselectedForegroundColor: Colors.white,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "Pending "}),
+                    FluidNavBarIcon(
+                        icon: Icons.wheelchair_pickup,
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        unselectedForegroundColor: Colors.white,
+                        backgroundColor: colors.primary,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "Pick & Drop"}),
+                  ]
+                : [
+                    FluidNavBarIcon(
+                        icon: Icons.home,
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        //  svgPath: "assets/home.svg",
+                        backgroundColor: colors.primary,
+                        unselectedForegroundColor: Colors.white,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "Home"}),
+                    FluidNavBarIcon(
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        icon: Icons.list_alt_sharp,
+                        backgroundColor: colors.primary,
+                        unselectedForegroundColor: Colors.white,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "My Orders"}),
+                    FluidNavBarIcon(
+                        icon: Icons.shopping_cart,
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        unselectedForegroundColor: Colors.white,
+                        backgroundColor: colors.primary,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "My Cart"}),
+                    FluidNavBarIcon(
+                        icon: Icons.calendar_month,
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        backgroundColor: colors.primary,
+                        unselectedForegroundColor: Colors.white,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "Pending "}),
+                    FluidNavBarIcon(
+                        icon: Icons.wheelchair_pickup,
+                        // unselectedForegroundColor: Colors.grey,
+                        selectedForegroundColor: Colors.white,
+                        unselectedForegroundColor: Colors.white,
+                        backgroundColor: colors.primary,
+                        //  selectedIndex == 1 ? colors.primary : colors.white10,
+                        extras: {"label": "Pick & Drop"}),
+                  ],
             onChange: _handleNavigationChange,
             style: const FluidNavBarStyle(
               barBackgroundColor: colors.primary,
@@ -657,6 +742,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             ),
           ),
         ),
+      ),
     );
   }
 
@@ -693,10 +779,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   });
                   Navigator.pop(context);
                   // SystemNavigator.pop();
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
                   prefs.setBool("isLogIn", false);
                   prefs.clear();
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => LoginPage()));
                   // Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
                 },
               ),
@@ -721,13 +809,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
           break;
         case 1:
           // _child = roll=="2"? Calender(isFromBottom: true,) :Orders();
-          _child = roll== "2" ? Calender() : Orders();
+          _child = roll == "2" ? Calender() : Orders();
           break;
         case 2:
-          _child = roll=="2"? const PendingBooking(): AllCategory();
+          _child = roll == "2" ? const PendingBooking() : AllCategory();
           break;
         case 3:
-          _child =  roll=="2"? PickDrop(): PendingOrders();
+          _child = roll == "2" ? PickDrop() : PendingOrders();
           break;
         case 4:
           _child = PickDrop();
@@ -766,9 +854,9 @@ class _DrawerIconTabState extends State<DrawerIconTab> {
       decoration: BoxDecoration(
           gradient: widget.indexx == widget.tabb
               ? LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Color(0xff112C48), Color(0xff112C48)])
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xff112C48), Color(0xff112C48)])
               : null),
       // color:
       //     widget.indexx == widget.tabb ? colors.secondary : Colors.transparent,
@@ -779,15 +867,15 @@ class _DrawerIconTabState extends State<DrawerIconTab> {
           ),
           Container(
             decoration:
-            BoxDecoration(color: Color(0xff112C48), shape: BoxShape.circle),
+                BoxDecoration(color: Color(0xff112C48), shape: BoxShape.circle),
             height: 40,
             width: 40,
             child: Center(
                 child: Icon(
-                  widget.icon,
-                  color: widget.indexx == widget.tabb ? Colors.white : Colors.grey,
-                  size: 20,
-                )),
+              widget.icon,
+              color: widget.indexx == widget.tabb ? Colors.white : Colors.grey,
+              size: 20,
+            )),
           ),
           SizedBox(
             width: 20,

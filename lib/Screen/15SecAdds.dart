@@ -46,7 +46,7 @@ class _Add15SecState extends State<Add15Sec> {
       print("responseee $finaResult");
       if (finaResult['status'] == 1) {
         banner_Charge = finaResult['setting']['banner_per_day_charge'];
-        await prefs.setString('banner_Charge', finaResult['setting']['banner_per_day_charge'].toString());
+        await prefs.setString('banner_Charge', finaResult['setting']['ad_amount_15'].toString());
         print('____banner charge is$banner_Charge ___');
         setState(() {});
         // Fluttertoast.showToast(msg: '${finaResult['message']}');

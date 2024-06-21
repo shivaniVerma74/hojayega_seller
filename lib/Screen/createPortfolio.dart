@@ -122,7 +122,7 @@ class _ServicesDetailsState extends State<ServicesDetails> {
         centerTitle: true,
         backgroundColor: colors.primary,
         foregroundColor: Colors.white,
-        title: const Text('Service Details'),
+        title: const Text('Services'),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20.0)),
         ),
@@ -660,7 +660,6 @@ class _ServicesDetailsState extends State<ServicesDetails> {
           else {
             Fluttertoast.showToast(msg: "Please Select Category");
           }
-
         },
         backgroundColor: colors.primary,
         tooltip: "Add Services",
@@ -791,7 +790,7 @@ class _MyListViewState extends State<MyListView> {
           return Column(
             crossAxisAlignment:  CrossAxisAlignment.start,
             children: [
-              Text("${data.name}",style: const TextStyle(color: colors.primary,fontSize: 18,fontWeight: FontWeight.bold),),
+              Text("${data.name}",style: const TextStyle(color: colors.primary,fontSize: 15,fontWeight: FontWeight.bold),),
               const SizedBox(height: 8,),
               Column(
                 children: data.services.map((service){
@@ -807,14 +806,16 @@ class _MyListViewState extends State<MyListView> {
                               color: colors.primary
                           ),
                         ),
-                        const SizedBox(width: 8,),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             mainAxisSize: MainAxisSize.max,
                             children: [
-                              Text("${service.serviceName}",style: const TextStyle(color: colors.primary,fontSize: 16,),),
-                              Text("${service.mrpPrice}/-",style: const TextStyle(color: colors.primary,fontSize: 16,),),
+                              Container(
+                                width: 90,
+                                  child: Text("${service.serviceName}",style: const TextStyle(color: colors.primary,fontSize: 15,), maxLines: 2, overflow: TextOverflow.ellipsis,)),
+                              Text("${service.mrpPrice}/-",style: const TextStyle(color: colors.primary,fontSize: 15,),),
                             ],
                           ),
                         ),

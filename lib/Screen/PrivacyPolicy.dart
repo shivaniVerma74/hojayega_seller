@@ -5,35 +5,37 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
 
 import '../Helper/Color.dart';
-import '../Model/TermsAndCondition.dart';
+import '../Model/PrivacyPolicyModel.dart';
 
-class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+class PrivacyPolicy extends StatefulWidget {
+  const PrivacyPolicy({Key? key}) : super(key: key);
 
   @override
-  State<Settings> createState() => _SettingsState();
+  State<PrivacyPolicy> createState() => _PrivacyPolicyState();
 }
 
-class _SettingsState extends State<Settings> {
-  TermsAndCondition? terms;
-  Future<void> getTermCondition() async {
+class _PrivacyPolicyState extends State<PrivacyPolicy> {
+  PrivacyPolicyModel? privacy;
+  Future<void> getPrivacyPolicy() async {
     try {
-      var headers = {
-        'Cookie': 'ci_session=0a68526a3ce5b251a6761ec7c01fe4892118b57b'
-      };
+      // var headers = {
+      //   'Cookie': 'ci_session=0a68526a3ce5b251a6761ec7c01fe4892118b57b'
+      // };
       var request = http.MultipartRequest(
           'POST',
           Uri.parse(
               'https://developmentalphawizz.com/hojayega/Vendorapi/static_pages'));
 
-      request.headers.addAll(headers);
-      request.fields.addAll({'id': '3'});
+      // request.headers.addAll(headers);
+      request.fields.addAll({'id': '4'});
 
       http.StreamedResponse response = await request.send();
       var json = jsonDecode(await response.stream.bytesToString());
       if (response.statusCode == 200) {
         print(json);
-        terms = TermsAndCondition.fromJson(json);
+        privacy = PrivacyPolicyModel.fromJson(json);
+        print("privacy $json");
+        setState(() {});
       } else {
         print(response.reasonPhrase);
       }
@@ -46,8 +48,8 @@ class _SettingsState extends State<Settings> {
   late Future myFuture;
   @override
   void initState() {
-    myFuture = getTermCondition(); // TODO: implement initState
     super.initState();
+    myFuture = getPrivacyPolicy(); // TODO: implement initState
   }
 
   @override
@@ -64,7 +66,7 @@ class _SettingsState extends State<Settings> {
               bottomRight: Radius.circular(25),
             ),
           ),
-          title: const Text('Terms & Condition'),
+          title: const Text('Privacy Policy'),
           backgroundColor: colors.primary),
       body: SingleChildScrollView(
         child: Column(
@@ -78,8 +80,8 @@ class _SettingsState extends State<Settings> {
                         )
                       : Column(
                           children: [
-                            Html(data: terms!.setting!.title.toString()),
-                            Html(data: terms!.setting!.html.toString()),
+                            Html(data: privacy!.setting!.title.toString()),
+                            Html(data: privacy!.setting!.html.toString()),
                           ],
                         );
                 }),

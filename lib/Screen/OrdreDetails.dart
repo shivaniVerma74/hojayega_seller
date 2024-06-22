@@ -122,14 +122,17 @@ class _OrderDetailsState extends State<OrderDetails> {
       'order_id': widget.model?.orderId.toString() ?? "",
       'sub_total': totalPrice.toString(),
       'discount': disController.text,
-      'time': timefrom,
+      'time': timefrom.toString(),
       'promo_code': '1',
       'final_total': overRollAmt.toString(),
+      'product_type':
+          (productitem.indexOf(selectproducts.toString()) + 1).toString(),
       // 'vehicle_type': (vehicleItem.indexOf(selectedVehicle.toString()) + 1).toString(),
       'vehicle_type': vehicleId.toString(),
       // 'total': finalTotal.toString(),
       'time_id': time_id.toString(),
-      'order_type': (orderitem.indexOf(selectOrders.toString()) + 1).toString(),
+      // 'order_type': (orderitem.indexOf(selectOrders.toString()) + 1).toString(),
+      'order_type': selectVal.toString(),
       'delivery_charge': delCharge.toString(),
     });
     print('update order para ${request.fields}');
@@ -227,7 +230,7 @@ class _OrderDetailsState extends State<OrderDetails> {
     }
   }
 
-  String? delCharge;
+  String? delCharge, delChargeKm, kiloMeter;
   Future<void> deliveryCharge({required String vType}) async {
     try {
       var headers = {
@@ -256,8 +259,11 @@ class _OrderDetailsState extends State<OrderDetails> {
         var result = await response.stream.bytesToString();
         var finalresult = jsonDecode(result.toString());
         delCharge = finalresult["data"];
+        delChargeKm = finalresult["distance"][0];
+        kiloMeter = finalresult["distance"][1];
         setState(() {});
-        print("delivery charge is ${delCharge.toString()}");
+        print(
+            "delivery charge is ${delCharge.toString()} distnace $delChargeKm kilometer $kiloMeter");
         print("final result  in delivery${finalresult["message"]}");
         Fluttertoast.showToast(msg: finalresult['message']);
       } else {
@@ -761,7 +767,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   children: [
                     Container(
                       height: 30,
-                      width: 195,
+                      width: 210,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(0),
                         color: const Color(0xffE5CB24),
@@ -1307,9 +1313,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       // Image.asset("assets/images/edit.png"),
-                      const Text(
-                        "Delivery Charge as per Km = ",
-                        style: TextStyle(color: colors.primary),
+                      Text(
+                        "Delivery Charge as per $delChargeKm $kiloMeter = ",
+                        style: const TextStyle(color: colors.primary),
                       ),
                       delCharge == null || delCharge == ""
                           ? const Text("0.0")

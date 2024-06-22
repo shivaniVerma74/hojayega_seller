@@ -2,8 +2,8 @@
 /// msg : "Pages Data"
 /// setting : {"id":"4","title":"Privacy Policy","slug":"privacy_policy","html":"<h3>Lorem Ipsum collects information about you when you use our Website to access our services, and other online products and services (collectively, the &ldquo;Services&rdquo;) and through other interactions and communications you have with us. The term Services includes, collectively, various applications, websites, widgets, email notifications and other mediums, or portions of such mediums, through which you have accessed this</h3>\r\n\r\n<h3>Privacy Policy Vendore&nbsp;</h3>\r\n","created_at":"2022-11-08 15:51:09","updated_at":"2024-02-08 16:02:48","heading":"","img_1":"","img_2":"","img_3":"","img_4":"","url":""}
 
-class PrivacyPolicy {
-  PrivacyPolicy({
+class PrivacyPolicyModel {
+  PrivacyPolicyModel({
       String? status, 
       String? msg, 
       Setting? setting,}){
@@ -12,7 +12,7 @@ class PrivacyPolicy {
     _setting = setting;
 }
 
-  PrivacyPolicy.fromJson(dynamic json) {
+  PrivacyPolicyModel.fromJson(dynamic json) {
     _status = json['status'];
     _msg = json['msg'];
     _setting = json['setting'] != null ? Setting.fromJson(json['setting']) : null;
@@ -20,10 +20,10 @@ class PrivacyPolicy {
   String? _status;
   String? _msg;
   Setting? _setting;
-PrivacyPolicy copyWith({  String? status,
+PrivacyPolicyModel copyWith({  String? status,
   String? msg,
   Setting? setting,
-}) => PrivacyPolicy(  status: status ?? _status,
+}) => PrivacyPolicyModel(  status: status ?? _status,
   msg: msg ?? _msg,
   setting: setting ?? _setting,
 );

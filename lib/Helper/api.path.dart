@@ -9,18 +9,18 @@ class ApiServicves {
   static const String vendorregister = '${baseUrl}vendor_registration';
   static const String login = baseUrl + 'login';
   static const String myPickDrop = baseUrl + 'get_my_pick_drop_order';
-  static const String getProfile = baseUrl + 'get_profile';
+  static const String getProfile = '${baseUrl}get_profile';
   static const String getVendorOrder = baseUrl + 'get_vendor_orders';
   static const String vendorsendOtp = baseUrl + 'send_otp';
   static const String updateProfile = baseUrl + 'vendor_update';
-  static const String pickDropImageUpload = baseUrl + 'image_upload_order';
-  static const String getState = baseUrl + 'get_states';
-  static const String pickDropOrder = baseUrl + 'pick_drop_order';
-  static const String getCities = baseUrl + 'get_cities';
+  static const String pickDropImageUpload = '${baseUrl}image_upload_order';
+  static const String getState = '${baseUrl}get_states';
+  static const String pickDropOrder = '${baseUrl}pick_drop_order';
+  static const String getCities = '${baseUrl}get_cities';
   static const String pickDropCalculation =
-      baseUrl + 'pick_and_drops_amountcalculate';
-  static const String sendOtpforgetpassword = baseUrl + 'forgot_pass_user';
-  static const String getArea = baseUrl + 'get_regions';
+      '${baseUrl}pick_and_drops_amountcalculate';
+  static const String sendOtpforgetpassword = '${baseUrl}forgot_pass_user';
+  static const String getArea = '${baseUrl}get_regions';
   static const String resetpassword = baseUrl + 'reset_password';
   static const String getBanners = baseUrl + 'get_banners';
   static const String getCategories =

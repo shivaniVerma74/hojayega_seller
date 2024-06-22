@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthView/SignUpPersonal.dart';
 import '../Helper/api.path.dart';
 import '../Model/GetProfileModel.dart';
+import 'BottomBar.dart';
 
 // import '../utils/utils.dart';
 class MyProfile extends StatefulWidget {
@@ -363,6 +364,8 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   updateProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
     var headers = {
       'Cookie': 'ci_session=e4642f1868d270720612d7de7ba4c0ab33b140ed'
     };
@@ -390,26 +393,45 @@ class _MyProfileState extends State<MyProfile> {
       "gst_no": gstNumberController.text,
       "latitude": currentLocation!.latitude.toString(),
       "longitude": currentLocation!.longitude.toString(),
+      'vendor_id': vendorId.toString()
     });
     print("update profile ${request.fields}");
     request.headers.addAll(headers);
-    request.files.add(
-        await http.MultipartFile.fromPath('shop_image', _image?.path ?? ""));
-    request.files.add(
-        await http.MultipartFile.fromPath('pan_image', _image2?.path ?? ""));
-    request.files.add(
-        await http.MultipartFile.fromPath('adhar_front', _image3?.path ?? ""));
-    request.files.add(
-        await http.MultipartFile.fromPath('adhar_back', _image4?.path ?? ""));
-    request.files.add(
-        await http.MultipartFile.fromPath('adhar_back', _image5?.path ?? ""));
-    request.files.add(
-        await http.MultipartFile.fromPath('selfi_image', _image6?.path ?? ""));
-    request.files.add(
-        await http.MultipartFile.fromPath('qr_code', _qrimage?.path ?? ""));
+    if (_image?.path == null || _image?.path == "") {
+    } else {
+      request.files.add(
+          await http.MultipartFile.fromPath('shop_image', _image?.path ?? ""));
+    }
+    if (_image2?.path == null || _image2?.path == "") {
+    } else {
+      request.files.add(
+          await http.MultipartFile.fromPath('pan_image', _image2?.path ?? ""));
+    }
+    if (_image3?.path == null || _image3?.path == "") {
+    } else {
+      request.files.add(await http.MultipartFile.fromPath(
+          'adhar_front', _image3?.path ?? ""));
+    }
+    if (_image4?.path == null || _image4?.path == "") {
+    } else {
+      request.files.add(
+          await http.MultipartFile.fromPath('adhar_back', _image4?.path ?? ""));
+    }
+    if (_image6?.path == null || _image6?.path == "") {
+    } else {
+      request.files.add(await http.MultipartFile.fromPath(
+          'selfi_image', _image6?.path ?? ""));
+    }
+    if (_qrimage?.path == null || _qrimage?.path == "") {
+    } else {
+      request.files.add(
+          await http.MultipartFile.fromPath('qr_code', _qrimage?.path ?? ""));
+    }
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       print(await response.stream.bytesToString());
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => BottomNavBar()));
     } else {
       print(response.reasonPhrase);
     }
@@ -2007,7 +2029,9 @@ class _MyProfileState extends State<MyProfile> {
                                 Center(
                                   child: Card(
                                     child: InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        updateProfile();
+                                      },
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: colors.secondary,

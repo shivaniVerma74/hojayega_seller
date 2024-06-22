@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Helper/api.path.dart';
 import 'package:hojayega_seller/Screen/createPortfolio.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Helper/color.dart';
 import '../Model/CategoryModel.dart';
 import '../Model/ShopModel.dart';
@@ -19,6 +19,8 @@ class CreateOnlineStore extends StatefulWidget {
   @override
   State<CreateOnlineStore> createState() => _CreateOnlineStoreState();
 }
+
+String? parentId;
 
 class _CreateOnlineStoreState extends State<CreateOnlineStore> {
   final TextEditingController clientsServesController = TextEditingController();
@@ -246,60 +248,65 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                           //             color: colors.primary,
                           //           ))
                           //         :
-                                SizedBox(
-                                      height: 20,
-                                      child:
-                                      ListView.builder(
-                                        scrollDirection: Axis
-                                            .horizontal, // Horizontal scroll direction
-                                        itemCount: shopModel?.data?.length ?? 0,
-                                        itemBuilder: (context, index) {
-                                          return Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Checkbox(
-                                                activeColor: colors.secondary,
-                                                onChanged: (checked) {
-                                                  if (checked!) {
-                                                    selectedIndex = index;
-                                                    getCat(shopModel?.data?[index].id.toString() ??"");
-                                                    parentId =  shopModel?.data?[index].id.toString() ??"" ;
-                                                    print("=========parent id is ======$parentId===========");
-                                                  }
-                                                  setState(() {});
-                                                  //  print("jjcjcjjf");
-                                                  // // print("${checked}");
-                                                  //  setState(() {
-                                                  //    if ( checked==true) {
-                                                  //      print(checked);
-                                                  //      print(index);
-                                                  //      selectedCheckboxIndex = checked??false;
-                                                  //    } else {
-                                                  //      selectedCheckboxIndex = false;
-                                                  //    }
-                                                  //  });
-                                                  //  print(selectedCheckboxIndex);
-                                                },
-                                                checkColor: colors.primary,
-                                                value: selectedIndex == index,
-                                              ),
-                                              Text(
-                                                "${shopModel?.data?[index].name.toString()}",
-                                                style: const TextStyle(
-                                                    color: colors.primary,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      ),
+                          SizedBox(
+                            height: 20,
+                            child: ListView.builder(
+                              scrollDirection: Axis
+                                  .horizontal, // Horizontal scroll direction
+                              itemCount: shopModel?.data?.length ?? 0,
+                              itemBuilder: (context, index) {
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Checkbox(
+                                      activeColor: colors.secondary,
+                                      onChanged: (checked) {
+                                        if (checked!) {
+                                          selectedIndex = index;
+                                          getCat(shopModel?.data?[index].id
+                                                  .toString() ??
+                                              "");
+                                          parentId = shopModel?.data?[index].id
+                                                  .toString() ??
+                                              "";
+                                          print(
+                                              "=========parent id is ======$parentId===========");
+                                        }
+                                        setState(() {});
+                                        //  print("jjcjcjjf");
+                                        // // print("${checked}");
+                                        //  setState(() {
+                                        //    if ( checked==true) {
+                                        //      print(checked);
+                                        //      print(index);
+                                        //      selectedCheckboxIndex = checked??false;
+                                        //    } else {
+                                        //      selectedCheckboxIndex = false;
+                                        //    }
+                                        //  });
+                                        //  print(selectedCheckboxIndex);
+                                      },
+                                      checkColor: colors.primary,
+                                      value: selectedIndex == index,
                                     ),
+                                    Text(
+                                      "${shopModel?.data?[index].name.toString()}",
+                                      style: const TextStyle(
+                                          color: colors.primary,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
                           //     : SizedBox.shrink(),
                           // const SizedBox(
                           //   height: 20,
                           // ),
-                          SizedBox(height: 5,),
+                          SizedBox(
+                            height: 5,
+                          ),
                           Row(
                             children: const [
                               CircleAvatar(
@@ -334,12 +341,14 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                   ? const Center(
                                       child: Text("Categories Not Found"),
                                     )
-                                  : categoryModel?.data?.length == null || categoryModel?.data?.length == ""
+                                  : categoryModel?.data?.length == null ||
+                                          categoryModel?.data?.length == ""
                                       ? const Center(
                                           child: CircularProgressIndicator(
                                             color: colors.primary,
                                           ),
-                                        ) :
+                                        )
+                                      :
                                       // Container(
                                       //         margin:
                                       //             const EdgeInsets.only(left: 2, right: 2),
@@ -462,7 +471,10 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                     },
                                                     child: Column(
                                                       children: [
-                                                        categoryModel!.data![index].img ==
+                                                        categoryModel!
+                                                                        .data![
+                                                                            index]
+                                                                        .img ==
                                                                     "" ||
                                                                 categoryModel!
                                                                         .data![
@@ -483,8 +495,8 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                                 height: 100,
                                                                 width: 100,
                                                                 padding:
-                                                                    const EdgeInsets.all(
-                                                                        10),
+                                                                    const EdgeInsets
+                                                                        .all(10),
                                                                 // clipBehavior: Clip.hardEdge,
                                                                 margin:
                                                                     const EdgeInsets
@@ -494,25 +506,28 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                                         BorderRadius.circular(
                                                                             10),
                                                                     border: Border.all(
-                                                                        color:
-                                                                            colors.primary)),
-                                                                child: Image.network(
+                                                                        color: colors
+                                                                            .primary)),
+                                                                child: Image
+                                                                    .network(
                                                                   "https://developmentalphawizz.com/hojayega/${categoryModel!.data![index].img.toString()}",
                                                                   fit: BoxFit
                                                                       .fill,
                                                                 ),
-                                                        ),
+                                                              ),
                                                         Flexible(
-                                                            child: Text(
-                                                          categoryModel!
-                                                              .data![index]
-                                                              .cName
-                                                              .toString(),
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 10),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                          child: Text(
+                                                            categoryModel!
+                                                                .data![index]
+                                                                .cName
+                                                                .toString(),
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        10),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                           ),
                                                         ),
                                                       ],
@@ -783,24 +798,32 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 //     categoriesSelectedValues.where((element) => element==true)
                                 // );
                                 //
-                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
                                 if (categoriesSelectedValues.contains(true)) {
                                   for (var i = 0;
                                       i < categoriesSelectedValues.length;
                                       i++) {
                                     if (categoriesSelectedValues[i] == true) {
-                                      categoriesIdSelected.add(categoryModel?.data?[i].id);
-                                      print("categoriesss $categoriesIdSelected valueee $categoriesSelectedValues" );
+                                      categoriesIdSelected
+                                          .add(categoryModel?.data?[i].id);
+                                      print(
+                                          "categoriesss $categoriesIdSelected valueee $categoriesSelectedValues");
                                       selectedCategoryIndex.add(i);
                                     }
                                   }
-                                  prefs.setString("selectedCategoryIndex", selectedCategoryIndex.toString());
-                                  prefs.setString("selectedShopType", shopModel!.data![selectedIndex].id.toString());
+                                  prefs.setString("selectedCategoryIndex",
+                                      selectedCategoryIndex.toString());
+                                  prefs.setString(
+                                      "selectedShopType",
+                                      shopModel!.data![selectedIndex].id
+                                          .toString());
                                   log("selectedindex $selectedCategoryIndex");
                                   if (roll_id == "1") {
                                     // print(getData());
                                     Navigator.push(
-                                      context, MaterialPageRoute(
+                                      context,
+                                      MaterialPageRoute(
                                         builder: (context) => AllCategory(),
                                       ),
                                     );
@@ -808,7 +831,13 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                     if (_formKey.currentState!.validate()) {
                                       print(getData());
                                       saveCatDetails();
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => ServicesDetails(ParentId: parentId.toString())));
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ServicesDetails(
+                                                      ParentId: parentId
+                                                          .toString())));
                                     }
                                   }
                                 } else {
@@ -823,8 +852,10 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                       color: colors.secondary,
                                       borderRadius: BorderRadius.circular(5),
                                     ),
-                                    height: MediaQuery.of(context).size.height * 0.06,
-                                    width: MediaQuery.of(context).size.width * .6,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.06,
+                                    width:
+                                        MediaQuery.of(context).size.width * .6,
                                     child: const Center(
                                       child: Text(
                                         'Next',

@@ -1,8 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Model/GetProfileModel.dart';
 import 'package:hojayega_seller/Model/SliderModel.dart';
 import 'package:hojayega_seller/Screen/BusinessCard.dart';
@@ -11,13 +10,12 @@ import 'package:hojayega_seller/Screen/Pick&Drop.dart';
 import 'package:hojayega_seller/Screen/PromotionAdds.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../AuthView/Login.dart';
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
 import '../Model/TodayBooking.dart';
 import '../Model/VendorTodayOrder.dart';
-import 'Calender.dart';
-import 'Orders.dart';
 import 'Reports.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,19 +33,27 @@ class _HomePageState extends State<HomeScreen> {
   String? deliveryCardBalance;
   String? businessCardBalance;
   String? vendorId;
-getData() async {
- await getProfile();
- await  getSetting();
- await getBanner();
- await getCurrentorder();
- await getCurrenBooking();
-}
+  getData() async {
+    await getProfile();
+    await getSetting();
+    await getBanner();
+    await getCurrentorder();
+    await getCurrenBooking();
+  }
+
   @override
   void initState() {
     super.initState();
     // getWalletAmount();
+    getRoll();
     getProfile();
     getData();
+  }
+
+  getRoll() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    roll = prefs.getString('roll');
+    print("roll is in here $roll");
   }
 
   GetProfileModel? profileData;
@@ -56,15 +62,13 @@ getData() async {
   getProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     vendorId = prefs.getString("vendor_id");
-   roll=  prefs.getString('roll');
-   print("${prefs.getString('roll')}+++++++++++++++++++++++");
+    print("${prefs.getString('roll')}+++++++++++++++++++++++");
     var headers = {
       'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
-    request.fields.addAll({
-      'user_id': vendorId.toString()
-    });
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
+    request.fields.addAll({'user_id': vendorId.toString()});
     debugPrint("get profile parametersssss ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -72,10 +76,10 @@ getData() async {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = GetProfileModel.fromJson(json.decode(finalResponse));
       print("profile data responsee $finalResult");
-        profileData = finalResult;
-          deliveryCardBalance = profileData?.data?.first.dCard;
-          businessCardBalance = profileData?.data?.first.bCard;
-         setState(() {});
+      profileData = finalResult;
+      deliveryCardBalance = profileData?.data?.first.dCard;
+      businessCardBalance = profileData?.data?.first.bCard;
+      setState(() {});
     } else {
       print(response.reasonPhrase);
     }
@@ -85,15 +89,14 @@ getData() async {
   getCurrentorder() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     vendorId = prefs.getString("vendor_id");
-    roll=  prefs.getString('roll');
+    roll = prefs.getString('roll');
     print("${prefs.getString('roll')}+++++++++++++++++++++++");
     var headers = {
       'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorOrder));
-    request.fields.addAll({
-      'user_id': vendorId.toString()
-    });
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorOrder));
+    request.fields.addAll({'user_id': vendorId.toString()});
     debugPrint("get current parametersssss ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -108,20 +111,18 @@ getData() async {
     }
   }
 
-
   TodayBooking? vendorTodayBooking;
   getCurrenBooking() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     vendorId = prefs.getString("vendor_id");
-    roll=  prefs.getString('roll');
+    roll = prefs.getString('roll');
     print("${prefs.getString('roll')}+++++++++++++++++++++++");
     var headers = {
       'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorOrder));
-    request.fields.addAll({
-      'user_id': vendorId.toString()
-    });
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorOrder));
+    request.fields.addAll({'user_id': vendorId.toString()});
     debugPrint("get current parametersssss ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -135,8 +136,6 @@ getData() async {
       print(response.reasonPhrase);
     }
   }
-
-
 
   SliderModel? sliderModel;
   List<BannerListModel> sliderList1 = [];
@@ -153,7 +152,7 @@ getData() async {
       'Cookie': 'ci_session=ec3da314aabd690ad47ed36f9337c27b856dd58e'
     };
     var request =
-    http.MultipartRequest('POST', Uri.parse(ApiServicves.getBanners));
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getBanners));
     // request.fields.addAll({'banner_type': 'shop'});
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -189,14 +188,13 @@ getData() async {
       print(response.reasonPhrase);
     }
   }
-   // getWalletAmount() async {
-   //   SharedPreferences prefs = await SharedPreferences.getInstance();
-   //   deliveryCardBalance = prefs.getString("delivery_card_wallet");
-   //   businessCardBalance = prefs.getString("business_card_wallet");
-   // }
+  // getWalletAmount() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   deliveryCardBalance = prefs.getString("delivery_card_wallet");
+  //   businessCardBalance = prefs.getString("business_card_wallet");
+  // }
 
   int _pageIndex = 0;
-
 
   var arrNames = ['Manage\nAds', 'Reports', 'PickDrop'];
 
@@ -285,8 +283,8 @@ getData() async {
       var finaResult = jsonDecode(result);
       print("responseee $finaResult");
       if (finaResult['status'] == 1) {
-       // card_limit = finaResult['setting']['cart_limit'];
-         prefs.setString(
+        // card_limit = finaResult['setting']['cart_limit'];
+        prefs.setString(
             'card_limit', finaResult['setting']['cart_limit'].toString());
         setState(() {});
         // Fluttertoast.showToast(msg: '${finaResult['message']}');
@@ -728,33 +726,57 @@ getData() async {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: List<Widget>.generate(roll == "2"? arrNames2.length:arrNames.length, (index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 8),
-                        child: Column(
-                          children: [
-                            InkWell(
-                              onTap:() {
-                                if(index == 0){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PromotionAdds()));
-                                } else if(index == 1){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Reports()));
-                                } else{
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PickDrop()));
-                                }
-                              },
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.primary),
-                                child: Image.asset(roll == "2"? iconsNames2[index]: iconsNames[index], height: 10, width: 10,),
+                      children: List<Widget>.generate(
+                          roll == "2" ? arrNames2.length : arrNames.length,
+                          (index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 8),
+                          child: Column(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  if (index == 0) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PromotionAdds()));
+                                  } else if (index == 1) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Reports()));
+                                  } else {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => PickDrop()));
+                                  }
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: colors.primary),
+                                  child: Image.asset(
+                                    roll == "2"
+                                        ? iconsNames2[index]
+                                        : iconsNames[index],
+                                    height: 10,
+                                    width: 10,
+                                  ),
+                                ),
                               ),
-                            ),
-                            Text(roll == "2"? arrNames2[index]: arrNames[index], textAlign: TextAlign.center),
-                          ],
-                        ),
-                      );
-                    }),
+                              Text(
+                                  roll == "2"
+                                      ? arrNames2[index]
+                                      : arrNames[index],
+                                  textAlign: TextAlign.center),
+                            ],
+                          ),
+                        );
+                      }),
                     ),
                   ),
                 ),
@@ -784,102 +806,116 @@ getData() async {
                 // ),
               ],
             ),
-            roll == "2"?
-           Column(
-             children: [
-               const Padding(
-                 padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
-                 child: Text(
-                   "Today's Booking Status",
-                   style: TextStyle(
-                       color: Colors.black54,
-                       fontWeight: FontWeight.bold,
-                       fontSize: 20),
-                 ),
-               ),
-               Center(
-                 child: Table(
-                   border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
-                   columnWidths: const <int, TableColumnWidth>{
-                     0: FixedColumnWidth(125.0),
-                     1: FixedColumnWidth(125.0),
-                     2: FixedColumnWidth(90.0),
-                   },
-                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                   children: [
-                     // Header Row
-                     TableRow(
-                       children: [
-                         headerCell('Time Slot'),
-                         headerCell('Region'),
-                         headerCell('Status'),
-                       ],
-                     ),
-                     // Data Rows
-                     ...?vendorTodayBooking?.data?.map((TodayBookingData) {
-                       return TableRow(
-                         children: [
-                           Padding(
-                             padding: const EdgeInsets.only(left: 3),
-                             child: dataCell(TodayBookingData.slot.toString().replaceAll(":00", "")),
-                           ),
-                           dataCell(TodayBookingData.address.toString()),
-                           statusCell(TodayBookingData.bookingStatus.toString()),
-                         ],
-                       );
-                     }).toList(),
-                   ],
-                 ),
-               ),
-               const SizedBox(height: 10),
-             ],
-            ):SizedBox(),
-            roll =="1" ?
-            const Padding(
-              padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
-              child: Text(
-                "Today's Order Status",
-                style: TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),
-              ),
-            ): SizedBox(),
-            Center(
-              child: Table(
-                border: TableBorder.all(borderRadius: BorderRadius.circular(10)),
-                columnWidths: const <int, TableColumnWidth>{
-                  0: FixedColumnWidth(125.0),
-                  1: FixedColumnWidth(125.0),
-                  2: FixedColumnWidth(90.0),
-                },
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                children: [
-                  // Header Row
-                  TableRow(
+            roll == "2"
+                ? Column(
                     children: [
-                      headerCell('Time Slot'),
-                      headerCell('Region'),
-                      headerCell('Order Status'),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
+                        child: Text(
+                          "Today's Booking Status",
+                          style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                      ),
+                      Center(
+                        child: Table(
+                          border: TableBorder.all(
+                              borderRadius: BorderRadius.circular(10)),
+                          columnWidths: const <int, TableColumnWidth>{
+                            0: FixedColumnWidth(125.0),
+                            1: FixedColumnWidth(125.0),
+                            2: FixedColumnWidth(90.0),
+                          },
+                          defaultVerticalAlignment:
+                              TableCellVerticalAlignment.middle,
+                          children: [
+                            // Header Row
+                            TableRow(
+                              children: [
+                                headerCell('Time Slot'),
+                                headerCell('Region'),
+                                headerCell('Status'),
+                              ],
+                            ),
+                            // Data Rows
+                            ...?vendorTodayBooking?.data
+                                ?.map((TodayBookingData) {
+                              return TableRow(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 3),
+                                    child: dataCell(TodayBookingData.slot
+                                        .toString()
+                                        .replaceAll(":00", "")),
+                                  ),
+                                  dataCell(TodayBookingData.address.toString()),
+                                  statusCell(TodayBookingData.bookingStatus
+                                      .toString()),
+                                ],
+                              );
+                            }).toList(),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
+                        child: Text(
+                          "Today's Order Status",
+                          style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                      ),
+                      Center(
+                        child: Table(
+                          border: TableBorder.all(
+                              borderRadius: BorderRadius.circular(10)),
+                          columnWidths: const <int, TableColumnWidth>{
+                            0: FixedColumnWidth(125.0),
+                            1: FixedColumnWidth(125.0),
+                            2: FixedColumnWidth(90.0),
+                          },
+                          defaultVerticalAlignment:
+                              TableCellVerticalAlignment.middle,
+                          children: [
+                            // Header Row
+                            TableRow(
+                              children: [
+                                headerCell('Time Slot'),
+                                headerCell('Region'),
+                                headerCell('Order Status'),
+                              ],
+                            ),
+                            // Data Rows
+                            ...?vendorTodayOrder?.orders?.map((VendorOrders) {
+                              return TableRow(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 3),
+                                    child: dataCell(VendorOrders.time
+                                        .toString()
+                                        .replaceAll(":00", "")),
+                                  ),
+                                  dataCell(VendorOrders.pickRegion.toString()),
+                                  statusCell(
+                                      VendorOrders.orderStatus.toString()),
+                                ],
+                              );
+                            }).toList(),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                  // Data Rows
-                  ...?vendorTodayOrder?.orders?.map((VendorOrders) {
-                    return TableRow(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 3),
-                          child: dataCell(VendorOrders.time.toString().replaceAll(":00", "")),
-                        ),
-                        dataCell(VendorOrders.pickRegion.toString()),
-                        statusCell(VendorOrders.orderStatus.toString()),
-                      ],
-                    );
-                  }).toList(),
-                ],
-              ),
-            ),
-           const SizedBox(height: 10),
+            const SizedBox(height: 10),
             // Container(
             //   height: 100,
             //   width: 200,
@@ -946,7 +982,7 @@ getData() async {
                     autoPlay: true,
                     autoPlayInterval: const Duration(seconds: 3),
                     autoPlayAnimationDuration:
-                    const Duration(milliseconds: 800),
+                        const Duration(milliseconds: 800),
                     autoPlayCurve: Curves.fastOutSlowIn,
                     enlargeCenterPage: false,
                     onPageChanged: (index, reason) {
@@ -955,30 +991,34 @@ getData() async {
                       });
                     },
                   ),
-                  items: sliderList.map((item) => Padding(
-                      padding: const EdgeInsets.only(left: 5, right: 5),
-                      child: item == null || item == ""
-                          ? Container(
-                         width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          image: const DecorationImage(
-                              image: AssetImage(
-                                "assets/images/placeholder.png",
-                              ),
-                              fit: BoxFit.fill),
+                  items: sliderList
+                      .map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.only(left: 5, right: 5),
+                          child: item == null || item == ""
+                              ? Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: const DecorationImage(
+                                        image: AssetImage(
+                                          "assets/images/placeholder.png",
+                                        ),
+                                        fit: BoxFit.fill),
+                                  ),
+                                )
+                              : Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                        image: NetworkImage("$item"),
+                                        fit: BoxFit.fill),
+                                  ),
+                                ),
                         ),
-                      ): Container(
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                              image: NetworkImage("$item"),
-                              fit: BoxFit.fill),
-                        ),
-                      ),
-                    ),
-                  ).toList(),
+                      )
+                      .toList(),
                 ),
                 const SizedBox(
                   height: 10,
@@ -1043,9 +1083,14 @@ getData() async {
                 children: [
                   InkWell(
                     onTap: () async {
-                     await Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => DeliveryCard(walletAmount: deliveryCardBalance ?? card_limit.toString(),))).then((value) async {
-                            await getProfile();
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DeliveryCard(
+                                    walletAmount: deliveryCardBalance ??
+                                        card_limit.toString(),
+                                  ))).then((value) async {
+                        await getProfile();
                       });
                     },
                     child: Container(
@@ -1068,11 +1113,12 @@ getData() async {
                                   color: colors.whiteTemp,
                                   fontSize: 18),
                             ),
-                            Text("₹ ${deliveryCardBalance ?? card_limit}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.whiteTemp,
-                                    fontSize: 18),
+                            Text(
+                              "₹ ${deliveryCardBalance ?? card_limit}",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.whiteTemp,
+                                  fontSize: 18),
                             ),
                           ],
                         ),
@@ -1080,11 +1126,15 @@ getData() async {
                     ),
                   ),
                   InkWell(
-                    onTap:() async {
-                     await Navigator.push(
-                          context, MaterialPageRoute(
-                              builder: (context) => BusinessCard(walletAmount: businessCardBalance ?? card_limit.toString()))).then((value) async {
-                         await getProfile();
+                    onTap: () async {
+                      await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BusinessCard(
+                                      walletAmount: businessCardBalance ??
+                                          card_limit.toString())))
+                          .then((value) async {
+                        await getProfile();
                       });
                     },
                     child: Container(
@@ -1105,11 +1155,12 @@ getData() async {
                                     fontWeight: FontWeight.w600,
                                     color: colors.whiteTemp,
                                     fontSize: 18)),
-                            Text("₹ ${businessCardBalance?? card_limit}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.whiteTemp,
-                                    fontSize: 18),
+                            Text(
+                              "₹ ${businessCardBalance ?? card_limit}",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.whiteTemp,
+                                  fontSize: 18),
                             ),
                           ],
                         ),

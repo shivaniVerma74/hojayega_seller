@@ -17,6 +17,7 @@ import '../Helper/api.path.dart';
 import '../Helper/appButton.dart';
 import '../Helper/color.dart';
 import '../Model/GetProfileModel.dart';
+import 'CreateOnlineStore.dart';
 import 'Earning.dart';
 import 'Help.dart';
 import 'HomeScreen.dart';
@@ -25,8 +26,10 @@ import 'Orders.dart';
 import 'PendingBooking.dart';
 import 'PendingOrders.dart';
 import 'Pick&Drop.dart';
+import 'PrivacyPolicy.dart';
 import 'PromotionAdds.dart';
 import 'Settings.dart';
+import 'createPortfolio.dart';
 import 'notificationScreen.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -316,43 +319,64 @@ class _BottomNavBarState extends State<BottomNavBar> {
               const SizedBox(
                 height: 5,
               ),
-              // InkWell(
-              //     onTap: () {
-              //       // Navigator.push(
-              //       //   context,
-              //       //   MaterialPageRoute(
-              //       //       builder: (context) => const  OfferJobWidget()),
-              //       // );
-              //       setState(() {
-              //         currentIndex = 2;
-              //       });
-              //     },
-              //     child: DrawerIconTab(
-              //         titlee: 'Product Portfolio',
-              //         icon: Icons.file_present_outlined,
-              //         tabb: 2,
-              //         indexx: currentIndex)),
-              // SizedBox(
-              //   height: 5,
-              // ),
-              // InkWell(
-              //     onTap: () {
-              //       // Navigator.push(
-              //       //   context,
-              //       //   MaterialPageRoute(builder: (context) => const CoursesPage()),
-              //       // );
-              //       setState(() {
-              //         currentIndex = 3;
-              //       });
-              //     },
-              //     child: DrawerIconTab(
-              //         titlee: 'Switch User',
-              //         icon: Icons.file_copy,
-              //         tabb: 3,
-              //         indexx: currentIndex)),
-              const SizedBox(
-                height: 5,
-              ),
+              roll == "2"
+                  ? InkWell(
+                      onTap: () {
+                        setState(() {
+                          currentIndex = 2;
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ServicesDetails(
+                                  ParentId: parentId.toString())),
+                        );
+                      },
+                      child: DrawerIconTab(
+                        titlee: 'Add Services',
+                        icon: Icons.design_services_rounded,
+                        tabb: 5,
+                        indexx: currentIndex,
+                      ),
+                    )
+                  :
+                  // InkWell(
+                  //     onTap: () {
+                  //       // Navigator.push(
+                  //       //   context,
+                  //       //   MaterialPageRoute(
+                  //       //       builder: (context) => const  OfferJobWidget()),
+                  //       // );
+                  //       setState(() {
+                  //         currentIndex = 2;
+                  //       });
+                  //     },
+                  //     child: DrawerIconTab(
+                  //         titlee: 'Product Portfolio',
+                  //         icon: Icons.file_present_outlined,
+                  //         tabb: 2,
+                  //         indexx: currentIndex)),
+                  // SizedBox(
+                  //   height: 5,
+                  // ),
+                  // InkWell(
+                  //     onTap: () {
+                  //       // Navigator.push(
+                  //       //   context,
+                  //       //   MaterialPageRoute(builder: (context) => const CoursesPage()),
+                  //       // );
+                  //       setState(() {
+                  //         currentIndex = 3;
+                  //       });
+                  //     },
+                  //     child: DrawerIconTab(
+                  //         titlee: 'Switch User',
+                  //         icon: Icons.file_copy,
+                  //         tabb: 3,
+                  //         indexx: currentIndex)),
+                  const SizedBox(
+                      height: 5,
+                    ),
               InkWell(
                   onTap: () {
                     Navigator.push(
@@ -585,9 +609,28 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     });
                   },
                   child: DrawerIconTab(
-                    titlee: 'Settings',
+                    titlee: 'Terms & Condition',
                     icon: Icons.settings,
-                    tabb: 14,
+                    tabb: 15,
+                    indexx: currentIndex,
+                  )),
+              const SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PrivacyPolicy()),
+                    );
+                    setState(() {
+                      currentIndex = 16;
+                    });
+                  },
+                  child: DrawerIconTab(
+                    titlee: 'Privacy Policy',
+                    icon: Icons.settings,
+                    tabb: 16,
                     indexx: currentIndex,
                   )),
               const SizedBox(
@@ -600,13 +643,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         MaterialPageRoute(
                             builder: (context) => ContactUsScreen()));
                     setState(() {
-                      currentIndex = 16;
+                      currentIndex = 17;
                     });
                   },
                   child: DrawerIconTab(
                     titlee: 'Help',
                     icon: Icons.help,
-                    tabb: 15,
+                    tabb: 17,
                     indexx: currentIndex,
                   )),
               const SizedBox(
@@ -615,14 +658,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
               InkWell(
                   onTap: () {
                     setState(() {
-                      currentIndex = 17;
+                      currentIndex = 18;
                     });
                     logout(context);
                   },
                   child: DrawerIconTab(
                     titlee: 'Log Out',
                     icon: Icons.logout_outlined,
-                    tabb: 16,
+                    tabb: 18,
                     indexx: currentIndex,
                   )),
               const SizedBox(
@@ -800,6 +843,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         });
   }
 
+  // bool? isTrue = true;
   void _handleNavigationChange(int index) {
     setState(() {
       selectedIndex = index;

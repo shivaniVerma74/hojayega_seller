@@ -7,19 +7,20 @@
 
 class EarningsModel {
   EarningsModel({
-      String? status, 
-      String? message, 
-      String? totalEarning, 
-      String? onineEarning, 
-      String? cod, 
-      List<Products>? products,}){
+    String? status,
+    String? message,
+    String? totalEarning,
+    String? onineEarning,
+    String? cod,
+    List<Products>? products,
+  }) {
     _status = status;
     _message = message;
     _totalEarning = totalEarning;
     _onineEarning = onineEarning;
     _cod = cod;
     _products = products;
-}
+  }
 
   EarningsModel.fromJson(dynamic json) {
     _status = json['status'];
@@ -40,19 +41,22 @@ class EarningsModel {
   String? _onineEarning;
   String? _cod;
   List<Products>? _products;
-EarningsModel copyWith({  String? status,
-  String? message,
-  String? totalEarning,
-  String? onineEarning,
-  String? cod,
-  List<Products>? products,
-}) => EarningsModel(  status: status ?? _status,
-  message: message ?? _message,
-  totalEarning: totalEarning ?? _totalEarning,
-  onineEarning: onineEarning ?? _onineEarning,
-  cod: cod ?? _cod,
-  products: products ?? _products,
-);
+  EarningsModel copyWith({
+    String? status,
+    String? message,
+    String? totalEarning,
+    String? onineEarning,
+    String? cod,
+    List<Products>? products,
+  }) =>
+      EarningsModel(
+        status: status ?? _status,
+        message: message ?? _message,
+        totalEarning: totalEarning ?? _totalEarning,
+        onineEarning: onineEarning ?? _onineEarning,
+        cod: cod ?? _cod,
+        products: products ?? _products,
+      );
   String? get status => _status;
   String? get message => _message;
   String? get totalEarning => _totalEarning;
@@ -72,7 +76,6 @@ EarningsModel copyWith({  String? status,
     }
     return map;
   }
-
 }
 
 /// transaction_id : "Order Delivered Successfully 3"
@@ -85,13 +88,14 @@ EarningsModel copyWith({  String? status,
 
 class Products {
   Products({
-      String? transactionId, 
-      String? orderId, 
-      String? amount, 
-      String? createdAt, 
-      String? paymentMode, 
-      String? status, 
-      String? productImage,}){
+    String? transactionId,
+    String? orderId,
+    String? amount,
+    String? createdAt,
+    String? paymentMode,
+    String? status,
+    String? productImage,
+  }) {
     _transactionId = transactionId;
     _orderId = orderId;
     _amount = amount;
@@ -99,7 +103,7 @@ class Products {
     _paymentMode = paymentMode;
     _status = status;
     _productImage = productImage;
-}
+  }
 
   Products.fromJson(dynamic json) {
     _transactionId = json['transaction_id'];
@@ -117,21 +121,24 @@ class Products {
   String? _paymentMode;
   String? _status;
   String? _productImage;
-Products copyWith({  String? transactionId,
-  String? orderId,
-  String? amount,
-  String? createdAt,
-  String? paymentMode,
-  String? status,
-  String? productImage,
-}) => Products(  transactionId: transactionId ?? _transactionId,
-  orderId: orderId ?? _orderId,
-  amount: amount ?? _amount,
-  createdAt: createdAt ?? _createdAt,
-  paymentMode: paymentMode ?? _paymentMode,
-  status: status ?? _status,
-  productImage: productImage ?? _productImage,
-);
+  Products copyWith({
+    String? transactionId,
+    String? orderId,
+    String? amount,
+    String? createdAt,
+    String? paymentMode,
+    String? status,
+    String? productImage,
+  }) =>
+      Products(
+        transactionId: transactionId ?? _transactionId,
+        orderId: orderId ?? _orderId,
+        amount: amount ?? _amount,
+        createdAt: createdAt ?? _createdAt,
+        paymentMode: paymentMode ?? _paymentMode,
+        status: status ?? _status,
+        productImage: productImage ?? _productImage,
+      );
   String? get transactionId => _transactionId;
   String? get orderId => _orderId;
   String? get amount => _amount;
@@ -151,5 +158,4 @@ Products copyWith({  String? transactionId,
     map['product_image'] = _productImage;
     return map;
   }
-
 }

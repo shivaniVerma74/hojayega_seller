@@ -606,6 +606,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                           return null;
                                         },
                                         decoration: InputDecoration(
+                                          hintText: "EX. 3 client",
                                           isDense: true,
                                           border: OutlineInputBorder(
                                               borderRadius:
@@ -675,8 +676,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                             child: TextFormField(
                                               controller:
                                                   workingHoursController,
-                                              keyboardType:
-                                                  TextInputType.number,
+                                              keyboardType: TextInputType.text,
                                               validator: (value) {
                                                 if (value == null ||
                                                     value.isEmpty) {
@@ -685,6 +685,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                 return null;
                                               },
                                               decoration: InputDecoration(
+                                                hintText: "Ex.9 AM to 10 PM",
                                                 isDense: true,
                                                 border: OutlineInputBorder(
                                                     borderRadius:
@@ -704,8 +705,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                 .41,
                                             child: TextFormField(
                                               controller: workingDaysController,
-                                              keyboardType:
-                                                  TextInputType.number,
+                                              keyboardType: TextInputType.text,
                                               validator: (value) {
                                                 if (value == null ||
                                                     value.isEmpty) {
@@ -714,6 +714,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                                 return null;
                                               },
                                               decoration: InputDecoration(
+                                                hintText: "Ex. Mon-Sat",
                                                 isDense: true,
                                                 border: OutlineInputBorder(
                                                     borderRadius:
@@ -775,12 +776,14 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                           return null;
                                         },
                                         decoration: InputDecoration(
+                                          hintText: "EX. 200 Rs",
                                           isDense: true,
                                           border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              borderSide: const BorderSide(
-                                                  color: colors.primary)),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            borderSide: const BorderSide(
+                                                color: colors.primary),
+                                          ),
                                         ),
                                       ),
                                     ],

@@ -294,6 +294,7 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
   }
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -583,6 +584,9 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
                 child: Card(
                   child: InkWell(
                     onTap: () {
+                      setState(() {
+                        loading = true;
+                      });
                       if (_image == null ||
                           startDateCtr.text == "" ||
                           startDateCtr.text == null ||
@@ -598,10 +602,15 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
                     },
                     child: Container(
                       child: Center(
-                        child: Text(
-                          'Pay',
-                          style: TextStyle(color: Colors.white, fontSize: 19),
-                        ),
+                        child: loading
+                            ? CircularProgressIndicator(
+                                color: colors.whiteTemp,
+                              )
+                            : Text(
+                                'Pay',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 19),
+                              ),
                       ),
                       decoration: BoxDecoration(
                         color: colors.secondary,

@@ -1,12 +1,15 @@
 import 'dart:convert';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Helper/api.path.dart';
 import 'package:http/http.dart' as http;
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Helper/color.dart';
+import '../Model/GetProfileModel.dart';
 import '../Model/TransactionModel.dart';
 
 class DeliveryCard extends StatefulWidget {
@@ -31,8 +34,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
 
   TextEditingController addMoneyCtr = TextEditingController();
 
-  var arrPrice=[500,1000,1500,2000];
-  int addMoney=0;
+  var arrPrice = [500, 1000, 1500, 2000];
+  int addMoney = 0;
 
   addWallet() async {
     // SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -85,7 +88,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
-      final jsonResponse = TransactionModel.fromJson(json.decode(finalResponse));
+      final jsonResponse =
+          TransactionModel.fromJson(json.decode(finalResponse));
       setState(() {
         transactionModel = jsonResponse;
       });
@@ -96,8 +100,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
 
   Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
     Fluttertoast.showToast(msg: "Payment successfully");
-     addWallet();
-     Navigator.pop(context);
+    addWallet();
+    Navigator.pop(context);
     // Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
   }
 
@@ -137,6 +141,34 @@ class _DeliveryCardState extends State<DeliveryCard> {
     }
   }
 
+  GetProfileModel? profileData;
+  String? deliveryCardBalance;
+
+  getProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    print("${prefs.getString('roll')}+++++++++++++++++++++++");
+    var headers = {
+      'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
+    };
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
+    request.fields.addAll({'user_id': vendorId.toString()});
+    debugPrint("get profile parametersssss ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = GetProfileModel.fromJson(json.decode(finalResponse));
+      print("profile data responsee $finalResult");
+      profileData = finalResult;
+      deliveryCardBalance = profileData?.data?.first.dCard;
+      setState(() {});
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,45 +190,59 @@ class _DeliveryCardState extends State<DeliveryCard> {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Column(
                 children: [
-                  Container(
-                    height: 100,
-                    width: MediaQuery.of(context).size.width / 1.2,
-                    decoration: BoxDecoration(
-                        image: const DecorationImage(
-                          image: AssetImage("assets/images/homered.png"),
-                          fit: BoxFit.cover,
+                  const AutoSizeText(
+                    "Please maintain 100 minimum wallet amount to \nactive the account",
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        height: 100,
+                        width: MediaQuery.of(context).size.width / 1.2,
+                        decoration: BoxDecoration(
+                            image: const DecorationImage(
+                              image: AssetImage("assets/images/homered.png"),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 25),
+                          child: Column(
+                            children: [
+                              const Text(
+                                "Delivery Card Balance ",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.whiteTemp,
+                                    fontSize: 19),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              // wallet_balance_added == null ? Text("₹ 0",
+                              //     style: TextStyle(
+                              //         fontWeight: FontWeight.w600,
+                              //         color: colors.whiteTemp,
+                              //         fontSize: 23)):
+                              Text(
+                                "₹ ${wallet_balance_added ?? widget.walletAmount}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.whiteTemp,
+                                    fontSize: 23),
+                              ),
+                            ],
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 25),
-                      child: Column(
-                        children:  [
-                          const Text(
-                            "Delivery Card Balance ",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: colors.whiteTemp,
-                                fontSize: 19),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          // wallet_balance_added == null ? Text("₹ 0",
-                          //     style: TextStyle(
-                          //         fontWeight: FontWeight.w600,
-                          //         color: colors.whiteTemp,
-                          //         fontSize: 23)):
-                          Text("₹ ${wallet_balance_added ?? widget.walletAmount}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.whiteTemp,
-                                  fontSize: 23)),
-                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
@@ -218,14 +264,15 @@ class _DeliveryCardState extends State<DeliveryCard> {
                   height: MediaQuery.of(context).size.height / 3.7,
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),border: Border.all(color: colors.primary,width: 2),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: colors.primary, width: 2),
                       color: colors.whiteTemp),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
                         Padding(
-                          padding:
-                              const EdgeInsets.only(top: 15, left: 30, right: 30),
+                          padding: const EdgeInsets.only(
+                              top: 15, left: 30, right: 30),
                           child: TextFormField(
                             keyboardType: TextInputType.number,
                             controller: addMoneyCtr,
@@ -249,7 +296,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
                                       BorderSide(color: Colors.grey.shade200)),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: Colors.grey.shade200),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade200),
                               ),
                             ),
                           ),
@@ -260,28 +308,32 @@ class _DeliveryCardState extends State<DeliveryCard> {
                           child: Container(
                             height: 30,
                             child: ListView.builder(
-                              scrollDirection:
-                              Axis.horizontal,
+                              scrollDirection: Axis.horizontal,
                               // Set the direction to horizontal
                               itemCount: arrPrice.length,
                               itemBuilder: (context, index) {
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
                                   child: InkWell(
-                                    onTap: (){
-                                     // print("11");
-                                      addMoney=addMoney+arrPrice[index];
+                                    onTap: () {
+                                      // print("11");
+                                      addMoney = addMoney + arrPrice[index];
                                       setState(() {
-                                        addMoneyCtr.text=addMoney.toString();
+                                        addMoneyCtr.text = addMoney.toString();
                                       });
                                     },
                                     child: Container(
-                                      width:  60,
-                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),color: colors.primary),
+                                      width: 60,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          color: colors.primary),
                                       child: Center(
                                         child: Text(
                                           arrPrice[index].toString(),
-                                          style: TextStyle(color: colors.whiteTemp),
+                                          style: TextStyle(
+                                              color: colors.whiteTemp),
                                         ),
                                       ),
                                     ),
@@ -291,7 +343,9 @@ class _DeliveryCardState extends State<DeliveryCard> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20,),
+                        SizedBox(
+                          height: 20,
+                        ),
                         InkWell(
                           onTap: () {
                             final form = _formkey.currentState!;
@@ -347,7 +401,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
                 ? const Center(
                     child: Text(
                       "No Transaction",
-                      style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
                     ),
                   )
                 : ListView.builder(

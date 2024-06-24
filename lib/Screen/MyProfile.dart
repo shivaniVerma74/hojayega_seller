@@ -1649,26 +1649,26 @@ class _MyProfileState extends State<MyProfile> {
                                             },
                                             child: Card(
                                               child: Container(
-                                                  height: 80,
-                                                  width: 220,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                        color: colors.primary),
-                                                    color: Colors.white,
-                                                    // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                                  ),
-                                                  child: _qrimage != null
-                                                      ? Image.file(
-                                                          _qrimage!.absolute,
-                                                          fit: BoxFit.fill,
-                                                        )
-                                                      : Image.network(
-                                                          "https://developmentalphawizz.com/hojayega${selfiImage!}",
-                                                          fit: BoxFit.fill,
-                                                        )),
+                                                height: 80,
+                                                width: 220,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                      color: colors.primary),
+                                                  color: Colors.white,
+                                                  // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                                ),
+                                                child: _qrimage != null
+                                                    ? Image.file(
+                                                        _qrimage!.absolute,
+                                                        fit: BoxFit.fill,
+                                                      )
+                                                    : Image.network(
+                                                        "https://developmentalphawizz.com/hojayega${selfiImage!}",
+                                                        fit: BoxFit.fill,
+                                                      ),
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -1682,7 +1682,6 @@ class _MyProfileState extends State<MyProfile> {
                         ),
                       ),
                     ),
-
                     // Card(
                     //   child: InkWell(
                     //     onTap: (){

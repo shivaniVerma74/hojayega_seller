@@ -96,14 +96,16 @@ class _HomePageState extends State<HomeScreen> {
     };
     var request =
         http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorOrder));
-    request.fields.addAll({'user_id': vendorId.toString()});
+    request.fields.addAll({
+      'user_id': vendorId.toString(),
+    });
     debugPrint("get current parametersssss ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = VendorTodayOrder.fromJson(json.decode(finalResponse));
-      print("profile data responsee $finalResult");
+      print("current data response $finalResult");
       vendorTodayOrder = finalResult;
       setState(() {});
     } else {

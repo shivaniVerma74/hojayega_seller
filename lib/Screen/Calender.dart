@@ -230,6 +230,13 @@ class _CalenderState extends State<Calender> {
                                                       fontWeight:
                                                           FontWeight.bold))
                                               : SizedBox(),
+                                          data?.status == "Cancelled"
+                                              ? const Text('Cancelled',
+                                                  style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontWeight:
+                                                          FontWeight.bold))
+                                              : SizedBox(),
                                           const SizedBox(
                                             height: 5,
                                           ),
@@ -369,7 +376,8 @@ class _CalenderState extends State<Calender> {
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ),
-                                data.status == "Complete"
+                                data.status == "Complete" ||
+                                        data.status == "Cancelled"
                                     ? SizedBox()
                                     : Padding(
                                         padding: const EdgeInsets.only(
@@ -384,26 +392,28 @@ class _CalenderState extends State<Calender> {
                                                     data.bookingId.toString());
                                               },
                                               child: Container(
-                                                  height: 30,
-                                                  width: 140,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                      color: colors.primary),
-                                                  child: const Center(
-                                                      child: Text(
+                                                height: 30,
+                                                width: 140,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    color: colors.primary),
+                                                child: const Center(
+                                                  child: Text(
                                                     "Complete Booking",
                                                     style: TextStyle(
                                                         color: Colors.white,
                                                         fontSize: 15,
                                                         fontWeight:
                                                             FontWeight.w600),
-                                                  ))),
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
-                                      )
+                                      ),
                               ],
                             ),
                           ),

@@ -854,21 +854,24 @@ class _MyListViewState extends State<MyListView> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Container(
-                                        width: 90,
-                                        child: Text(
-                                          "${service.serviceName}",
-                                          style: const TextStyle(
-                                            color: colors.primary,
-                                            fontSize: 15,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
+                                      width: 50,
+                                      child: Text(
+                                        "${service.serviceName}",
+                                        style: const TextStyle(
+                                          color: colors.primary,
+                                          fontSize: 15,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 60,
+                                    ),
                                     Text(
                                       "${service.mrpPrice}/-",
                                       style: const TextStyle(
@@ -876,11 +879,19 @@ class _MyListViewState extends State<MyListView> {
                                         fontSize: 15,
                                       ),
                                     ),
+                                    Text(
+                                      "${service.specialPrice}/-",
+                                      style: const TextStyle(
+                                        color: colors.primary,
+                                        fontSize: 15,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                               const SizedBox(
-                                width: 12,
+                                width: 8,
                               ),
                               InkWell(
                                   onTap: () {
@@ -951,7 +962,7 @@ class _MyListViewState extends State<MyListView> {
                                     activeColor: colors.primary,
                                   ),
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         );

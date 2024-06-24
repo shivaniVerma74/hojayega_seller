@@ -1,14 +1,14 @@
-import 'dart:io';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart'as http;
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helper/Color.dart';
 import '../Helper/api.path.dart';
-import '../Model/Sec15ModelList.dart';
 import 'BottomBar.dart';
 
 class Add15Sec extends StatefulWidget {
@@ -19,15 +19,12 @@ class Add15Sec extends StatefulWidget {
 }
 
 class _Add15SecState extends State<Add15Sec> {
-
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getSetting();
   }
-
 
   String? banner_Charge;
   int? amount;
@@ -37,7 +34,8 @@ class _Add15SecState extends State<Add15Sec> {
     var headers = {
       'Cookie': 'ci_session=bfa970b6e13a45a52775a4cd4995efa6026d6895'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getSettings));
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getSettings));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -46,7 +44,8 @@ class _Add15SecState extends State<Add15Sec> {
       print("responseee $finaResult");
       if (finaResult['status'] == 1) {
         banner_Charge = finaResult['setting']['banner_per_day_charge'];
-        await prefs.setString('banner_Charge', finaResult['setting']['ad_amount_15'].toString());
+        await prefs.setString(
+            'banner_Charge', finaResult['setting']['ad_amount_15'].toString());
         print('____banner charge is$banner_Charge ___');
         setState(() {});
         // Fluttertoast.showToast(msg: '${finaResult['message']}');
@@ -65,11 +64,13 @@ class _Add15SecState extends State<Add15Sec> {
   final picker = ImagePicker();
 
   Future getImageGallery() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
-      }  else {
+        Navigator.pop(context);
+      } else {
         print('no image picked');
       }
     });
@@ -77,16 +78,16 @@ class _Add15SecState extends State<Add15Sec> {
 
   Future _getImageFromCamera() async {
     final pickedFile =
-    await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
-      }  else {
+        Navigator.pop(context);
+      } else {
         print('no image picked');
       }
     });
   }
-
 
   Future<void> _showPickerOptions() async {
     showModalBottomSheet(
@@ -114,12 +115,13 @@ class _Add15SecState extends State<Add15Sec> {
       },
     );
   }
+
   TextEditingController totalamtCtr = TextEditingController();
   String? vendorId, roll;
-  addOffers() async{
+  addOffers() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     vendorId = preferences.getString('vendor_id');
-    roll=  preferences.getString('roll');
+    roll = preferences.getString('roll');
     print("vendor id add product screen $vendorId");
     var headers = {
       'Cookie': 'ci_session=60bef4788330603caab520de3a388682e1b2fdea'
@@ -127,19 +129,20 @@ class _Add15SecState extends State<Add15Sec> {
     var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.offers));
     request.fields.addAll({
       'user_id': vendorId.toString(),
-      'type': roll=="1" ? "shop" : "service",
+      'type': roll == "1" ? "shop" : "service",
       'total_amount': totalamtCtr.text,
       'transaction_id': 'wallet'
     });
     print("======15sec=========${request.fields}===========");
-    request.files.add(await http.MultipartFile.fromPath('image', _image!.path.toString()));
+    request.files.add(
+        await http.MultipartFile.fromPath('image', _image!.path.toString()));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavBar()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => BottomNavBar()));
       print(await response.stream.bytesToString());
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
@@ -161,12 +164,14 @@ class _Add15SecState extends State<Add15Sec> {
           ),
           title: const Text('15Sec Adds'),
           backgroundColor: colors.primary),
-      body:  SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Form(
           key: _formkey,
           child: Column(
             children: [
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
               InkWell(
                 onTap: () {
                   imageCode = 1;
@@ -174,7 +179,7 @@ class _Add15SecState extends State<Add15Sec> {
                 },
                 child: Card(
                   child: Container(
-                    height: MediaQuery.of(context).size.height/4.3,
+                    height: MediaQuery.of(context).size.height / 4.3,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -182,21 +187,27 @@ class _Add15SecState extends State<Add15Sec> {
                     ),
                     child: _image != null
                         ? Image.file(
-                      _image!.absolute,
-                      fit: BoxFit.fill,
-                    ): Padding(
-                      padding: const EdgeInsets.only(top: 40),
-                      child: Column(
-                        children: const [
-                          Text("Upload Image", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),),
-                          Icon(
-                            Icons.file_upload_outlined,
-                            color: colors.secondary,
-                            size: 50,
+                            _image!.absolute,
+                            fit: BoxFit.fill,
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.only(top: 40),
+                            child: Column(
+                              children: const [
+                                Text(
+                                  "Upload Image",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Icon(
+                                  Icons.file_upload_outlined,
+                                  color: colors.secondary,
+                                  size: 50,
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
               ),
@@ -305,7 +316,9 @@ class _Add15SecState extends State<Add15Sec> {
               //     ),
               //   ],
               // ),
-              SizedBox(height: 16,),
+              SizedBox(
+                height: 16,
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15),
                 child: Column(
@@ -320,51 +333,52 @@ class _Add15SecState extends State<Add15Sec> {
                           decoration: BoxDecoration(
                               color: colors.whiteTemp,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: colors.primary)
-                          ),
-                          width: MediaQuery.of(context).size.width/2-30,
+                              border: Border.all(color: colors.primary)),
+                          width: MediaQuery.of(context).size.width / 2 - 30,
                           child: TextFormField(
                             readOnly: true,
                             style: const TextStyle(color: Colors.black),
                             // controller: oldPriceController,
                             keyboardType: TextInputType.number,
                             maxLength: 10,
-                            decoration:  InputDecoration(
-                              // suffixIcon: Icon(Icons.calendar_month),
-                              // contentPadding: EdgeInsets.only(top: 16),
+                            decoration: InputDecoration(
+                                // suffixIcon: Icon(Icons.calendar_month),
+                                // contentPadding: EdgeInsets.only(top: 16),
                                 counterText: '',
                                 border: InputBorder.none,
-                                hintStyle: const TextStyle(fontWeight: FontWeight.w400),
-                                hintText: "Charges: $banner_Charge"
-                            ),
+                                hintStyle: const TextStyle(
+                                    fontWeight: FontWeight.w400),
+                                hintText: "Charges: $banner_Charge RS."),
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.only(top: 0, left: 12, right: 8),
+                          padding:
+                              const EdgeInsets.only(top: 0, left: 12, right: 8),
                           height: 60,
                           decoration: BoxDecoration(
                               color: colors.whiteTemp,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: colors.primary)
-                          ),
-                          width: MediaQuery.of(context).size.width/2-30,
+                              border: Border.all(color: colors.primary)),
+                          width: MediaQuery.of(context).size.width / 2 - 30,
                           child: TextFormField(
-                            onChanged:(value) => {
-                              totalAmtCtr.text = "${(int.parse(banner_Charge??""))* (int.parse(value))} RS",
-                              print("===============${totalAmtCtr.text}==========="),
+                            onChanged: (value) => {
+                              totalAmtCtr.text =
+                                  "${(int.parse(banner_Charge ?? "")) * (int.parse(value))} RS",
+                              print(
+                                  "===============${totalAmtCtr.text}==========="),
                             },
-                            style:  const TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                             controller: dayCtr,
                             keyboardType: TextInputType.number,
                             maxLength: 10,
-                            decoration:  const InputDecoration(
-                              // suffixIcon: Icon(Icons.calendar_month),
-                              // contentPadding: EdgeInsets.only(top: 16),
+                            decoration: const InputDecoration(
+                                // suffixIcon: Icon(Icons.calendar_month),
+                                // contentPadding: EdgeInsets.only(top: 16),
                                 counterText: '',
                                 border: InputBorder.none,
-                                hintStyle: TextStyle(fontWeight: FontWeight.w400),
-                                hintText: "Enter Day"
-                            ),
+                                hintStyle:
+                                    TextStyle(fontWeight: FontWeight.w400),
+                                hintText: "Enter Day"),
                           ),
                         ),
                       ],
@@ -372,7 +386,9 @@ class _Add15SecState extends State<Add15Sec> {
                   ],
                 ),
               ),
-              SizedBox(height: 16,),
+              SizedBox(
+                height: 16,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -382,9 +398,8 @@ class _Add15SecState extends State<Add15Sec> {
                     decoration: BoxDecoration(
                         color: colors.whiteTemp,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: colors.primary)
-                    ),
-                    width: MediaQuery.of(context).size.width/1.1,
+                        border: Border.all(color: colors.primary)),
+                    width: MediaQuery.of(context).size.width / 1.1,
                     child: TextFormField(
                       readOnly: true,
                       style: const TextStyle(color: Colors.black),
@@ -392,26 +407,28 @@ class _Add15SecState extends State<Add15Sec> {
                       keyboardType: TextInputType.number,
                       maxLength: 10,
                       decoration: const InputDecoration(
-                        // suffixIcon: Padding(
-                        //   padding: EdgeInsets.only(top: 16),
-                        //   child: Text("0 Rs"),
-                        // ),
+                          // suffixIcon: Padding(
+                          //   padding: EdgeInsets.only(top: 16),
+                          //   child: Text("0 Rs"),
+                          // ),
                           contentPadding: EdgeInsets.only(top: 6),
                           counterText: '',
                           border: InputBorder.none,
-                          hintText: "Total Amount "
-                      ),
+                          hintText: "Total Amount "),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 70,),
+              const SizedBox(
+                height: 70,
+              ),
               Center(
                 child: Card(
                   child: InkWell(
                     onTap: () {
-                      if (_image == null || totalAmtCtr.text == "" || totalAmtCtr.text == null
-                      ) {
+                      if (_image == null ||
+                          totalAmtCtr.text == "" ||
+                          totalAmtCtr.text == null) {
                         Fluttertoast.showToast(msg: "Please Fill All Fields");
                       }
                       addOffers();
@@ -420,9 +437,7 @@ class _Add15SecState extends State<Add15Sec> {
                       child: Center(
                         child: Text(
                           'Pay',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 19
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 19),
                         ),
                       ),
                       decoration: BoxDecoration(

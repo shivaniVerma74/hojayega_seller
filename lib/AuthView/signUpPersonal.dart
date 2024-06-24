@@ -167,8 +167,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         await http.MultipartFile.fromPath('pan_image', _image2?.path ?? ""));
     request.files.add(
         await http.MultipartFile.fromPath('adhar_front', _image3?.path ?? ""));
-    request.files.add(
-        await http.MultipartFile.fromPath('adhar_back', _image4?.path ?? ""));
+    if (_image4 == null || _image4 == "") {
+    } else {
+      request.files.add(
+          await http.MultipartFile.fromPath('adhar_back', _image4?.path ?? ""));
+    }
     request.files.add(
         await http.MultipartFile.fromPath('adhar_back', _image5?.path ?? ""));
     request.files.add(
@@ -823,8 +826,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           isDense: true,
                                           hintText: 'Year of Experience',
                                           enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
+                                            borderSide:
+                                                BorderSide(color: Colors.white),
+                                          ),
                                           focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.white))),
@@ -905,7 +909,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                 child: Card(
                                   child: Container(
                                     // width: 220,
-
                                     // height: 50,
                                     // color: Colors.black,
                                     decoration: BoxDecoration(
@@ -935,14 +938,15 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             children: [
                               Card(
                                 child: Container(
-                                    width: 50,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: Image.asset(
-                                        'assets/images/password.png')),
+                                  width: 50,
+                                  height: 50,
+                                  // color: Colors.black,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: colors.lightgray),
+                                  child:
+                                      Image.asset('assets/images/password.png'),
+                                ),
                               ),
                               Expanded(
                                 child: Card(
@@ -1892,7 +1896,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                                 value.isEmpty) {
                                               return 'Enter IFSC Code';
                                             } else if (value.length < 11) {
-                                              return 'At least 10 characters required';
+                                              return 'At least 11 characters required';
                                             }
                                             return null;
                                           },
@@ -2235,7 +2239,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     const Padding(
                       padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
-                        "Aadhar Card (Back)",
+                        "Aadhar Card (Back)(Optional)",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: colors.text),
                       ),
@@ -2305,7 +2309,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     const Padding(
                       padding: EdgeInsets.only(top: 10, left: 6),
                       child: Text(
-                        "Shop At",
+                        "Shop At( Food licence)",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: colors.text),
                       ),
@@ -2403,7 +2407,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                               if (_image == null ||
                                   _image2 == null ||
                                   _image3 == null ||
-                                  _image4 == null ||
                                   _image5 == null ||
                                   _image6 == null) {
                                 Fluttertoast.showToast(

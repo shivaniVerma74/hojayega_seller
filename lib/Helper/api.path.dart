@@ -21,17 +21,17 @@ class ApiServicves {
       '${baseUrl}pick_and_drops_amountcalculate';
   static const String sendOtpforgetpassword = '${baseUrl}forgot_pass_user';
   static const String getArea = '${baseUrl}get_regions';
-  static const String resetpassword = baseUrl + 'reset_password';
-  static const String getBanners = baseUrl + 'get_banners';
+  static const String resetpassword = '${baseUrl}reset_password';
+  static const String getBanners = '${baseUrl}get_banners';
   static const String getCategories =
-      baseUrl + 'get_categories_by_shop_services';
-  static const String getVendorServices = baseUrl + 'get_vendor_services';
-  static const String deleteService = baseUrl + 'delete_service';
-  static const String updateServiceStatus = baseUrl + 'update_service_status';
-  static const String vendorDeals = baseUrl + 'vendor_deals';
-  static const String addServicesVendor = baseUrl + 'add_services_vendor';
-  static const String updateServicesVendor = baseUrl + 'update_service_vendor';
-  static const String getVendorProduct = baseUrl + 'get_vendor_products';
+      '${baseUrl}get_categories_by_shop_services';
+  static const String getVendorServices = '${baseUrl}get_vendor_services';
+  static const String deleteService = '${baseUrl}delete_service';
+  static const String updateServiceStatus = '${baseUrl}update_service_status';
+  static const String vendorDeals = '${baseUrl}vendor_deals';
+  static const String addServicesVendor = '${baseUrl}add_services_vendor';
+  static const String updateServicesVendor = '${baseUrl}update_service_vendor';
+  static const String getVendorProduct = '${baseUrl}get_vendor_products';
   static const String getSubCategories =
       baseUrl + 'get_categories_by_shop_services';
   static const String productchildCategories =

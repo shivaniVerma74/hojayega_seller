@@ -305,7 +305,7 @@ class _OrderDetailsState extends State<OrderDetails> {
     'Food',
     'Non-Food',
   ];
-  var productitem = ['Urgent', '2 Way', 'Multiple', 'Flexible'];
+  var productitem = ['Urgent', 'Flexible'];
 
   VehicleModel? vehicleItem;
   getVehicle() async {
@@ -1357,7 +1357,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       },
                       child: Container(
                         height: 30,
-                        width: 140,
+                        width: 150,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(0),
                           color: const Color(0xffE5CB24),

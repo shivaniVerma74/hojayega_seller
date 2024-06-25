@@ -306,6 +306,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
 
   var imageCode;
   File? croppedFile;
+
   Future getImageGallery() async {
     final pickedFile = await picker.pickImage(
         source: ImageSource.gallery,
@@ -1086,14 +1087,15 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                             children: [
                               Card(
                                 child: Container(
-                                    width: 50,
-                                    height: 50,
-                                    // color: Colors.black,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: colors.lightgray),
-                                    child: Image.asset(
-                                        'assets/images/daetofbirth.png')),
+                                  width: 50,
+                                  height: 50,
+                                  // color: Colors.black,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: colors.lightgray),
+                                  child: Image.asset(
+                                      'assets/images/daetofbirth.png'),
+                                ),
                               ),
                               Expanded(
                                 child: Card(

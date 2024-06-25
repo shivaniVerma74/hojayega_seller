@@ -8,6 +8,7 @@ import 'package:hojayega_seller/Screen/AllCategory.dart';
 import 'package:hojayega_seller/Screen/BusinessCard.dart';
 import 'package:hojayega_seller/Screen/Calender.dart';
 import 'package:hojayega_seller/Screen/DeliveryCard.dart';
+import 'package:hojayega_seller/Screen/Faq.dart';
 import 'package:hojayega_seller/Screen/MyProfile.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -618,54 +619,74 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 height: 5,
               ),
               InkWell(
-                  onTap: () {
-                    Navigator.push(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PrivacyPolicy()),
+                  );
+                  setState(() {
+                    currentIndex = 16;
+                  });
+                },
+                child: DrawerIconTab(
+                  titlee: 'Privacy Policy',
+                  icon: Icons.settings,
+                  tabb: 16,
+                  indexx: currentIndex,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => PrivacyPolicy()),
-                    );
-                    setState(() {
-                      currentIndex = 16;
-                    });
-                  },
-                  child: DrawerIconTab(
-                    titlee: 'Privacy Policy',
-                    icon: Icons.settings,
-                    tabb: 16,
-                    indexx: currentIndex,
-                  )),
+                      MaterialPageRoute(
+                          builder: (context) => ContactUsScreen()));
+                  setState(() {
+                    currentIndex = 17;
+                  });
+                },
+                child: DrawerIconTab(
+                  titlee: 'Help',
+                  icon: Icons.help,
+                  tabb: 17,
+                  indexx: currentIndex,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => FaqPage()));
+                  setState(() {
+                    currentIndex = 18;
+                  });
+                },
+                child: DrawerIconTab(
+                  titlee: 'Faq',
+                  icon: Icons.question_mark,
+                  tabb: 18,
+                  indexx: currentIndex,
+                ),
+              ),
               const SizedBox(
                 height: 5,
               ),
               InkWell(
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ContactUsScreen()));
                     setState(() {
-                      currentIndex = 17;
-                    });
-                  },
-                  child: DrawerIconTab(
-                    titlee: 'Help',
-                    icon: Icons.help,
-                    tabb: 17,
-                    indexx: currentIndex,
-                  )),
-              const SizedBox(
-                height: 5,
-              ),
-              InkWell(
-                  onTap: () {
-                    setState(() {
-                      currentIndex = 18;
+                      currentIndex = 19;
                     });
                     logout(context);
                   },
                   child: DrawerIconTab(
                     titlee: 'Log Out',
                     icon: Icons.logout_outlined,
-                    tabb: 18,
+                    tabb: 19,
                     indexx: currentIndex,
                   )),
               const SizedBox(

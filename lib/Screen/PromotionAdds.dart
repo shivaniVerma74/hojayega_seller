@@ -654,10 +654,11 @@ class _PromotionAddsState extends State<PromotionAdds> {
                                     borderRadius: BorderRadius.circular(10),
                                     color: colors.primary),
                                 child: const Center(
-                                    child: Text(
-                                  "Active",
-                                  style: TextStyle(color: colors.whiteTemp),
-                                )),
+                                  child: Text(
+                                    "Active",
+                                    style: TextStyle(color: colors.whiteTemp),
+                                  ),
+                                ),
                               ),
                             )
                           : SizedBox(),
@@ -680,12 +681,13 @@ class _PromotionAddsState extends State<PromotionAdds> {
                           : const SizedBox.shrink(),
                       const SizedBox(height: 5),
                       Container(
-                          height: 200,
-                          width: MediaQuery.of(context).size.width,
-                          child: Image.network(
-                            "https://developmentalphawizz.com/hojayega/${sec15List?.data?[i].image}",
-                            fit: BoxFit.fill,
-                          )),
+                        height: 200,
+                        width: MediaQuery.of(context).size.width,
+                        child: Image.network(
+                          "https://developmentalphawizz.com/hojayega/${sec15List?.data?[i].image}",
+                          fit: BoxFit.fill,
+                        ),
+                      ),
                     ],
                   );
                 });

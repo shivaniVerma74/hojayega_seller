@@ -38,7 +38,7 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
 
   Future getImageGallery() async {
     final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
@@ -50,7 +50,7 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
 
   Future _getImageFromCamera() async {
     final pickedFile =
-        await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
@@ -201,6 +201,8 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
     print("====promotion add here===========${request.fields}===========");
     request.files.add(
         await http.MultipartFile.fromPath('image', _image!.path.toString()));
+    print(
+        "====promotion add here===========${request.files} ${_image!.path}===========");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {

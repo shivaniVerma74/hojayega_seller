@@ -79,8 +79,6 @@ class _MyProfileState extends State<MyProfile> {
   String? customerLocationImage;
   String? shopImage;
 
-  List<String> items3 = ['Indore', 'Bhopal', 'jaipur', 'Ujjain'];
-
   File? _qrimage;
   File? _currentlocationimage;
   File? _image;
@@ -130,6 +128,7 @@ class _MyProfileState extends State<MyProfile> {
         print('no image picked');
       }
     });
+    Navigator.pop(context);
   }
 
   Future _getImageFromCamera() async {
@@ -156,6 +155,7 @@ class _MyProfileState extends State<MyProfile> {
         print('no image picked');
       }
     });
+    Navigator.pop(context);
   }
 
   loading() {
@@ -196,6 +196,7 @@ class _MyProfileState extends State<MyProfile> {
       upiidContoler.text = profileData!.data!.first.upiId ?? "";
       customerLocationImage = profileData?.data?.first.customerLocation;
       panImage = profileData?.data?.first.panImage;
+      gstNumberController.text = profileData?.data?.first.gstNo ?? "";
       shopImage = profileData?.data?.first.shopImage;
       getState();
       getCity(stateId);
@@ -342,16 +343,16 @@ class _MyProfileState extends State<MyProfile> {
       builder: (BuildContext context) {
         return Wrap(
           children: <Widget>[
+            // ListTile(
+            //   leading: Icon(Icons.photo_library),
+            //   title: Text('Gallery'),
+            //   onTap: () {
+            //     getImageGallery();
+            //   },
+            // ),
             ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Gallery'),
-              onTap: () {
-                getImageGallery();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text('Camera'),
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
               onTap: () {
                 _getImageFromCamera();
                 // _getImage(ImageSource.camera);

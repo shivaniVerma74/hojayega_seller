@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
-import 'package:http/http.dart' as http;
 import '../Model/AreaModel.dart';
 import '../Model/VehicleModel.dart';
 import '../Model/getTimeSlotModel.dart';
@@ -24,7 +25,6 @@ class PickDrop extends StatefulWidget {
 }
 
 class _PickDropState extends State<PickDrop> {
-
   String _selectedOption = 'Yes';
   var arrValue = ['Cake', 'fragile', 'Ready', 'Non'];
   Map<int, int> _radioSelections = {};
@@ -39,7 +39,7 @@ class _PickDropState extends State<PickDrop> {
   final picker = ImagePicker();
   Future getImageGallery() async {
     final pickedFile =
-    await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
@@ -67,11 +67,11 @@ class _PickDropState extends State<PickDrop> {
           child: packageImages != null
               ? Image.file(packageImages!, fit: BoxFit.cover)
               : Column(
-            children: const [
-              Center(child: Icon(Icons.upload_file_outlined, size: 60)),
-              Text("Upload")
-            ],
-          ),
+                  children: const [
+                    Center(child: Icon(Icons.upload_file_outlined, size: 60)),
+                    Text("Upload")
+                  ],
+                ),
         ),
       ),
     );
@@ -115,19 +115,19 @@ class _PickDropState extends State<PickDrop> {
             borderRadius: BorderRadius.circular(10),
             child: packageImages != null
                 ? Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Image.file(packageImages!, fit: BoxFit.fill))
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: Image.file(packageImages!, fit: BoxFit.fill))
                 : Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Column(
-                children: const [
-                  Center(
-                    child: Icon(Icons.upload_file_outlined, size: 60),
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Column(
+                      children: const [
+                        Center(
+                          child: Icon(Icons.upload_file_outlined, size: 60),
+                        ),
+                        Text("Upload")
+                      ],
+                    ),
                   ),
-                  Text("Upload")
-                ],
-              ),
-            ),
           ),
         ),
       ),
@@ -152,37 +152,36 @@ class _PickDropState extends State<PickDrop> {
 
   Future showAlertDialog(BuildContext context, String type) async {
     return await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Select Image'),
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                pickImage(ImageSource.gallery, type);
-                Navigator.pop(context);
-                // getImage(ImageSource.camera, context, 1);
-              },
-              child: Text('Gallery'),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Select Image'),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    pickImage(ImageSource.gallery, type);
+                    Navigator.pop(context);
+                    // getImage(ImageSource.camera, context, 1);
+                  },
+                  child: Text('Gallery'),
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    pickImage(ImageSource.camera, type);
+                    Navigator.pop(context);
+                  },
+                  child: Text('Camera'),
+                ),
+              ],
             ),
-            const SizedBox(
-              width: 15,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                pickImage(ImageSource.camera, type);
-                Navigator.pop(context);
-              },
-              child: Text('Camera'),
-            ),
-          ],
-        ),
-      ),
-    ) ??
+          ),
+        ) ??
         false;
   }
-
 
   TextEditingController productDescriptionCtr = TextEditingController();
   TextEditingController noteCtr = TextEditingController();
@@ -236,9 +235,9 @@ class _PickDropState extends State<PickDrop> {
             // droplatitude[index] = result.geometry!.location.lat.toString();
             // droplongitudes[index] = result.geometry!.location.lng.toString();
             myLoction = result.formattedAddress.toString();
-            print("location isss ${droplongitudes[index]} ${droplatitude[index]}");
-            setState(() {
-            });
+            print(
+                "location isss ${droplongitudes[index]} ${droplatitude[index]}");
+            setState(() {});
             Navigator.of(context).pop();
           },
           initialPosition: LatLng(22.719568, 75.857727),
@@ -285,14 +284,16 @@ class _PickDropState extends State<PickDrop> {
     var headers = {
       'Cookie': 'ci_session=fe4c2f6a50f816f350af135dfe5a0d5e1806af69'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.pickDropCalculation));
+    var request = http.MultipartRequest(
+        'POST', Uri.parse(ApiServicves.pickDropCalculation));
     request.fields.addAll({
       'pick_longitudes[]': longitudes.join(','),
       'pick_latitudes[]': longitudes.join(','),
       'drop_latitudes[]': '$droplatitude',
       'drop_longitudes[]': '$droplongitudes',
       'cabs': vehicleId.toString(),
-      'product': (productitem.indexOf(selectproducts.toString()) + 1).toString(),
+      'product':
+          (productitem.indexOf(selectproducts.toString()) + 1).toString(),
       'order': selectOrders.toString()
     });
     print("amount for pick and drop ${request.fields}");
@@ -304,11 +305,9 @@ class _PickDropState extends State<PickDrop> {
       if (userData['response_code'] == "1") {
         delCharge = userData['delivery_charge'];
         print("delivery charge is $delCharge");
-        setState(() {
-        });
+        setState(() {});
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
@@ -326,16 +325,17 @@ class _PickDropState extends State<PickDrop> {
     };
     var request = http.Request('POST', Uri.parse(ApiServicves.pickDropOrder));
     request.body = json.encode({
-      "user_id":user_id.toString(),
-      "vehicle_type":vehicleId.toString(),
-      "product_type":(productitem.indexOf(selectproducts.toString()) + 1).toString(),
-      "order_type":selectOrders.toString(),
-      "sub_total":delCharge.toString(),
-      "product_description":productDescriptionCtr.text,
-      "note":noteCtr.text,
-      "time":time_id.toString(),
-      "drop_data":dropList,
-      "pick_data":pickList,
+      "user_id": user_id.toString(),
+      "vehicle_type": vehicleId.toString(),
+      "product_type":
+          (productitem.indexOf(selectproducts.toString()) + 1).toString(),
+      "order_type": selectOrders.toString(),
+      "sub_total": delCharge.toString(),
+      "product_description": productDescriptionCtr.text,
+      "note": noteCtr.text,
+      "time": time_id.toString(),
+      "drop_data": dropList,
+      "pick_data": pickList,
     });
     log("final pick drop para ${request.body}");
     request.headers.addAll(headers);
@@ -349,7 +349,8 @@ class _PickDropState extends State<PickDrop> {
         order_Id = userData['orderid'];
         print("order id is ${order_Id}");
         await imageUpload();
-        Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavBar()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => BottomNavBar()));
         setState(() {});
       }
     } else {
@@ -358,17 +359,16 @@ class _PickDropState extends State<PickDrop> {
   }
 
   imageUpload() async {
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.pickDropImageUpload));
-    request.fields.addAll({
-      'order_id': '${order_Id.toString()}'
-    });
+    var request = http.MultipartRequest(
+        'POST', Uri.parse(ApiServicves.pickDropImageUpload));
+    request.fields.addAll({'order_id': '${order_Id.toString()}'});
     print("image upload para ${request.fields}");
-    request.files.add(await http.MultipartFile.fromPath('image', packageImages!.path.toString()));
+    request.files.add(await http.MultipartFile.fromPath(
+        'image', packageImages!.path.toString()));
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       print(await response.stream.bytesToString());
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
@@ -382,7 +382,7 @@ class _PickDropState extends State<PickDrop> {
       'Cookie': 'ci_session=95bbd5f6f543e31f65185f824755bcb57842c775'
     };
     var request =
-    http.MultipartRequest('POST', Uri.parse(ApiServicves.getArea));
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getArea));
     request.fields.addAll({
       'city_id': '131',
     });
@@ -407,16 +407,14 @@ class _PickDropState extends State<PickDrop> {
   String? selectOrders;
   String? selectproducts;
 
-  var productitem = ['Urgent', '2 Way', 'Multiple', 'Flexible'];
+  List<String> productitem = ['Urgent', '2 Way', 'Multiple', 'Flexible'];
 
-  var orderitem = [
+  List<String> orderitem = [
     'Cake/Fragile',
     'Cooked Meal',
     'Food',
     'Non-Food',
   ];
-
-
 
   List<String?> selectarea1 = [];
   String? selectedValue;
@@ -434,15 +432,19 @@ class _PickDropState extends State<PickDrop> {
   List<String> pickupphoneCtr = [''];
   List<String> typaaddressCtr = [''];
 
+  final _formKey = GlobalKey<FormState>();
+  final _formKey2 = GlobalKey<FormState>();
+
   Widget _buildRow(int index) {
     return Container(
       //  color: Color(0xffEFEFEF),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Color(0xffEFEFEF),
-          border: Border.all(
-            color: colors.primary,
-          )),
+        borderRadius: BorderRadius.circular(10),
+        color: Color(0xffEFEFEF),
+        border: Border.all(
+          color: colors.primary,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -450,28 +452,31 @@ class _PickDropState extends State<PickDrop> {
             padding: EdgeInsets.all(8.0),
             child: Text(
               "Drop Details",
-              style: TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           const Padding(
             padding: EdgeInsets.only(left: 8),
             child: Text(
               "Drop Location",
-              style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
           ),
           Card(
             child: Container(
               width: double.infinity,
-              height: 40,
+              height: 50,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white),
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
               child: Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select Drop location';
+                    }
+                    return null;
+                  },
                   onTap: () {
                     getDropLocation(index);
                   },
@@ -483,17 +488,14 @@ class _PickDropState extends State<PickDrop> {
                   },
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                      prefixIcon:
-                      Icon(Icons.map, color: colors.secondary),
+                      prefixIcon: Icon(Icons.map, color: colors.secondary),
                       counterText: "",
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 5),
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide.none),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                      border: OutlineInputBorder(borderSide: BorderSide.none),
                       hintText: "Select Location On Map",
                       hintStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
+                          fontWeight: FontWeight.bold, color: Colors.black)),
                 ),
               ),
             ),
@@ -501,13 +503,18 @@ class _PickDropState extends State<PickDrop> {
           Card(
             child: Container(
               width: double.infinity,
-              height: 40,
+              height: 50,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white),
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
               child: Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter Drop name';
+                    }
+                    return null;
+                  },
                   initialValue: dropnameCtr[index],
                   onChanged: (value) {
                     setState(() {
@@ -518,10 +525,12 @@ class _PickDropState extends State<PickDrop> {
                   decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.person, color: colors.secondary),
                       counterText: "",
-                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                       border: OutlineInputBorder(borderSide: BorderSide.none),
                       hintText: "Drop Name",
-                      hintStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                      hintStyle: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black)),
                 ),
               ),
             ),
@@ -529,13 +538,21 @@ class _PickDropState extends State<PickDrop> {
           Card(
             child: Container(
               width: double.infinity,
-              height: 40,
+              height: 50,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white),
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
               child: Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a phone number';
+                    }
+                    if (value.length != 10) {
+                      return 'Phone number must be 10 digits';
+                    }
+                    return null;
+                  },
                   maxLength: 10,
                   initialValue: dropphoneCtr[index],
                   onChanged: (value) {
@@ -545,17 +562,14 @@ class _PickDropState extends State<PickDrop> {
                   },
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.phone,
-                          color: colors.secondary),
+                      prefixIcon: Icon(Icons.phone, color: colors.secondary),
                       counterText: "",
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 0),
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide.none),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                      border: OutlineInputBorder(borderSide: BorderSide.none),
                       hintText: "Drop Phone Number",
                       hintStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
+                          fontWeight: FontWeight.bold, color: Colors.black)),
                 ),
               ),
             ),
@@ -563,13 +577,18 @@ class _PickDropState extends State<PickDrop> {
           Card(
             child: Container(
               width: double.infinity,
-              height: 40,
+              height: 50,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white),
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
               child: Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an Drop address';
+                    }
+                    return null;
+                  },
                   initialValue: droptypeaddressCtr[index],
                   onChanged: (value) {
                     setState(() {
@@ -578,26 +597,23 @@ class _PickDropState extends State<PickDrop> {
                   },
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.location_on,
-                          color: colors.secondary),
+                      prefixIcon:
+                          Icon(Icons.location_on, color: colors.secondary),
                       counterText: "",
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 0),
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide.none),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                      border: OutlineInputBorder(borderSide: BorderSide.none),
                       hintText: "Type Address",
                       hintStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
+                          fontWeight: FontWeight.bold, color: Colors.black)),
                 ),
               ),
             ),
           ),
-
           Card(
             child: Container(
                 width: double.infinity,
-                height: 40,
+                height: 50,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white),
@@ -611,15 +627,13 @@ class _PickDropState extends State<PickDrop> {
                     items: areaList.map((items) {
                       return DropdownMenuItem(
                         value: items.id,
-                        child: Container(
-                            child: Text(items.name.toString())),
+                        child: Container(child: Text(items.name.toString())),
                       );
                     }).toList(),
                     onChanged: (dynamic value) {
                       setState(() {
-                        selectarea1[index] = value ;
-                        print(
-                            "===my technic=======${areaid}===============");
+                        selectarea1[index] = value;
+                        print("===my technic=======${areaid}===============");
                       });
                     },
                     underline: Container(),
@@ -632,179 +646,203 @@ class _PickDropState extends State<PickDrop> {
   }
 
   Widget _buildRow2(int i) {
-    return
-      Container(
-        //  color: Color(0xffEFEFEF),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Color(0xffEFEFEF),
-          border: Border.all(
-            color: colors.primary,
-          ),
+    return Container(
+      //  color: Color(0xffEFEFEF),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Color(0xffEFEFEF),
+        border: Border.all(
+          color: colors.primary,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                "PickUp Location",
-                style: TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              "PickUp Location",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Card(
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a Pick location';
+                  }
+                  return null;
+                },
+                onTap: () {
+                  getLocation(i);
+                },
+                controller: addressCtr[i],
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.map, color: colors.secondary),
+                  counterText: "",
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                  border: OutlineInputBorder(borderSide: BorderSide.none),
+                  hintText: "Select Location On Map",
+                  hintStyle: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
               ),
             ),
-            Card(
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white),
+          ),
+          Card(
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(1.0),
                 child: TextFormField(
-                  onTap: () {
-                    getLocation(i);
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter Pick name';
+                    }
+                    return null;
                   },
-                  controller: addressCtr[i],
+
+                  initialValue: pickupnameCtr[i],
+                  onChanged: (value) {
+                    setState(() {
+                      pickupnameCtr[i] = value;
+                    });
+                  },
+                  // keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.person, color: colors.secondary),
+                      counterText: "",
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                      border: OutlineInputBorder(borderSide: BorderSide.none),
+                      hintText: "PickUp Name",
+                      hintStyle: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black)),
+                ),
+              ),
+            ),
+          ),
+          Card(
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a phone number';
+                    }
+                    if (value.length != 10) {
+                      return 'Phone number must be 10 digits';
+                    }
+                    return null;
+                  },
+                  maxLength: 10,
+                  initialValue: pickupphoneCtr[i],
+                  onChanged: (value) {
+                    setState(() {
+                      pickupphoneCtr[i] = value;
+                    });
+                  },
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                    prefixIcon:
-                    Icon(Icons.map, color: colors.secondary),
+                    prefixIcon: Icon(Icons.phone, color: colors.secondary),
                     counterText: "",
-                    contentPadding: EdgeInsets.symmetric(
-                        vertical: 5, horizontal: 5),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide.none),
-                    hintText: "Select Location On Map",
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                    hintText: "PickUp Phone Number",
                     hintStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                        fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ),
               ),
             ),
-            Card(
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white),
-                child: Padding(
-                  padding: const EdgeInsets.all(1.0),
-                  child: TextFormField(
-                    initialValue: pickupnameCtr[i],
-                    // keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.person,
-                            color: colors.secondary),
-                        counterText: "",
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 0, horizontal: 0),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide.none),
-                        hintText: "PickUp Name",
-                        hintStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black)),
+          ),
+          Card(
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an address';
+                    }
+                    return null;
+                  },
+                  initialValue: typaaddressCtr[i],
+                  onChanged: (value) {
+                    setState(() {
+                      typaaddressCtr[i] = value;
+                    });
+                  },
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    prefixIcon:
+                        Icon(Icons.location_on, color: colors.secondary),
+                    counterText: "",
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                    hintText: "Type Address",
+                    hintStyle: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ),
               ),
             ),
-            Card(
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white),
-                child: Padding(
-                  padding: const EdgeInsets.all(1.0),
-                  child: TextFormField(
-                    maxLength: 10,
-                    initialValue: pickupphoneCtr[i],
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.phone,
-                          color: colors.secondary),
-                      counterText: "",
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 0),
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide.none),
-                      hintText: "PickUp Phone Number",
-                      hintStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                    ),
-                  ),
+          ),
+          Card(
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton(
+                  isExpanded: true,
+                  value: selectarea[i],
+                  hint: const Text('Select Zone(Area)'),
+                  icon: const Icon(Icons.keyboard_arrow_down),
+                  items: areaList.map((items) {
+                    return DropdownMenuItem(
+                      value: items.id,
+                      child: Container(child: Text(items.name.toString())),
+                    );
+                  }).toList(),
+                  onChanged: (dynamic value) {
+                    setState(() {
+                      selectarea[i] = value;
+                      areaid = value;
+                      print("===my technic=======${areaid}===============");
+                    });
+                  },
+                  underline: Container(),
                 ),
               ),
             ),
-            Card(
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white),
-                child: Padding(
-                  padding: const EdgeInsets.all(1.0),
-                  child: TextFormField(
-                    initialValue: typaaddressCtr[i],
-                    keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.location_on,
-                            color: colors.secondary),
-                        counterText: "",
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 0, horizontal: 0),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide.none),
-                        hintText: "Type Address",
-                        hintStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black)),
-                  ),
-                ),
-              ),
-            ),
-            Card(
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButton(
-                    isExpanded: true,
-                    value: selectarea[i],
-                    hint: const Text('Select Zone(Area)'),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: areaList.map((items) {
-                      return DropdownMenuItem(
-                        value: items.id,
-                        child: Container(
-                            child: Text(items.name.toString())),
-                      );
-                    }).toList(),
-                    onChanged: (dynamic value) {
-                      setState(() {
-                        selectarea[i] = value;
-                        areaid = value;
-                        print(
-                            "===my technic=======${areaid}===============");
-                      });
-                    },
-                    underline: Container(),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 
   VehicleData? selectedVehicle;
@@ -817,15 +855,15 @@ class _PickDropState extends State<PickDrop> {
     var headers = {
       'Cookie': 'ci_session=a13b5d98bb1165c193782ed72de9bf712b5ece9e'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vehicleList));
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.vehicleList));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     var json = jsonDecode(await response.stream.bytesToString());
     if (response.statusCode == 200) {
       vehicleItem = VehicleModel.fromJson(json);
       setState(() {});
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
@@ -853,7 +891,7 @@ class _PickDropState extends State<PickDrop> {
         body: SingleChildScrollView(
           child: Padding(
             padding:
-            const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 30),
+                const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 30),
             child: Column(
               // mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -882,12 +920,14 @@ class _PickDropState extends State<PickDrop> {
                       InkWell(
                         onTap: () {
                           setState(() {
-                            selectarea.add(selectedValue1); // Add a new row with default city 'Indore'
+                            selectarea.add(
+                                selectedValue1); // Add a new row with default city 'Indore'
                             pickupphoneCtr.add('');
                             pickupnameCtr.add('');
                             // addressCtr.add('');
                             typaaddressCtr.add('');
-                            Fluttertoast.showToast(msg: "One More PickUp Added");
+                            Fluttertoast.showToast(
+                                msg: "One More PickUp Added");
                           });
                         },
                         child: Container(
@@ -907,50 +947,54 @@ class _PickDropState extends State<PickDrop> {
                           ),
                         ),
                       ),
-                      pickupnameCtr.length == 1 ? SizedBox():
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            selectarea.last; // Add a new row with default city 'Indore'
-                            pickupphoneCtr.remove('');
-                            pickupnameCtr.remove('');
-                            // addressCtr.add('');
-                            typaaddressCtr.remove('');
-                            Fluttertoast.showToast(msg: "One PickUp id Remove");
-                          });
-                        },
-                        child: Container(
-                          width: 34,
-                          height: 30,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: colors.primary),
-                          child: Center(
-                            child: Text(
-                              "-",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize:25
+                      pickupnameCtr.length == 1
+                          ? SizedBox()
+                          : InkWell(
+                              onTap: () {
+                                setState(() {
+                                  selectarea
+                                      .last; // Add a new row with default city 'Indore'
+                                  pickupphoneCtr.remove('');
+                                  pickupnameCtr.remove('');
+                                  // addressCtr.add('');
+                                  typaaddressCtr.remove('');
+                                  Fluttertoast.showToast(
+                                      msg: "One PickUp id Remove");
+                                });
+                              },
+                              child: Container(
+                                width: 34,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: colors.primary),
+                                child: Center(
+                                  child: Text(
+                                    "-",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
-
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: pickupnameCtr.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, i) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: _buildRow2(i),
-                    );
-                  },
+                Form(
+                  key: _formKey,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: pickupnameCtr.length,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, i) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _buildRow2(i),
+                      );
+                    },
+                  ),
                 ),
                 SizedBox(
                   height: 12,
@@ -977,7 +1021,7 @@ class _PickDropState extends State<PickDrop> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               color: colors.primary),
-                          child: Center(
+                          child: const Center(
                             child: Text(
                               "+",
                               style: TextStyle(
@@ -989,35 +1033,36 @@ class _PickDropState extends State<PickDrop> {
                           ),
                         ),
                       ),
-                      dropnameCtr.length ==1 ? SizedBox():
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            droptypeaddressCtr.remove('');
-                            dropnameCtr.remove('');
-                            dropphoneCtr.remove('');
-                            dropLocationCtr.remove('');
-                            selectarea1.last;
-                            Fluttertoast.showToast(msg: "Drop is Remove");
-                          });
-                        },
-                        child: Container(
-                          width: 34,
-                          height: 30,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: colors.primary),
-                          child: Center(
-                            child: Text(
-                              "-",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize:25),
+                      dropnameCtr.length == 1
+                          ? SizedBox()
+                          : InkWell(
+                              onTap: () {
+                                setState(() {
+                                  droptypeaddressCtr.remove('');
+                                  dropnameCtr.remove('');
+                                  dropphoneCtr.remove('');
+                                  dropLocationCtr.remove('');
+                                  selectarea1.last;
+                                  Fluttertoast.showToast(msg: "Drop is Remove");
+                                });
+                              },
+                              child: Container(
+                                width: 34,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: colors.primary),
+                                child: Center(
+                                  child: Text(
+                                    "-",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -1199,16 +1244,19 @@ class _PickDropState extends State<PickDrop> {
                 //     ],
                 //   ),
                 // ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: dropnameCtr.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: _buildRow(index),
-                    );
-                  },
+                Form(
+                  key: _formKey2,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: dropnameCtr.length,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _buildRow(index),
+                      );
+                    },
+                  ),
                 ),
                 const Padding(
                   padding: EdgeInsets.only(top: 10),
@@ -1258,23 +1306,24 @@ class _PickDropState extends State<PickDrop> {
                       Icons.keyboard_arrow_down_sharp,
                       color: colors.primary,
                     ),
-                    onChanged: ( newValue) {
+                    onChanged: (newValue) {
                       setState(() {
                         selectTimeslot = newValue;
                         time_id = newValue?.id.toString();
-                        timefrom ="${newValue?.stateTime.toString()}-${newValue?.endTime.toString()}";
-                        print("time from=======$timefrom time id is $time_id===============");
+                        timefrom =
+                            "${newValue?.stateTime.toString()}-${newValue?.endTime.toString()}";
+                        print(
+                            "time from=======$timefrom time id is $time_id===============");
                       });
                     },
                     items: timeSlot.map((TimeSlotListBooking orderitem) {
                       return DropdownMenuItem(
                         value: orderitem,
                         child: SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width / 1.5,
-                            child: Text("${orderitem.stateTime.toString()} - ${orderitem.endTime.toString()}",
-                              style: const TextStyle(
-                                  color: colors.secondary),
+                            width: MediaQuery.of(context).size.width / 1.5,
+                            child: Text(
+                              "${orderitem.stateTime.toString()} - ${orderitem.endTime.toString()}",
+                              style: const TextStyle(color: colors.secondary),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             )),
@@ -1284,7 +1333,7 @@ class _PickDropState extends State<PickDrop> {
                         contentPadding: EdgeInsets.all(10),
                         border: OutlineInputBorder(
                             borderRadius:
-                            BorderRadius.all(Radius.circular(10))),
+                                BorderRadius.all(Radius.circular(10))),
                         hintText: 'Select Time Slot',
                         hintStyle: TextStyle(color: colors.primary),
                         filled: true,
@@ -1301,9 +1350,10 @@ class _PickDropState extends State<PickDrop> {
                         style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.bold),
                       ),
-                      Text("",
-                        style: TextStyle(
-                            fontSize: 1, fontWeight: FontWeight.w400),
+                      Text(
+                        "",
+                        style:
+                            TextStyle(fontSize: 1, fontWeight: FontWeight.w400),
                       )
                     ],
                   ),
@@ -1339,7 +1389,7 @@ class _PickDropState extends State<PickDrop> {
                         contentPadding: EdgeInsets.all(10),
                         border: OutlineInputBorder(
                             borderRadius:
-                            BorderRadius.all(Radius.circular(10))),
+                                BorderRadius.all(Radius.circular(10))),
                         hintText: 'Select Product Type',
                         hintStyle: TextStyle(color: colors.primary),
                         filled: true,
@@ -1435,7 +1485,8 @@ class _PickDropState extends State<PickDrop> {
                       setState(() {
                         selectedVehicle = newValue!;
                         vehicleId = selectedVehicle?.id.toString();
-                        print("vehicle select${selectedVehicle} vehicle id ${vehicleId}==============");
+                        print(
+                            "vehicle select${selectedVehicle} vehicle id ${vehicleId}==============");
                         pickDropDeliveryCalcuate();
                         // getDeliveryCharges(
                         //     vType: selectedVehicle.toString());
@@ -1444,13 +1495,15 @@ class _PickDropState extends State<PickDrop> {
                     items: vehicleItem?.data?.map((VehicleData orderitem) {
                       return DropdownMenuItem(
                         value: orderitem,
-                        child: Image.network("https://developmentalphawizz.com/hojayega/${orderitem.image}"),
+                        child: Image.network(
+                            "https://developmentalphawizz.com/hojayega/${orderitem.image}"),
                       );
                     }).toList(),
                     decoration: const InputDecoration(
                         contentPadding: EdgeInsets.all(10),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10))),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
                         hintText: 'Select Vehicle Type',
                         hintStyle: TextStyle(color: colors.primary),
                         filled: true,
@@ -1474,9 +1527,9 @@ class _PickDropState extends State<PickDrop> {
                       decoration: const InputDecoration(
                           counterText: "",
                           contentPadding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                           border:
-                          OutlineInputBorder(borderSide: BorderSide.none),
+                              OutlineInputBorder(borderSide: BorderSide.none),
                           hintStyle: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black)),
@@ -1505,9 +1558,9 @@ class _PickDropState extends State<PickDrop> {
                       decoration: const InputDecoration(
                           counterText: "",
                           contentPadding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                           border:
-                          OutlineInputBorder(borderSide: BorderSide.none),
+                              OutlineInputBorder(borderSide: BorderSide.none),
                           hintStyle: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black)),
@@ -1528,19 +1581,20 @@ class _PickDropState extends State<PickDrop> {
                       padding: const EdgeInsets.only(left: 10, right: 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children:  [
+                        children: [
                           Text(
                             "Amount",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 20),
                           ),
-                          delCharge ==null || delCharge == "" ?
-                          Text("0.0"):
-                          Text(
-                            "${delCharge.toString()}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20),
-                          ),
+                          delCharge == null || delCharge == ""
+                              ? Text("0.0")
+                              : Text(
+                                  "${delCharge.toString()}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
                         ],
                       ),
                     ),
@@ -1586,32 +1640,70 @@ class _PickDropState extends State<PickDrop> {
                     //     pickDrop();
                     //   }
                     // },
-                    onTap: (){
-                      for(int i = 0; i<dropnameCtr.length ; i++) {
-                        dropList.add((
-                            {
-                              "drop_location": dropLocationCtr[i].text,
-                              "drop_name": dropnameCtr[i],
-                              "drop_phone": dropphoneCtr[i],
-                              "drop_address_type": droptypeaddressCtr[i],
-                              "drop_zone": selectarea1[i],
-                              "drop_latitude": droplatitude[i],
-                              "drop_longitude": droplongitudes[i]
-                            }
-                        ));
+                    onTap: () {
+                      if (!_formKey.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Fill All Fields')),
+                        );
+                        return;
                       }
-                      for(int k = 0; k<pickupnameCtr.length ; k++) {
-                        pickList.add((
-                            {
-                              "pick_location": addressCtr[k].text,
-                              "pick_name": pickupnameCtr[k],
-                              "pick_phone": pickupphoneCtr[k],
-                              "pick_address_type": typaaddressCtr[k],
-                              "pick_zone": selectarea[k],
-                              "latitude_input": latitude[k],
-                              "longitude_input": longitudes[k]
-                            }
-                        ));
+                      if (!_formKey2.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Fill All Fields')),
+                        );
+                        return;
+                      }
+                      print("object$selectOrders");
+                      if (selectTimeslot == null || selectTimeslot!.isEmpty) {
+                        Fluttertoast.showToast(msg: "Please Select Time");
+                        return;
+                      }
+                      if (selectOrders == null || selectOrders!.isEmpty) {
+                        Fluttertoast.showToast(
+                            msg: "Please Select ProductType");
+                        return;
+                      }
+                      if (packageImages == null || packageImages == "") {
+                        Fluttertoast.showToast(msg: "Please Select Image");
+                        return;
+                      }
+                      if (noteCtr.text.isEmpty) {
+                        Fluttertoast.showToast(msg: "Please Enter Note");
+                        return;
+                      }
+                      if (selectedVehicle == null || selectedVehicle == "") {
+                        Fluttertoast.showToast(msg: "Please Select Vehicle");
+                        return;
+                      }
+                      if (selectproducts == null || selectproducts!.isEmpty) {
+                        Fluttertoast.showToast(msg: "Please Select  OrderType");
+                        return;
+                      }
+                      for (int i = 0; i < dropnameCtr.length; i++) {
+                        dropList.add(({
+                          "drop_location": dropLocationCtr[i].text,
+                          "drop_name": dropnameCtr[i],
+                          "drop_phone": dropphoneCtr[i],
+                          "drop_address_type": droptypeaddressCtr[i],
+                          "drop_zone": selectarea1[i],
+                          "drop_latitude": droplatitude[i],
+                          "drop_longitude": droplongitudes[i]
+                        }));
+                      }
+                      for (int k = 0; k < pickupnameCtr.length; k++) {
+                        print(
+                            "pick name number ${pickupnameCtr} ${pickupphoneCtr} ${typaaddressCtr}");
+                        pickList.add(
+                          ({
+                            "pick_location": addressCtr[k].text,
+                            "pick_name": pickupnameCtr[k],
+                            "pick_phone": pickupphoneCtr[k],
+                            "pick_address_type": typaaddressCtr[k],
+                            "pick_zone": selectarea[k],
+                            "latitude_input": latitude[k],
+                            "longitude_input": longitudes[k]
+                          }),
+                        );
                       }
                       pickDrop();
                     },

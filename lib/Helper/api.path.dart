@@ -7,12 +7,12 @@ class ApiServicves {
 
   static const String veriftOtp = '${baseUrl}verify_otp';
   static const String vendorregister = '${baseUrl}vendor_registration';
-  static const String login = baseUrl + 'login';
-  static const String myPickDrop = baseUrl + 'get_my_pick_drop_order';
+  static const String login = '${baseUrl}login';
+  static const String myPickDrop = '${baseUrl}get_my_pick_drop_order';
   static const String getProfile = '${baseUrl}get_profile';
-  static const String getVendorOrder = baseUrl + 'get_vendor_orders';
-  static const String vendorsendOtp = baseUrl + 'send_otp';
-  static const String updateProfile = baseUrl + 'vendor_update';
+  static const String getVendorOrder = '${baseUrl}get_vendor_orders';
+  static const String vendorsendOtp = '${baseUrl}send_otp';
+  static const String updateProfile = '${baseUrl}vendor_update';
   static const String pickDropImageUpload = '${baseUrl}image_upload_order';
   static const String getState = '${baseUrl}get_states';
   static const String pickDropOrder = '${baseUrl}pick_drop_order';
@@ -33,17 +33,17 @@ class ApiServicves {
   static const String updateServicesVendor = '${baseUrl}update_service_vendor';
   static const String getVendorProduct = '${baseUrl}get_vendor_products';
   static const String getSubCategories =
-      baseUrl + 'get_categories_by_shop_services';
+      '${baseUrl}get_categories_by_shop_services';
   static const String productchildCategories =
-      baseUrl + 'product_child_category';
-  static const String typeofShops = baseUrl + 'type_shops';
+      '${baseUrl}product_child_category';
+  static const String typeofShops = '${baseUrl}type_shops';
   static const String addProducts = '${baseUrl}add_product';
-  static const String vendorOrders = baseUrl + 'get_vendor_orders';
-  static const String pendingBooking = baseUrl + 'get_booking_vendor';
-  static const String getVendorBookings = baseUrl + 'get_bookings';
-  static const String timeSlots = baseUrl + 'get_time_slot';
+  static const String vendorOrders = '${baseUrl}get_vendor_orders';
+  static const String pendingBooking = '${baseUrl}get_booking_vendor';
+  static const String getVendorBookings = '${baseUrl}get_bookings';
+  static const String timeSlots = '${baseUrl}get_time_slot';
   static const String requestForSettlement =
-      baseUrl + 'request_settlement_amount';
+      '${baseUrl}request_settlement_amount';
   static const String vendorEarning = '${baseUrl}get_vendor_earning';
   static const String acceptRejectOrder = '${baseUrl}accept_reject_order';
   static const String notifications = '${baseUrl}notifications';
@@ -68,6 +68,7 @@ class ApiServicves {
   static const String unitsAPi = '${baseUrl}get_unit_list';
   static const String getHelp = '${baseUrl}setting';
   static const String staticPages = '${baseUrl}static_pages';
+  static const String festiveCheck = '${baseUrl}check_festival';
 }
 
 String? vendor_name;

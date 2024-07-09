@@ -33,6 +33,7 @@ class _HomePageState extends State<HomeScreen> {
   String? deliveryCardBalance;
   String? businessCardBalance;
   String? vendorId;
+
   getData() async {
     await getProfile();
     await getSetting();
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomeScreen> {
     var request =
         http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
     request.fields.addAll({'user_id': vendorId.toString()});
-    debugPrint("get profile parametersssss ${request.fields}");
+    debugPrint("get profile parameters-ssss ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -117,7 +118,6 @@ class _HomePageState extends State<HomeScreen> {
   getCurrenBooking() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     vendorId = prefs.getString("vendor_id");
-    roll = prefs.getString('roll');
     print("${prefs.getString('roll')}+++++++++++++++++++++++");
     var headers = {
       'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
@@ -125,13 +125,13 @@ class _HomePageState extends State<HomeScreen> {
     var request =
         http.MultipartRequest('POST', Uri.parse(ApiServicves.getVendorOrder));
     request.fields.addAll({'user_id': vendorId.toString()});
-    debugPrint("get current parametersssss ${request.fields}");
+    debugPrint("get current parameters-ssss ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       final finalResult = TodayBooking.fromJson(json.decode(finalResponse));
-      print("profile data responsee $finalResult");
+      print("profile data response $finalResult");
       vendorTodayBooking = finalResult;
       setState(() {});
     } else {
@@ -283,7 +283,7 @@ class _HomePageState extends State<HomeScreen> {
     if (response.statusCode == 200) {
       var result = await response.stream.bytesToString();
       var finaResult = jsonDecode(result);
-      print("responseee $finaResult");
+      print("response $finaResult");
       if (finaResult['status'] == 1) {
         // card_limit = finaResult['setting']['cart_limit'];
         prefs.setString(
@@ -296,6 +296,19 @@ class _HomePageState extends State<HomeScreen> {
     } else {
       print(response.reasonPhrase);
     }
+  }
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+  Future<Null> _refresh() {
+    return callApi();
+  }
+
+  Future<Null> callApi() async {
+    getProfile();
+    getSetting();
+    getCurrenBooking();
+    getCurrentorder();
   }
 
   @override
@@ -712,477 +725,526 @@ class _HomePageState extends State<HomeScreen> {
       //     ),
       //   ]),
       // ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+      body: !isLoading
+          ? RefreshIndicator(
+              key: _refreshIndicatorKey,
+              onRefresh: _refresh,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: List<Widget>.generate(
-                          roll == "2" ? arrNames2.length : arrNames.length,
-                          (index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 8),
-                          child: Column(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  if (index == 0) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PromotionAdds()));
-                                  } else if (index == 1) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => Reports()));
-                                  } else {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => PickDrop()));
-                                  }
-                                },
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: colors.primary),
-                                  child: Image.asset(
-                                    roll == "2"
-                                        ? iconsNames2[index]
-                                        : iconsNames[index],
-                                    height: 10,
-                                    width: 10,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: List<Widget>.generate(
+                                  roll == "2"
+                                      ? arrNames2.length
+                                      : arrNames.length, (index) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 20, right: 8),
+                                  child: Column(
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          if (index == 0) {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PromotionAdds()));
+                                          } else if (index == 1) {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Reports()));
+                                          } else {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PickDrop()));
+                                          }
+                                        },
+                                        child: Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              color: colors.primary),
+                                          child: Image.asset(
+                                            roll == "2"
+                                                ? iconsNames2[index]
+                                                : iconsNames[index],
+                                            height: 10,
+                                            width: 10,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                          roll == "2"
+                                              ? arrNames2[index]
+                                              : arrNames[index],
+                                          textAlign: TextAlign.center),
+                                    ],
                                   ),
+                                );
+                              }),
+                            ),
+                          ),
+                        ),
+                        // Expanded(
+                        //   flex: 1,
+                        //   child: InkWell(
+                        //     onTap: () {
+                        //       Navigator.push(context,
+                        //           MaterialPageRoute(builder: (context) => const Calender(isFromBottom: false,)));
+                        //     },
+                        //     child: Padding(
+                        //       padding: const EdgeInsets.only(right: 5),
+                        //       child: Column(
+                        //         children: [
+                        //           Container(
+                        //               width: 40,
+                        //               height: 40,
+                        //               decoration: BoxDecoration(
+                        //                   borderRadius: BorderRadius.circular(5),
+                        //                   color: colors.whiteTemp),
+                        //               child: Image.asset('assets/images/calender.png')),
+                        //           const Text("Calender")
+                        //         ],
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                    roll == "2"
+                        ? Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(
+                                    left: 20, bottom: 10, top: 10),
+                                child: Text(
+                                  "Today's Booking Status",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
                                 ),
                               ),
-                              Text(
-                                  roll == "2"
-                                      ? arrNames2[index]
-                                      : arrNames[index],
-                                  textAlign: TextAlign.center),
+                              Center(
+                                child: Table(
+                                  border: TableBorder.all(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  columnWidths: const <int, TableColumnWidth>{
+                                    0: FixedColumnWidth(125.0),
+                                    1: FixedColumnWidth(125.0),
+                                    2: FixedColumnWidth(90.0),
+                                  },
+                                  defaultVerticalAlignment:
+                                      TableCellVerticalAlignment.middle,
+                                  children: [
+                                    // Header Row
+                                    TableRow(
+                                      children: [
+                                        headerCell('Time Slot'),
+                                        headerCell('Region'),
+                                        headerCell('Status'),
+                                      ],
+                                    ),
+                                    // Data Rows
+                                    ...?vendorTodayBooking?.data
+                                        ?.map((TodayBookingData) {
+                                      return TableRow(
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 3),
+                                            child: dataCell(TodayBookingData
+                                                .slot
+                                                .toString()
+                                                .replaceAll(":00", "")),
+                                          ),
+                                          dataCell(TodayBookingData.address
+                                              .toString()),
+                                          statusCell(TodayBookingData
+                                              .bookingStatus
+                                              .toString()),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(
+                                    left: 20, bottom: 10, top: 10),
+                                child: Text(
+                                  "Today's Order Status",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
+                              ),
+                              Center(
+                                child: Table(
+                                  border: TableBorder.all(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  columnWidths: const <int, TableColumnWidth>{
+                                    0: FixedColumnWidth(125.0),
+                                    1: FixedColumnWidth(125.0),
+                                    2: FixedColumnWidth(90.0),
+                                  },
+                                  defaultVerticalAlignment:
+                                      TableCellVerticalAlignment.middle,
+                                  children: [
+                                    // Header Row
+                                    TableRow(
+                                      children: [
+                                        headerCell('Time Slot'),
+                                        headerCell('Region'),
+                                        headerCell('Order Status'),
+                                      ],
+                                    ),
+                                    // Data Rows
+                                    ...?vendorTodayOrder?.orders
+                                        ?.map((VendorOrders) {
+                                      return TableRow(
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 3),
+                                            child: dataCell(VendorOrders.time
+                                                .toString()
+                                                .replaceAll(":00", "")),
+                                          ),
+                                          dataCell(VendorOrders.pickRegion
+                                              .toString()),
+                                          statusCell(VendorOrders.orderStatus
+                                              .toString()),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                        );
-                      }),
-                    ),
-                  ),
-                ),
-                // Expanded(
-                //   flex: 1,
-                //   child: InkWell(
-                //     onTap: () {
-                //       Navigator.push(context,
-                //           MaterialPageRoute(builder: (context) => const Calender(isFromBottom: false,)));
-                //     },
-                //     child: Padding(
-                //       padding: const EdgeInsets.only(right: 5),
-                //       child: Column(
-                //         children: [
-                //           Container(
-                //               width: 40,
-                //               height: 40,
-                //               decoration: BoxDecoration(
-                //                   borderRadius: BorderRadius.circular(5),
-                //                   color: colors.whiteTemp),
-                //               child: Image.asset('assets/images/calender.png')),
-                //           const Text("Calender")
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
-              ],
-            ),
-            roll == "2"
-                ? Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
-                        child: Text(
-                          "Today's Booking Status",
-                          style: TextStyle(
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20),
-                        ),
-                      ),
-                      Center(
-                        child: Table(
-                          border: TableBorder.all(
-                              borderRadius: BorderRadius.circular(10)),
-                          columnWidths: const <int, TableColumnWidth>{
-                            0: FixedColumnWidth(125.0),
-                            1: FixedColumnWidth(125.0),
-                            2: FixedColumnWidth(90.0),
-                          },
-                          defaultVerticalAlignment:
-                              TableCellVerticalAlignment.middle,
-                          children: [
-                            // Header Row
-                            TableRow(
-                              children: [
-                                headerCell('Time Slot'),
-                                headerCell('Region'),
-                                headerCell('Status'),
-                              ],
-                            ),
-                            // Data Rows
-                            ...?vendorTodayBooking?.data
-                                ?.map((TodayBookingData) {
-                              return TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 3),
-                                    child: dataCell(TodayBookingData.slot
-                                        .toString()
-                                        .replaceAll(":00", "")),
-                                  ),
-                                  dataCell(TodayBookingData.address.toString()),
-                                  statusCell(TodayBookingData.bookingStatus
-                                      .toString()),
-                                ],
-                              );
-                            }).toList(),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 20, bottom: 10, top: 10),
-                        child: Text(
-                          "Today's Order Status",
-                          style: TextStyle(
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20),
-                        ),
-                      ),
-                      Center(
-                        child: Table(
-                          border: TableBorder.all(
-                              borderRadius: BorderRadius.circular(10)),
-                          columnWidths: const <int, TableColumnWidth>{
-                            0: FixedColumnWidth(125.0),
-                            1: FixedColumnWidth(125.0),
-                            2: FixedColumnWidth(90.0),
-                          },
-                          defaultVerticalAlignment:
-                              TableCellVerticalAlignment.middle,
-                          children: [
-                            // Header Row
-                            TableRow(
-                              children: [
-                                headerCell('Time Slot'),
-                                headerCell('Region'),
-                                headerCell('Order Status'),
-                              ],
-                            ),
-                            // Data Rows
-                            ...?vendorTodayOrder?.orders?.map((VendorOrders) {
-                              return TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 3),
-                                    child: dataCell(VendorOrders.time
-                                        .toString()
-                                        .replaceAll(":00", "")),
-                                  ),
-                                  dataCell(VendorOrders.pickRegion.toString()),
-                                  statusCell(
-                                      VendorOrders.orderStatus.toString()),
-                                ],
-                              );
-                            }).toList(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-            const SizedBox(height: 10),
-            // Container(
-            //   height: 100,
-            //   width: 200,
-            //   child: homepageimagemodel == null
-            //       ? Center(child: CircularProgressIndicator())
-            //       : CarouselSlider(
-            //     options: CarouselOptions(
-            //       autoPlay: true,
-            //       aspectRatio: 2,
-            //       viewportFraction: 1,
-            //     ),
-            //     items: homepageimagemodel!.data!.map((item) {
-            //       return Builder(
-            //         builder: (BuildContext context) {
-            //           return Container(
-            //             width: MediaQuery.of(context).size.width,
-            //             margin: EdgeInsets.symmetric(horizontal: 5.0),
-            //             child: Image.network(item.image!, fit: BoxFit.cover),
-            //           );
-            //         },
-            //       );
-            //     }).toList(),
-            //   ),
-            // ),
+                    const SizedBox(height: 10),
+                    // Container(
+                    //   height: 100,
+                    //   width: 200,
+                    //   child: homepageimagemodel == null
+                    //       ? Center(child: CircularProgressIndicator())
+                    //       : CarouselSlider(
+                    //     options: CarouselOptions(
+                    //       autoPlay: true,
+                    //       aspectRatio: 2,
+                    //       viewportFraction: 1,
+                    //     ),
+                    //     items: homepageimagemodel!.data!.map((item) {
+                    //       return Builder(
+                    //         builder: (BuildContext context) {
+                    //           return Container(
+                    //             width: MediaQuery.of(context).size.width,
+                    //             margin: EdgeInsets.symmetric(horizontal: 5.0),
+                    //             child: Image.network(item.image!, fit: BoxFit.cover),
+                    //           );
+                    //         },
+                    //       );
+                    //     }).toList(),
+                    //   ),
+                    // ),
 
-            // Padding(
-            //   padding: const EdgeInsets.only(top:10),
-            //   child: CarouselSlider(
-            //     items: imageList.map((item) {
-            //       return ClipRRect(
-            //         borderRadius: BorderRadius.circular(10.0), // Border radius
-            //         child: Image.asset(
-            //
-            //           item[imageUrl]!,
-            //           fit: BoxFit.cover,
-            //           width: double.infinity,
-            //         ),
-            //       );
-            //     }).toList(), // Convert to List<Widget>
-            //     carouselController: carouselController,
-            //     options: CarouselOptions(
-            //       scrollPhysics: const BouncingScrollPhysics(),
-            //       autoPlay: true,
-            //       aspectRatio: 2,
-            //       viewportFraction: 1,
-            //       onPageChanged: (index, reason) {
-            //         setState(() {
-            //           currentIndex = index;
-            //         });
-            //       },
-            //     ),
-            //   ),
-            // ),
-            Column(
-              children: [
-                CarouselSlider(
-                  options: CarouselOptions(
-                    height: MediaQuery.of(context).size.height * 0.22,
-                    aspectRatio: 16 / 9,
-                    viewportFraction: 1.0,
-                    initialPage: 0,
-                    enableInfiniteScroll: true,
-                    reverse: false,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 3),
-                    autoPlayAnimationDuration:
-                        const Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: false,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        currentIndex = index;
-                      });
-                    },
-                  ),
-                  items: sliderList
-                      .map(
-                        (item) => Padding(
-                          padding: const EdgeInsets.only(left: 5, right: 5),
-                          child: item == null || item == ""
-                              ? Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: const DecorationImage(
-                                        image: AssetImage(
-                                          "assets/images/placeholder.png",
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top:10),
+                    //   child: CarouselSlider(
+                    //     items: imageList.map((item) {
+                    //       return ClipRRect(
+                    //         borderRadius: BorderRadius.circular(10.0), // Border radius
+                    //         child: Image.asset(
+                    //
+                    //           item[imageUrl]!,
+                    //           fit: BoxFit.cover,
+                    //           width: double.infinity,
+                    //         ),
+                    //       );
+                    //     }).toList(), // Convert to List<Widget>
+                    //     carouselController: carouselController,
+                    //     options: CarouselOptions(
+                    //       scrollPhysics: const BouncingScrollPhysics(),
+                    //       autoPlay: true,
+                    //       aspectRatio: 2,
+                    //       viewportFraction: 1,
+                    //       onPageChanged: (index, reason) {
+                    //         setState(() {
+                    //           currentIndex = index;
+                    //         });
+                    //       },
+                    //     ),
+                    //   ),
+                    // ),
+                    Column(
+                      children: [
+                        CarouselSlider(
+                          options: CarouselOptions(
+                            height: MediaQuery.of(context).size.height * 0.22,
+                            aspectRatio: 16 / 9,
+                            viewportFraction: 1.0,
+                            initialPage: 0,
+                            enableInfiniteScroll: true,
+                            reverse: false,
+                            autoPlay: true,
+                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                            enlargeCenterPage: false,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            },
+                          ),
+                          items: sliderList
+                              .map(
+                                (item) => Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 5, right: 5),
+                                  child: item == null || item == ""
+                                      ? Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            image: const DecorationImage(
+                                                image: AssetImage(
+                                                  "assets/images/placeholder.png",
+                                                ),
+                                                fit: BoxFit.fill),
+                                          ),
+                                        )
+                                      : Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            image: DecorationImage(
+                                                image: NetworkImage("$item"),
+                                                fit: BoxFit.fill),
+                                          ),
                                         ),
-                                        fit: BoxFit.fill),
-                                  ),
-                                )
-                              : Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                        image: NetworkImage("$item"),
-                                        fit: BoxFit.fill),
-                                  ),
                                 ),
+                              )
+                              .toList(),
                         ),
-                      )
-                      .toList(),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Center(
-                  child: SizedBox(
-                    width: 100,
-                    height: 6,
-                    child: Center(
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: sliderList.length ?? 0,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return Container(
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Center(
+                          child: SizedBox(
+                            width: 100,
                             height: 6,
-                            width: 6,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: index == currentIndex
-                                  ? colors.primary
-                                  : Colors.grey,
+                            child: Center(
+                              child: ListView.separated(
+                                shrinkWrap: true,
+                                itemCount: sliderList.length ?? 0,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    height: 6,
+                                    width: 6,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: index == currentIndex
+                                          ? colors.primary
+                                          : Colors.grey,
+                                    ),
+                                  );
+                                },
+                                separatorBuilder: (context, index) {
+                                  return const SizedBox(
+                                    width: 5,
+                                  );
+                                },
+                              ),
                             ),
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          return const SizedBox(
-                            width: 5,
-                          );
-                        },
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(
+                    //     top: 10.0,
+                    //   ),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.center,
+                    //     children: List.generate(
+                    //       3,
+                    //       (index) => Container(
+                    //         width: 8.0,
+                    //         height: 8.0,
+                    //         margin: EdgeInsets.symmetric(horizontal: 4.0),
+                    //         decoration: BoxDecoration(
+                    //           shape: BoxShape.circle,
+                    //           color:
+                    //               currentIndex == index ? Color(0xff6EE2F5) : Colors.grey,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          InkWell(
+                            onTap: () async {
+                              await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DeliveryCard(
+                                            walletAmount: deliveryCardBalance ??
+                                                card_limit.toString(),
+                                          ))).then((value) async {
+                                await getProfile();
+                              });
+                            },
+                            child: Container(
+                              height: 100,
+                              width: 170,
+                              decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                    image:
+                                        AssetImage("assets/images/homered.png"),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      "Delivery Card",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: colors.whiteTemp,
+                                          fontSize: 19),
+                                    ),
+                                    const Text(
+                                      "Add Amount Here",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: colors.whiteTemp,
+                                          fontSize: 13),
+                                    ),
+                                    Text(
+                                      "₹ ${deliveryCardBalance ?? card_limit}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: colors.whiteTemp,
+                                          fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => BusinessCard(
+                                          walletAmount: businessCardBalance ??
+                                              card_limit.toString()))).then(
+                                  (value) async {
+                                await getProfile();
+                              });
+                            },
+                            child: Container(
+                              height: 100,
+                              width: 170,
+                              decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/homeblue.png"),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Column(
+                                  children: [
+                                    const Text("Business Card",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: colors.whiteTemp,
+                                            fontSize: 19)),
+                                    const Text(
+                                      "Add Amount Here",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: colors.whiteTemp,
+                                          fontSize: 13),
+                                    ),
+                                    Text(
+                                      "₹ ${businessCardBalance ?? card_limit}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: colors.whiteTemp,
+                                          fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Container(
+                          //   width: 150,
+                          //   child: Image.asset('assets/images/homeblue.png'),
+                          // ),
+                          //   Container(
+                          //   width: 150,
+                          //   child: Image.asset('assets/images/homered.png'),
+                          // ),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-            // Padding(
-            //   padding: const EdgeInsets.only(
-            //     top: 10.0,
-            //   ),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: List.generate(
-            //       3,
-            //       (index) => Container(
-            //         width: 8.0,
-            //         height: 8.0,
-            //         margin: EdgeInsets.symmetric(horizontal: 4.0),
-            //         decoration: BoxDecoration(
-            //           shape: BoxShape.circle,
-            //           color:
-            //               currentIndex == index ? Color(0xff6EE2F5) : Colors.grey,
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  InkWell(
-                    onTap: () async {
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DeliveryCard(
-                                    walletAmount: deliveryCardBalance ??
-                                        card_limit.toString(),
-                                  ))).then((value) async {
-                        await getProfile();
-                      });
-                    },
-                    child: Container(
-                      height: 100,
-                      width: 170,
-                      decoration: BoxDecoration(
-                          image: const DecorationImage(
-                            image: AssetImage("assets/images/homered.png"),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 25),
-                        child: Column(
-                          children: [
-                            const Text(
-                              "Delivery Card",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.whiteTemp,
-                                  fontSize: 18),
-                            ),
-                            Text(
-                              "₹ ${deliveryCardBalance ?? card_limit}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.whiteTemp,
-                                  fontSize: 18),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () async {
-                      await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => BusinessCard(
-                                      walletAmount: businessCardBalance ??
-                                          card_limit.toString())))
-                          .then((value) async {
-                        await getProfile();
-                      });
-                    },
-                    child: Container(
-                      height: 100,
-                      width: 170,
-                      decoration: BoxDecoration(
-                          image: const DecorationImage(
-                            image: AssetImage("assets/images/homeblue.png"),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 25),
-                        child: Column(
-                          children: [
-                            const Text("Business Card",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.whiteTemp,
-                                    fontSize: 18)),
-                            Text(
-                              "₹ ${businessCardBalance ?? card_limit}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.whiteTemp,
-                                  fontSize: 18),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Container(
-                  //   width: 150,
-                  //   child: Image.asset('assets/images/homeblue.png'),
-                  // ),
-                  //   Container(
-                  //   width: 150,
-                  //   child: Image.asset('assets/images/homered.png'),
-                  // ),
-                ],
+              ),
+            )
+          : Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: colors.primary,
+                ),
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

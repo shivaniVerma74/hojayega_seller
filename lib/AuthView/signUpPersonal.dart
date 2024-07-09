@@ -42,10 +42,14 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     getstate();
     if (isNumeric(widget.mobileOrEmail)) {
       phoneController.text = widget.mobileOrEmail;
+      isActive = 0;
     } else {
       emailController.text = widget.mobileOrEmail;
+      isActive = 1;
     }
   }
+
+  int isActive = -1;
 
   Position? currentLocation;
 
@@ -313,34 +317,35 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         imageQuality: 70,
         maxWidth: 300,
         maxHeight: 400);
+
     if (pickedFile != null) {
       final cropFile = await ImageCropper().cropImage(
           sourcePath: pickedFile.path, cropStyle: CropStyle.rectangle);
+
       if (cropFile != null) {
-        croppedFile = File(cropFile.path);
+        setState(() {
+          if (imageCode == 1) {
+            _image = File(cropFile.path);
+          } else if (imageCode == 2) {
+            _image2 = File(cropFile.path);
+          } else if (imageCode == 3) {
+            _image3 = File(cropFile.path);
+          } else if (imageCode == 4) {
+            _image4 = File(cropFile.path);
+          } else if (imageCode == 5) {
+            _image5 = File(cropFile.path);
+          } else if (imageCode == 6) {
+            _image6 = File(cropFile.path);
+          } else if (imageCode == 7) {
+            _currentlocationimage = File(cropFile.path);
+          } else if (imageCode == 8) {
+            _qrimage = File(cropFile.path);
+          }
+        });
       }
+    } else {
+      print('no image picked');
     }
-    setState(() {
-      if (croppedFile != null && imageCode == 1) {
-        _image = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 2) {
-        _image2 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 3) {
-        _image3 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 4) {
-        _image4 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 5) {
-        _image5 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 6) {
-        _image6 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 7) {
-        _currentlocationimage = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 8) {
-        _qrimage = File(croppedFile!.path);
-      } else {
-        print('no image picked');
-      }
-    });
   }
 
   Future _getImageFromCamera() async {
@@ -349,36 +354,35 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         imageQuality: 70,
         maxWidth: 300,
         maxHeight: 400);
+
     if (pickedFile != null) {
       final cropFile = await ImageCropper().cropImage(
           sourcePath: pickedFile.path, cropStyle: CropStyle.rectangle);
+
       if (cropFile != null) {
-        croppedFile = File(cropFile.path);
+        setState(() {
+          if (imageCode == 1) {
+            _image = File(cropFile.path);
+          } else if (imageCode == 2) {
+            _image2 = File(cropFile.path);
+          } else if (imageCode == 3) {
+            _image3 = File(cropFile.path);
+          } else if (imageCode == 4) {
+            _image4 = File(cropFile.path);
+          } else if (imageCode == 5) {
+            _image5 = File(cropFile.path);
+          } else if (imageCode == 6) {
+            _image6 = File(cropFile.path);
+          } else if (imageCode == 7) {
+            _currentlocationimage = File(cropFile.path);
+          } else if (imageCode == 8) {
+            _qrimage = File(cropFile.path);
+          }
+        });
       }
+    } else {
+      print('no image picked');
     }
-    setState(() {
-      if (croppedFile != null && imageCode == 1) {
-        _image = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 2) {
-        _image2 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 3) {
-        _image3 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 4) {
-        _image4 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 5) {
-        _image5 = File(croppedFile!.path);
-      } else if (croppedFile != null && imageCode == 6) {
-        _image6 = File(croppedFile!.path);
-      }
-      // else if (croppedFile != null && imageCode == 7) {
-      //   _currentlocationimage = File(croppedFile!.path);
-      // }
-      else if (croppedFile != null && imageCode == 8) {
-        _qrimage = File(croppedFile!.path);
-      } else {
-        print('no image picked');
-      }
-    });
   }
 
   List<CityData> cityList = [];
@@ -869,6 +873,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                       keyboardType: TextInputType.number,
                                       maxLength: 10,
                                       controller: phoneController,
+                                      readOnly: isActive == 0 ? true : false,
                                       decoration: const InputDecoration(
                                           isDense: true,
                                           counterText: "",
@@ -916,19 +921,22 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: colors.lightgray),
                                     child: TextFormField(
+                                      readOnly: isActive == 1 ? true : false,
                                       controller: emailController,
                                       validator: _validateEmail,
                                       decoration: const InputDecoration(
-                                          isDense: true,
-                                          border: InputBorder.none,
-                                          hintText: 'Email Address',
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide:
-                                                BorderSide(color: Colors.white),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                        isDense: true,
+                                        border: InputBorder.none,
+                                        hintText: 'Email Address',
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),

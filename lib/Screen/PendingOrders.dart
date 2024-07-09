@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
 import '../Model/GetVendorOrderModel.dart';
@@ -16,20 +17,19 @@ class PendingOrders extends StatefulWidget {
 }
 
 class _PendingOrdersState extends State<PendingOrders> {
- @override
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getData();
   }
 
-
- String? vendorId;
- getData() async {
-   final SharedPreferences preferences = await SharedPreferences.getInstance();
-   vendorId = preferences.getString('vendor_id');
-   return getVendorOrder();
- }
+  String? vendorId;
+  getData() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    vendorId = preferences.getString('vendor_id');
+    return getVendorOrder();
+  }
 
   GetVendorOrderModel? vendorOrderModel;
   getVendorOrder() async {
@@ -37,14 +37,16 @@ class _PendingOrdersState extends State<PendingOrders> {
     var headers = {
       'Cookie': 'ci_session=6430902524c1703efd1eeb4c66d3537c73dbe375'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorOrders));
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorOrders));
     request.fields.addAll({'user_id': vendorId.toString(), 'status': "1"});
-    print("parameterr ${request.fields}");
+    print("parameterr in penifng orders${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
-      final finalResult = GetVendorOrderModel.fromJson(json.decode(finalResponse));
+      final finalResult =
+          GetVendorOrderModel.fromJson(json.decode(finalResponse));
       print("get vendor order responsee $finalResult $finalResponse");
       vendorOrderModel = finalResult;
       setState(() {});
@@ -56,21 +58,21 @@ class _PendingOrdersState extends State<PendingOrders> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-          // Text("Pending Orders", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: colors.primary),),
-          const SizedBox(height: 10),
-         // ListView.builder(
-         //   shrinkWrap: true,
-         //   physics: NeverScrollableScrollPhysics(),
-         //   itemCount: vendorOrderModel?.orders?.length??0,
-         //   itemBuilder: (context, index) {
-         //   return getPendingOrders(context,index);
-         // },)
-          getPendingOrders(context),
-        ],
-       ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Text("Pending Orders", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: colors.primary),),
+            const SizedBox(height: 10),
+            // ListView.builder(
+            //   shrinkWrap: true,
+            //   physics: NeverScrollableScrollPhysics(),
+            //   itemCount: vendorOrderModel?.orders?.length??0,
+            //   itemBuilder: (context, index) {
+            //   return getPendingOrders(context,index);
+            // },)
+            getPendingOrders(context),
+          ],
+        ),
       ),
     );
   }
@@ -92,76 +94,90 @@ class _PendingOrdersState extends State<PendingOrders> {
     Order('10:00 to 12:00 pm', 'Ujjain', 'Approved'),
   ];
 
- Widget  getPendingOrders(BuildContext context,) {
+  Widget getPendingOrders(
+    BuildContext context,
+  ) {
     return Column(
       children: [
-        vendorOrderModel?.orders?.isNotEmpty ?? false ?
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Table(
-              border: TableBorder.all(borderRadius: BorderRadius.circular(5)),
-              columnWidths: const <int, TableColumnWidth>{
-                0: FixedColumnWidth(60.0),
-                1: FixedColumnWidth(110.0),
-                2: FixedColumnWidth(90.0),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: [
-                // Header Row
-                TableRow(
-                  children: [
-                    headerCell('Order No'),
-                    headerCell('Time Slot'),
-                    headerCell('Region'),
-                    headerCell('Order Status'),
-                  ],
-                ),
-                // Data Rows
-                ...?vendorOrderModel?.orders?.map((order) {
-                  return TableRow(
+        vendorOrderModel?.orders?.isNotEmpty ?? false
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Table(
+                    border:
+                        TableBorder.all(borderRadius: BorderRadius.circular(5)),
+                    columnWidths: const <int, TableColumnWidth>{
+                      0: FixedColumnWidth(60.0),
+                      1: FixedColumnWidth(110.0),
+                      2: FixedColumnWidth(90.0),
+                    },
+                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     children: [
-                      Container(
-                        height: 50,
-                        child:  Center(child: Text(order.orderId.toString())),
+                      // Header Row
+                      TableRow(
+                        children: [
+                          headerCell('Order No'),
+                          headerCell('Time Slot'),
+                          headerCell('Region'),
+                          headerCell('Order Status'),
+                        ],
                       ),
-                      Container(
-                          height: 50,
-                          child: Center(
-                              child: Padding(
-                              padding: const EdgeInsets.only(left: 2),
-                              child: Text(order.time.toString().replaceAll(":00", "")),
-                             ),
-                          ),
-                      ),
-                      Container(
-                        height: 50,
-                        child: Center(
-                            child: Text(order.address.toString())),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4, right: 4),
-                        child: Container(
-                          height: 30,
-                          width: 60,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: const Color(0xffE5CB24)) ,
-                          child: const Center(
-                              child: Text("Pending", style: TextStyle(color: colors.primary, fontWeight:FontWeight.bold))),
-                        ),
-                      ),
+                      // Data Rows
+                      ...?vendorOrderModel?.orders?.map((order) {
+                        return TableRow(
+                          children: [
+                            Container(
+                              height: 50,
+                              child:
+                                  Center(child: Text(order.orderId.toString())),
+                            ),
+                            Container(
+                              height: 50,
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 2),
+                                  child: Text(order.time
+                                      .toString()
+                                      .replaceAll(":00", "")),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 50,
+                              child:
+                                  Center(child: Text(order.address.toString())),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4, right: 4),
+                              child: Container(
+                                height: 30,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: const Color(0xffE5CB24)),
+                                child: const Center(
+                                  child: Text(
+                                    "Pending",
+                                    style: TextStyle(
+                                        color: colors.primary,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
                     ],
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
-        ): Container(
-          height:
-          MediaQuery.of(context).size.height/2.5,
-          child: const Center(
-            child: Text("Data Not Found"),
-          ),
-        ),
+                  ),
+                ),
+              )
+            : Container(
+                height: MediaQuery.of(context).size.height / 2.5,
+                child: const Center(
+                  child: Text("Data Not Found"),
+                ),
+              ),
       ],
     );
   }

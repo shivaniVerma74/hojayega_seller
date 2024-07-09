@@ -24,6 +24,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
   @override
   void initState() {
     super.initState();
+    getSetting();
+    getProfile();
     getData();
     // addWallet();
     _razorpay = Razorpay();
@@ -98,6 +100,33 @@ class _DeliveryCardState extends State<DeliveryCard> {
     }
   }
 
+  String? card_limit;
+
+  getSetting() async {
+    var headers = {
+      'Cookie': 'ci_session=bfa970b6e13a45a52775a4cd4995efa6026d6895'
+    };
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getHelp));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      var finaResult = jsonDecode(result);
+      print("response herre $finaResult");
+      if (finaResult['response_code'] == "1") {
+        card_limit = finaResult['data1']['wallet_balance_limit'];
+        print("wallet limit $card_limit");
+        setState(() {});
+        // Fluttertoast.showToast(msg: '${finaResult['message']}');
+      } else {
+        // Fluttertoast.showToast(msg: "${finaResult['message']}");
+      }
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
   Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
     Fluttertoast.showToast(msg: "Payment successfully");
     addWallet();
@@ -163,6 +192,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
       print("profile data responsee $finalResult");
       profileData = finalResult;
       deliveryCardBalance = profileData?.data?.first.dCard;
+      print("delivery card in card Screen $deliveryCardBalance");
       setState(() {});
     } else {
       print(response.reasonPhrase);
@@ -192,8 +222,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
               padding: const EdgeInsets.only(top: 20),
               child: Column(
                 children: [
-                  const AutoSizeText(
-                    "Please maintain 100 minimum wallet amount to \nactive the account",
+                  AutoSizeText(
+                    "Please maintain ₹$card_limit minimum wallet amount to \nactive the account",
                     style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                     textAlign: TextAlign.center,
                   ),
@@ -232,7 +262,7 @@ class _DeliveryCardState extends State<DeliveryCard> {
                               //         color: colors.whiteTemp,
                               //         fontSize: 23)):
                               Text(
-                                "₹ ${wallet_balance_added ?? widget.walletAmount}",
+                                "₹ ${wallet_balance_added ?? deliveryCardBalance}",
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w600,
                                     color: colors.whiteTemp,

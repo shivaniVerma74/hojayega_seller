@@ -211,10 +211,7 @@ class _OrderDetailsState extends State<OrderDetails> {
     var headers = {
       'Cookie': 'ci_session=357aeaa9c34813410a247f64361084193b7c4337'
     };
-    var request = http.Request(
-        'POST',
-        Uri.parse(
-            'https://developmentalphawizz.com/hojayega/Vendorapi/check_festival'));
+    var request = http.Request('POST', Uri.parse(ApiServicves.festiveCheck));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -263,7 +260,7 @@ class _OrderDetailsState extends State<OrderDetails> {
         kiloMeter = finalresult["distance"][1];
         setState(() {});
         print(
-            "delivery charge is ${delCharge.toString()} distnace $delChargeKm kilometer $kiloMeter");
+            "delivery charge is ${delCharge.toString()} distance $delChargeKm kilometer $kiloMeter");
         print("final result  in delivery${finalresult["message"]}");
         Fluttertoast.showToast(msg: finalresult['message']);
       } else {
@@ -972,7 +969,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       setState(() {
                         selectproducts = newValue!;
                         print(
-                            "===my technic ${selectVal}=======$selectOrders ======");
+                            "===my technic $selectVal=======$selectOrders ======");
                       });
                       print("jdddddddddddddddd $selectproducts");
                       if (selectproducts == "Flexible") {
@@ -1313,10 +1310,17 @@ class _OrderDetailsState extends State<OrderDetails> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       // Image.asset("assets/images/edit.png"),
-                      Text(
-                        "Delivery Charge as per $delChargeKm $kiloMeter = ",
-                        style: const TextStyle(color: colors.primary),
-                      ),
+                      delChargeKm == null ||
+                              delChargeKm == "" && kiloMeter == null ||
+                              kiloMeter == ""
+                          ? const Text(
+                              "Delivery Charge as per 0.0 & 0.0 = ",
+                              style: TextStyle(color: colors.primary),
+                            )
+                          : Text(
+                              "Delivery Charge as per $delChargeKm $kiloMeter = ",
+                              style: const TextStyle(color: colors.primary),
+                            ),
                       delCharge == null || delCharge == ""
                           ? const Text("0.0")
                           : Text(
@@ -1375,10 +1379,12 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 finalTotal == null ||
                                         finalTotal == "" ||
                                         finalTotal == "0.0"
-                                    ? Text("$discountAmt RS.",
+                                    ? Text(
+                                        "$discountAmt RS.",
                                         style: const TextStyle(
                                             fontSize: 15,
-                                            color: colors.primary))
+                                            color: colors.primary),
+                                      )
                                     : Text(
                                         "${overRollAmt.toString()} Rs.",
                                         style: const TextStyle(

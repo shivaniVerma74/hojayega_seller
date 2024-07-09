@@ -65,7 +65,7 @@ class _Add15SecState extends State<Add15Sec> {
 
   Future getImageGallery() async {
     final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
@@ -78,7 +78,7 @@ class _Add15SecState extends State<Add15Sec> {
 
   Future _getImageFromCamera() async {
     final pickedFile =
-        await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
@@ -96,15 +96,15 @@ class _Add15SecState extends State<Add15Sec> {
         return Wrap(
           children: <Widget>[
             ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Gallery'),
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
               onTap: () {
                 getImageGallery();
               },
             ),
             ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text('Camera'),
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
               onTap: () {
                 _getImageFromCamera();
                 // _getImage(ImageSource.camera);
@@ -130,7 +130,7 @@ class _Add15SecState extends State<Add15Sec> {
     request.fields.addAll({
       'user_id': vendorId.toString(),
       'type': roll == "1" ? "shop" : "service",
-      'total_amount': totalamtCtr.text,
+      'total_amount': totalAmtCtr.text,
       'transaction_id': 'wallet'
     });
     print("======15sec=========${request.fields}===========");

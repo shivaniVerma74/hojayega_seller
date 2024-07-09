@@ -677,18 +677,19 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 height: 5,
               ),
               InkWell(
-                  onTap: () {
-                    setState(() {
-                      currentIndex = 19;
-                    });
-                    logout(context);
-                  },
-                  child: DrawerIconTab(
-                    titlee: 'Log Out',
-                    icon: Icons.logout_outlined,
-                    tabb: 19,
-                    indexx: currentIndex,
-                  )),
+                onTap: () {
+                  setState(() {
+                    currentIndex = 19;
+                  });
+                  logout(context);
+                },
+                child: DrawerIconTab(
+                  titlee: 'Log Out',
+                  icon: Icons.logout_outlined,
+                  tabb: 19,
+                  indexx: currentIndex,
+                ),
+              ),
               const SizedBox(
                 height: 20,
               ),
@@ -877,7 +878,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
           _child = roll == "2" ? Calender() : Orders();
           break;
         case 2:
-          _child = roll == "2" ? const PendingBooking() : AllCategory();
+          _child =
+              roll == "2" ? const PendingBooking() : AllCategory(isShow: false);
           break;
         case 3:
           _child = roll == "2" ? PickDrop() : PendingOrders();

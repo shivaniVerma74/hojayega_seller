@@ -1,12 +1,11 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:io';
 
 import '../Helper/color.dart';
 import '../Model/createonlineImageModel.dart';
 import '../Model/createonlineModel.dart';
-
 
 class CreateOnlineStore extends StatefulWidget {
   const CreateOnlineStore({Key? key}) : super(key: key);
@@ -18,46 +17,46 @@ class CreateOnlineStore extends StatefulWidget {
 class _CreateOnlineStoreState extends State<CreateOnlineStore> {
   int selectedCheckboxIndex = -1; // To track the selected checkbox
 
-  var index=0;
+  var index = 0;
 
-  var data1=[];
+  var data1 = [];
   CreateonlineModel? createOnlineModel;
-  CreateonlineImageModel?  createonlineImageModel;
+  CreateonlineImageModel? createonlineImageModel;
   List<bool> selectedItems = List.generate(15, (index) => false);
   Future<void> fetchData() async {
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/hojayega/Vendorapi/get_categories_by_shop_services?roll=2'));
-    request.fields.addAll({
-      'roll':'2'
-    });
+    var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://developmentalphawizz.com/hojayega/Vendorapi/get_categories_by_shop_services?roll=2'));
+    request.fields.addAll({'roll': '2'});
 
     //request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       print('aaa11');
       var result = await response.stream.bytesToString();
-      var finalResult =  CreateonlineImageModel.fromJson(json.decode(result));
+      var finalResult = CreateonlineImageModel.fromJson(json.decode(result));
       setState(() {
         createonlineImageModel = finalResult;
-        print("images is s ${finalResult} ${createonlineImageModel?.data?.first.img}");
+        print(
+            "images is s ${finalResult} ${createonlineImageModel?.data?.first.img}");
       });
-    }
-    else {
+    } else {
       print('bbb22');
       print(response.reasonPhrase);
     }
-
   }
 
-
   List<CreateonlineModel> userList = [];
-  Future<void> getdata ()async{
+  Future<void> getdata() async {
     var headers = {
       'Cookie': 'ci_session=75640c7ceba16b47ad9a9ac9d5aee2abffd0c21b'
     };
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/hojayega/Vendorapi/type_shops?type=services'));
-    request.fields.addAll({
-      'type': 'services'
-    });
+    var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://developmentalphawizz.com/hojayega/Vendorapi/type_shops?type=services'));
+    request.fields.addAll({'type': 'services'});
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -68,8 +67,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
         createOnlineModel = finalResult;
         print("data is ${finalResult} ${createOnlineModel?.data?.first.name}");
       });
-    }
-    else {
+    } else {
       print('bb');
       print(response.reasonPhrase);
     }
@@ -116,8 +114,8 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                         ),
                         Text(
                           "Take a quick moment choosing your store category.\nThis helps us set up your store to match your products.",
-                          style:
-                          TextStyle(color: colors.lightWhite2, fontSize: 12),
+                          style: TextStyle(
+                              color: colors.lightWhite2, fontSize: 12),
                         ),
                       ],
                     ),
@@ -171,7 +169,9 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                             ),
                             Container(
                               height: 30,
-                              decoration: BoxDecoration(border: Border.all(color:colors.primary),borderRadius: BorderRadius.circular(5)),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: colors.primary),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 itemCount: createOnlineModel!.data!.length,
@@ -193,7 +193,8 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                         activeColor: colors.primary,
                                       ),
                                       Text(
-                                        createOnlineModel!.data![index].name.toString(),
+                                        createOnlineModel!.data![index].name
+                                            .toString(),
                                         style: TextStyle(color: colors.primary),
                                       ),
                                     ],
@@ -227,58 +228,70 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                               ],
                             ),
                             Container(
-                             width: double.infinity, // adjust width if needed
-                             height: 500, // adjust height if needed
-                              child:GridView.builder(
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    mainAxisSpacing: 3,
-                                    childAspectRatio: 2 / 2.4
-                                ),
-                                itemCount: createonlineImageModel!.data!.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Stack(
-                                    alignment: Alignment.topLeft,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedItems[index] = !selectedItems[index];
-                                          });
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: Image.network("https://developmentalphawizz.com/hojayega/${createonlineImageModel!.data![index].img.toString()}")
+                                width:
+                                    double.infinity, // adjust width if needed
+                                height: 500, // adjust height if needed
+                                child: GridView.builder(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3,
+                                          mainAxisSpacing: 3,
+                                          childAspectRatio: 2 / 2.4),
+                                  itemCount:
+                                      createonlineImageModel!.data!.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Stack(
+                                      alignment: Alignment.topLeft,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedItems[index] =
+                                                  !selectedItems[index];
+                                            });
+                                          },
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: Image.network(
+                                                      "https://developmentalphawizz.com/hojayega/${createonlineImageModel!.data![index].img.toString()}")),
+                                              Text(
+                                                createonlineImageModel!
+                                                    .data![index].cName
+                                                    .toString(),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        if (selectedItems[index])
+                                          Container(
+                                            margin: EdgeInsets.all(10),
+                                            //  padding: EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              color: colors.secondary,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                            Text( createonlineImageModel!.data![index].cName.toString(),)
-                                          ],
-                                        ),
-                                      ),
-                                      if (selectedItems[index])
-                                        Container(
-                                          margin: EdgeInsets.all(10),
-                                          //  padding: EdgeInsets.all(2),
-                                          decoration: BoxDecoration(
-                                            color: colors.secondary,
-                                            borderRadius: BorderRadius.circular(8),
+                                            child: const Icon(
+                                              Icons.check,
+                                              color: Colors.white,
+                                              size: 15,
+                                            ),
                                           ),
-                                          child: const Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 15,
-                                          ),
-                                        ),
-                                    ],
-                                  );
-                                },
-                              )
-                            ),
+                                      ],
+                                    );
+                                  },
+                                )),
 
-                            SizedBox(height: 10,),
+                            SizedBox(
+                              height: 10,
+                            ),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: const [
@@ -302,9 +315,13 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 8,),
+                            SizedBox(
+                              height: 8,
+                            ),
                             Container(
-                              decoration: BoxDecoration(border: Border.all(color: colors.primary),borderRadius: BorderRadius.circular(10)),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: colors.primary),
+                                  borderRadius: BorderRadius.circular(10)),
                               child: TextFormField(
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -317,7 +334,9 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 8,),
+                            SizedBox(
+                              height: 8,
+                            ),
                             Row(
                               children: const [
                                 CircleAvatar(
@@ -341,7 +360,6 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 SizedBox(
                                   width: 30,
                                 ),
-
                                 CircleAvatar(
                                   child: Text(
                                     '4',
@@ -351,7 +369,6 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                   backgroundColor: colors.primary,
                                   maxRadius: 8,
                                 ),
-
                                 SizedBox(
                                   width: 5,
                                 ),
@@ -361,30 +378,31 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                       fontWeight: FontWeight.bold,
                                       color: colors.primary),
                                 ),
-
                               ],
                             ),
-                           // SizedBox(height: 8,),
-                           //  Row(
-                           //    children: [
-                           //
-                           //      Container(
-                           //        decoration: BoxDecoration(border: Border.all(color: colors.primary),borderRadius: BorderRadius.circular(10)),
-                           //        child: TextFormField(
-                           //          decoration: InputDecoration(
-                           //            border: InputBorder.none,
-                           //          ),
-                           //        ),
-                           //      ),
-                           //    ],
-                           //  ),
+                            // SizedBox(height: 8,),
+                            //  Row(
+                            //    children: [
+                            //
+                            //      Container(
+                            //        decoration: BoxDecoration(border: Border.all(color: colors.primary),borderRadius: BorderRadius.circular(10)),
+                            //        child: TextFormField(
+                            //          decoration: InputDecoration(
+                            //            border: InputBorder.none,
+                            //          ),
+                            //        ),
+                            //      ),
+                            //    ],
+                            //  ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                               children: [
                                 Container(
-                                  width: MediaQuery.of(context).size.width * .41,
-                                  decoration: BoxDecoration(border: Border.all(color: colors.primary),borderRadius: BorderRadius.circular(10)),
+                                  width:
+                                      MediaQuery.of(context).size.width * .41,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: colors.primary),
+                                      borderRadius: BorderRadius.circular(10)),
                                   child: TextFormField(
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -397,11 +415,13 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                     ),
                                   ),
                                 ),
-
-                               // SizedBox(width: 5,),
+                                // SizedBox(width: 5,),
                                 Container(
-                                  width: MediaQuery.of(context).size.width * .41,
-                                  decoration: BoxDecoration(border: Border.all(color: colors.primary),borderRadius: BorderRadius.circular(10)),
+                                  width:
+                                      MediaQuery.of(context).size.width * .41,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: colors.primary),
+                                      borderRadius: BorderRadius.circular(10)),
                                   child: TextFormField(
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -443,14 +463,17 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                               padding: EdgeInsets.only(left: 20),
                               child: Text(
                                 "Keep charges between 20rs to 100rs",
-                                style: TextStyle(
-                                    color: colors.primary),
+                                style: TextStyle(color: colors.primary),
                               ),
                             ),
-                            SizedBox(height: 10,),
+                            SizedBox(
+                              height: 10,
+                            ),
                             Container(
                               //width: MediaQuery.of(context).size.width * .41,
-                              decoration: BoxDecoration(border: Border.all(color: colors.primary),borderRadius: BorderRadius.circular(10)),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: colors.primary),
+                                  borderRadius: BorderRadius.circular(10)),
                               child: TextFormField(
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -463,18 +486,22 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20,),
+                            SizedBox(
+                              height: 20,
+                            ),
 
                             Center(
                               child: InkWell(
-                                onTap: (){
+                                onTap: () {
                                   getdata();
                                   fetchData();
-                                 },
+                                },
                                 child: Container(
                                   height: 50,
                                   width: 200,
-                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: colors.secondary),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: colors.secondary),
                                   child: const Center(
                                     child: Text(
                                       'Next',

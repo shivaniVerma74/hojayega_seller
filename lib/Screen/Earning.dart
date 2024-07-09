@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/EarningsModel.dart';
-import '../Model/TransactionModel.dart';
 
 class Earning extends StatefulWidget {
   const Earning({Key? key}) : super(key: key);
@@ -19,7 +18,6 @@ class Earning extends StatefulWidget {
 }
 
 class _EarningState extends State<Earning> {
-
   @override
   void initState() {
     // TODO: implement initState
@@ -27,13 +25,17 @@ class _EarningState extends State<Earning> {
   }
 
   EarningsModel? earningData;
-  getEarnings(String? type,) async {
+  String? roll;
+  getEarnings(
+    String? type,
+  ) async {
     print("object Tis ${_startDateController.text.toString()}");
     print("object Tis ${_startAccDateController.text.toString()}");
     print("object Tis ${_endDateController.text.toString()}");
     print("object Tis ${_endDateAccController.text.toString()}");
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String? vendorId = preferences.getString('vendor_id');
+    roll = preferences.getString('roll');
     var headers = {
       'Cookie': 'ci_session=8669ba7a011c91f49e6425fd6279035043aaccd5'
     };
@@ -41,9 +43,14 @@ class _EarningState extends State<Earning> {
         http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorEarning));
     request.fields.addAll({
       'vendor_id': vendorId.toString(),
-      'start_date': selected == 0 ? _startDateController.text.toString() : _startAccDateController.text.toString(),
-      'end_date': selected == 0 ? _endDateController.text.toString() : _endDateAccController.text.toString(),
-      'type': type.toString()
+      'start_date': selected == 0
+          ? _startDateController.text.toString()
+          : _startAccDateController.text.toString(),
+      'end_date': selected == 0
+          ? _endDateController.text.toString()
+          : _endDateAccController.text.toString(),
+      'type': type.toString(),
+      'role': roll.toString(),
     });
     print("earningss para ${request.fields} $selected");
     request.headers.addAll(headers);
@@ -59,8 +66,7 @@ class _EarningState extends State<Earning> {
     }
   }
 
-
-TextEditingController amtCtr = TextEditingController();
+  TextEditingController amtCtr = TextEditingController();
 
   amountRequest(String? amount) async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -68,7 +74,8 @@ TextEditingController amtCtr = TextEditingController();
     var headers = {
       'Cookie': 'ci_session=33c3240e9634316144a84aab4a17112c99db3031'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.requestForSettlement));
+    var request = http.MultipartRequest(
+        'POST', Uri.parse(ApiServicves.requestForSettlement));
     request.fields.addAll({
       'type': '1',
       'amount': amount.toString(),
@@ -80,13 +87,12 @@ TextEditingController amtCtr = TextEditingController();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       final jsonresponse = json.decode(finalResponse);
-      if(jsonresponse["response_code"] == "0") {
+      if (jsonresponse["response_code"] == "0") {
         Fluttertoast.showToast(msg: jsonresponse["message"]);
       } else {
         Fluttertoast.showToast(msg: jsonresponse["message"]);
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
@@ -118,10 +124,9 @@ TextEditingController amtCtr = TextEditingController();
             TextButton(
               child: const Text('Submit'),
               onPressed: () {
-                if(amtCtr.text.isEmpty){
+                if (amtCtr.text.isEmpty) {
                   Fluttertoast.showToast(msg: "Please Enter Amount");
-                }
-                else {
+                } else {
                   amountRequest(amtCtr.text);
                 }
                 Navigator.of(context).pop();
@@ -156,7 +161,8 @@ TextEditingController amtCtr = TextEditingController();
 
   final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
 
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller) async {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -170,7 +176,8 @@ TextEditingController amtCtr = TextEditingController();
     }
   }
 
-  Future<void> _selectEndDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectEndDate(
+      BuildContext context, TextEditingController controller) async {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -185,8 +192,8 @@ TextEditingController amtCtr = TextEditingController();
     getEarnings("Earrning");
   }
 
-
-  Future<void> _selectAccDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectAccDate(
+      BuildContext context, TextEditingController controller) async {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -200,7 +207,8 @@ TextEditingController amtCtr = TextEditingController();
     }
   }
 
-  Future<void> _selectAccEndDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectAccEndDate(
+      BuildContext context, TextEditingController controller) async {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -221,7 +229,6 @@ TextEditingController amtCtr = TextEditingController();
     _endDateController.dispose();
     super.dispose();
   }
-
 
   DateTime initialDate = DateTime.now();
   @override
@@ -269,11 +276,11 @@ TextEditingController amtCtr = TextEditingController();
                             child: Text(
                               'Earnings',
                               style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: selected == 0
-                                      ? Colors.white
-                                      : colors.primary,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: selected == 0
+                                    ? Colors.white
+                                    : colors.primary,
                               ),
                             ),
                           ),
@@ -294,21 +301,21 @@ TextEditingController amtCtr = TextEditingController();
                         child: Container(
                           height: 40,
                           decoration: BoxDecoration(
-                              color: selected == 1
-                                  ? colors.primary
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(color: colors.primary),
+                            color: selected == 1
+                                ? colors.primary
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: colors.primary),
                           ),
                           child: Center(
                             child: Text(
                               'Acc Summary',
                               style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: selected == 1
-                                      ? Colors.white
-                                      : colors.primary,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: selected == 1
+                                    ? Colors.white
+                                    : colors.primary,
                               ),
                             ),
                           ),
@@ -321,9 +328,9 @@ TextEditingController amtCtr = TextEditingController();
             ),
             selected == 0
                 ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                      children:[
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 15, right: 15),
                           child: Column(
@@ -337,20 +344,24 @@ TextEditingController amtCtr = TextEditingController();
                                     hintText: "Select Start Date",
                                     isDense: true,
                                     filled: true,
-                                    fillColor: Colors.grey.shade100 ,
+                                    fillColor: Colors.grey.shade100,
                                     suffixIcon: InkWell(
                                         onTap: () {
-                                          _selectDate(context, _startDateController);
+                                          _selectDate(
+                                              context, _startDateController);
                                         },
-                                        child: const Icon(Icons.calendar_month, color: colors.primary,)),
+                                        child: const Icon(
+                                          Icons.calendar_month,
+                                          color: colors.primary,
+                                        )),
                                     focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(color: Colors.grey.shade100)
-                                    ),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade100)),
                                     enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(color: Colors.grey.shade100)
-                                    ),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade100)),
                                   ),
                                 ),
                               ),
@@ -364,22 +375,24 @@ TextEditingController amtCtr = TextEditingController();
                                     hintText: "Select End Date",
                                     isDense: true,
                                     filled: true,
-                                    fillColor: Colors.grey.shade100 ,
+                                    fillColor: Colors.grey.shade100,
                                     suffixIcon: InkWell(
                                       onTap: () async {
-                                        _selectEndDate(context, _endDateController);
+                                        _selectEndDate(
+                                            context, _endDateController);
                                         // await getEarnings("Earning");
                                       },
-                                        child: const Icon(Icons.calendar_month, color: colors.primary),
+                                      child: const Icon(Icons.calendar_month,
+                                          color: colors.primary),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(color: Colors.grey.shade100)
-                                    ),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade100)),
                                     enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(color: Colors.grey.shade100)
-                                    ),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade100)),
                                   ),
                                 ),
                               ),
@@ -394,67 +407,85 @@ TextEditingController amtCtr = TextEditingController();
                             ],
                           ),
                         ),
-                        earningData?.status == "0" || earningData?.products?.length == ""
+                        earningData?.status == "0" ||
+                                earningData?.products?.length == ""
                             ? const Center(
-                          child: Text("Data Not Found", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
-                        ):
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: earningData?.products?.length?? 0,
-                          itemBuilder: (context, index) {
-                            return Column(
-                              children: [
-                                Card(
-                                  margin: EdgeInsets.all(10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Row(
-                                      children: [
-                                        earningData?.products?[index].productImage == null || earningData?.products?[index].productImage == "" ?
-                                        const CircleAvatar(
-                                          backgroundImage: NetworkImage("assets/images/placeholder.png",),
-                                          radius: 30,
-                                        ):
-                                        CircleAvatar(
-                                          backgroundImage: NetworkImage("${ApiServicves.imageUrl}${earningData?.products?[index].productImage}"),
-                                          radius: 30,
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Order No. - ${earningData?.products?[index].orderId}',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
+                                child: Text(
+                                  "Data Not Found",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: earningData?.products?.length ?? 0,
+                                itemBuilder: (context, index) {
+                                  return Column(
+                                    children: [
+                                      Card(
+                                        margin: const EdgeInsets.all(10),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Row(
+                                            children: [
+                                              earningData?.products?[index]
+                                                              .productImage ==
+                                                          null ||
+                                                      earningData
+                                                              ?.products?[index]
+                                                              .productImage ==
+                                                          ""
+                                                  ? const CircleAvatar(
+                                                      backgroundImage: NetworkImage(
+                                                          "assets/images/placeholder.png"),
+                                                      radius: 30,
+                                                    )
+                                                  : CircleAvatar(
+                                                      backgroundImage: NetworkImage(
+                                                          "${ApiServicves.imageUrl}${earningData?.products?[index].productImage}"),
+                                                      radius: 30,
+                                                    ),
+                                              const SizedBox(width: 10),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Order No. - ${earningData?.products?[index].orderId}',
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${earningData?.products?[index].paymentMode}",
+                                                    style: const TextStyle(
+                                                      color: Colors.red,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                      "${earningData?.products?[index].createdAt}"),
+                                                ],
                                               ),
-                                            ),
-                                            Text(
-                                              "${earningData?.products?[index].paymentMode}",
-                                              style: const TextStyle(
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
+                                              const Spacer(),
+                                              Text(
+                                                '+${"${earningData?.products?[index].amount}"}',
+                                                style: const TextStyle(
+                                                  color: Colors.green,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                            ),
-                                            Text("${earningData?.products?[index].createdAt}"),
-                                          ],
-                                        ),
-                                        const Spacer(),
-                                        Text(
-                                          '+${"${earningData?.products?[index].amount}"}',
-                                          style: const TextStyle(
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.bold,
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
                         Padding(
                           padding: const EdgeInsets.only(left: 30),
                           child: Column(
@@ -470,10 +501,10 @@ TextEditingController amtCtr = TextEditingController();
                                         borderRadius: BorderRadius.circular(4),
                                         boxShadow: const [
                                           BoxShadow(
-                                              color: Colors.grey,
-                                              blurRadius: 2,
-                                              offset: Offset(0, 1),
-                                          )
+                                            color: Colors.grey,
+                                            blurRadius: 2,
+                                            offset: Offset(0, 1),
+                                          ),
                                         ]),
                                     child: Center(
                                       child: Column(
@@ -484,15 +515,18 @@ TextEditingController amtCtr = TextEditingController();
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                          earningData?.totalEarning == null || earningData?.totalEarning =="" ? Text("0.0" , style: const TextStyle(
-                                            color: Colors.white,
-                                          ),):
-                                          Text(
-                                            '₹ ${earningData?.totalEarning}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
+                                          earningData?.totalEarning == null ||
+                                                  earningData?.totalEarning ==
+                                                      ""
+                                              ? const Text("0.0",
+                                                  style: TextStyle(
+                                                      color: Colors.white))
+                                              : Text(
+                                                  '₹ ${earningData?.totalEarning}',
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                         ],
                                       ),
                                     ),
@@ -507,7 +541,7 @@ TextEditingController amtCtr = TextEditingController();
                                     decoration: BoxDecoration(
                                         color: colors.primary,
                                         borderRadius: BorderRadius.circular(4),
-                                        boxShadow:  const [
+                                        boxShadow: const [
                                           BoxShadow(
                                               color: Colors.grey,
                                               blurRadius: 2,
@@ -522,22 +556,29 @@ TextEditingController amtCtr = TextEditingController();
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                          earningData?.cod == null || earningData?.cod =="" ? Text("0.0", style: TextStyle(
-                                            color: Colors.white,
-                                          ),):
-                                          Text(
-                                            '₹ ${earningData?.cod}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
+                                          earningData?.cod == null ||
+                                                  earningData?.cod == ""
+                                              ? Text(
+                                                  "0.0",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                )
+                                              : Text(
+                                                  '₹ ${earningData?.cod}',
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                         ],
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
                               InkWell(
                                 onTap: () {
                                   _showInputDialog(context);
@@ -547,13 +588,13 @@ TextEditingController amtCtr = TextEditingController();
                                   width: 150,
                                   padding: const EdgeInsets.all(8.0),
                                   decoration: BoxDecoration(
-                                      color:  colors.primary,
+                                      color: colors.primary,
                                       borderRadius: BorderRadius.circular(4),
                                       boxShadow: const [
                                         BoxShadow(
-                                            color: Colors.grey,
-                                            blurRadius: 2,
-                                            offset: Offset(0, 1),
+                                          color: Colors.grey,
+                                          blurRadius: 2,
+                                          offset: Offset(0, 1),
                                         ),
                                       ]),
                                   child: const Center(
@@ -571,135 +612,156 @@ TextEditingController amtCtr = TextEditingController();
                         ),
                       ],
                     ),
-                ):
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, right: 15),
-                      child: Column(
-                        children: <Widget>[
-                          Card(
-                            elevation: 5,
-                            child: TextFormField(
-                              controller: _startAccDateController,
-                              decoration: InputDecoration(
-                                counterText: "",
-                                hintText: "Select Start Date",
-                                isDense: true,
-                                filled: true,
-                                fillColor: Colors.grey.shade100 ,
-                                suffixIcon: InkWell(
-                                    onTap: () {
-                                      _selectAccDate(context, _startAccDateController);
-                                    },
-                                    child: const Icon(Icons.calendar_month, color: colors.primary)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.grey.shade100)
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.grey.shade100)
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Card(
-                            elevation: 5,
-                            child: TextFormField(
-                              controller: _endDateAccController,
-                              decoration: InputDecoration(
-                                counterText: "",
-                                hintText: "Select End Date",
-                                isDense: true,
-                                filled: true,
-                                fillColor: Colors.grey.shade100 ,
-                                suffixIcon: InkWell(
-                                  onTap: () async {
-                                    _selectAccEndDate(context, _endDateAccController);
-                                    // await getEarnings("Acc");
-                                  },
-                                  child: const Icon(Icons.calendar_month, color: colors.primary),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.grey.shade100)
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.grey.shade100)
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20.0),
-                        ],
-                      ),
-                    ),
-                    earningData?.products?.length == null || earningData?.products?.length == ""
-                        ? const Center(
-                      child: Text("Data Not Found", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
-                    ):
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: earningData?.products?.length?? 0,
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: [
+                  )
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, right: 15),
+                        child: Column(
+                          children: <Widget>[
                             Card(
-                              margin: EdgeInsets.all(10),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Row(
+                              elevation: 5,
+                              child: TextFormField(
+                                controller: _startAccDateController,
+                                decoration: InputDecoration(
+                                  counterText: "",
+                                  hintText: "Select Start Date",
+                                  isDense: true,
+                                  filled: true,
+                                  fillColor: Colors.grey.shade100,
+                                  suffixIcon: InkWell(
+                                      onTap: () {
+                                        _selectAccDate(
+                                            context, _startAccDateController);
+                                      },
+                                      child: const Icon(Icons.calendar_month,
+                                          color: colors.primary)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade100)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade100)),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Card(
+                              elevation: 5,
+                              child: TextFormField(
+                                controller: _endDateAccController,
+                                decoration: InputDecoration(
+                                  counterText: "",
+                                  hintText: "Select End Date",
+                                  isDense: true,
+                                  filled: true,
+                                  fillColor: Colors.grey.shade100,
+                                  suffixIcon: InkWell(
+                                    onTap: () async {
+                                      _selectAccEndDate(
+                                          context, _endDateAccController);
+                                      // await getEarnings("Acc");
+                                    },
+                                    child: const Icon(Icons.calendar_month,
+                                        color: colors.primary),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade100)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade100)),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20.0),
+                          ],
+                        ),
+                      ),
+                      earningData?.products?.length == null ||
+                              earningData?.products?.length == ""
+                          ? const Center(
+                              child: Text(
+                                "Data Not Found",
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.w600),
+                              ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: earningData?.products?.length ?? 0,
+                              itemBuilder: (context, index) {
+                                return Column(
                                   children: [
-                                    earningData?.products?[index].productImage == null || earningData?.products?[index].productImage == "" ?
-                                    const CircleAvatar(
-                                      backgroundImage: NetworkImage("assets/images/placeholder.png",),
-                                      radius: 30,
-                                    ):
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage("${ApiServicves.imageUrl}${earningData?.products?[index].productImage}"),
-                                      radius: 30,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Order No. - ${earningData?.products?[index].orderId}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                    Card(
+                                      margin: EdgeInsets.all(10),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Row(
+                                          children: [
+                                            earningData?.products?[index]
+                                                            .productImage ==
+                                                        null ||
+                                                    earningData
+                                                            ?.products?[index]
+                                                            .productImage ==
+                                                        ""
+                                                ? const CircleAvatar(
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                      "assets/images/placeholder.png",
+                                                    ),
+                                                    radius: 30,
+                                                  )
+                                                : CircleAvatar(
+                                                    backgroundImage: NetworkImage(
+                                                        "${ApiServicves.imageUrl}${earningData?.products?[index].productImage}"),
+                                                    radius: 30,
+                                                  ),
+                                            const SizedBox(width: 10),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Order No. - ${earningData?.products?[index].orderId}',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "${earningData?.products?[index].paymentMode}",
+                                                  style: const TextStyle(
+                                                    color: Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                    "${earningData?.products?[index].createdAt}"),
+                                              ],
+                                            ),
+                                            const Spacer(),
+                                            Text(
+                                              '+${"${earningData?.products?[index].amount}"}',
+                                              style: const TextStyle(
+                                                color: Colors.green,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        Text(
-                                          "${earningData?.products?[index].paymentMode}",
-                                          style: const TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text("${earningData?.products?[index].createdAt}"),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      '+${"${earningData?.products?[index].amount}"}',
-                                      style: const TextStyle(
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
+                                );
+                              },
                             ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
           ],
         ),
       ),

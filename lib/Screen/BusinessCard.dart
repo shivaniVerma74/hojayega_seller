@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helper/api.path.dart';
 import '../Helper/color.dart';
+import '../Model/GetProfileModel.dart';
 import '../Model/TransactionModel.dart';
 
 class BusinessCard extends StatefulWidget {
@@ -23,7 +24,8 @@ class _BusinessCardState extends State<BusinessCard> {
   @override
   void initState() {
     super.initState();
-    super.initState();
+    getSetting();
+    getProfile();
     getData();
     _razorpay = Razorpay();
     _razorpay?.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
@@ -56,6 +58,35 @@ class _BusinessCardState extends State<BusinessCard> {
       _razorpay?.open(options);
     } catch (e) {
       debugPrint('Error: e');
+    }
+  }
+
+  GetProfileModel? profileData;
+  String? businessCardBalance;
+
+  getProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    vendorId = prefs.getString("vendor_id");
+    print("${prefs.getString('roll')}+++++++++++++++++++++++");
+    var headers = {
+      'Cookie': 'ci_session=1826473be67eeb9329a8e5393f7907573d116ca1'
+    };
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getProfile));
+    request.fields.addAll({'user_id': vendorId.toString()});
+    debugPrint("get profile parametersssss ${request.fields}");
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var finalResponse = await response.stream.bytesToString();
+      final finalResult = GetProfileModel.fromJson(json.decode(finalResponse));
+      print("profile data responsee $finalResult");
+      profileData = finalResult;
+      businessCardBalance = profileData?.data?.first.bCard;
+      print("delivery card in card Screen $businessCardBalance");
+      setState(() {});
+    } else {
+      print(response.reasonPhrase);
     }
   }
 
@@ -138,6 +169,33 @@ class _BusinessCardState extends State<BusinessCard> {
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
+  String? card_limit;
+
+  getSetting() async {
+    var headers = {
+      'Cookie': 'ci_session=bfa970b6e13a45a52775a4cd4995efa6026d6895'
+    };
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getHelp));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      var finaResult = jsonDecode(result);
+      print("response herre $finaResult");
+      if (finaResult['response_code'] == "1") {
+        card_limit = finaResult['data1']['wallet_balance_limit'];
+        print("wallet limit $card_limit");
+        setState(() {});
+        // Fluttertoast.showToast(msg: '${finaResult['message']}');
+      } else {
+        // Fluttertoast.showToast(msg: "${finaResult['message']}");
+      }
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,12 +219,13 @@ class _BusinessCardState extends State<BusinessCard> {
               padding: const EdgeInsets.only(top: 20),
               child: Column(
                 children: [
-                  const AutoSizeText(
-                    "Please maintain 100 minimum wallet amount to \nactive the account",
-                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                  AutoSizeText(
+                    "Please maintain ₹$card_limit minimum wallet amount to \nactive the account",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: 15),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Row(
@@ -200,11 +259,13 @@ class _BusinessCardState extends State<BusinessCard> {
                               //         fontWeight: FontWeight.w600,
                               //         color: colors.whiteTemp,
                               //         fontSize: 23)):
-                              Text("₹ ${widget.walletAmount}",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: colors.whiteTemp,
-                                      fontSize: 23)),
+                              Text(
+                                "₹ $businessCardBalance",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.whiteTemp,
+                                    fontSize: 23),
+                              ),
                             ],
                           ),
                         ),

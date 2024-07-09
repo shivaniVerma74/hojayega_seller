@@ -130,7 +130,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
     var request =
         http.MultipartRequest('POST', Uri.parse(ApiServicves.vendorDeals));
     request.fields.addAll(data);
-    print("requestttt fieldsss======${request.fields}===========");
+    print("requestttt fields save details======${request.fields}===========");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -215,7 +215,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                         //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
-                            children: [
+                            children: const [
                               CircleAvatar(
                                   child: Text('1',
                                       style: TextStyle(
@@ -763,7 +763,7 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                               TextStyle(color: colors.primary),
                                         ),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 10,
                                       ),
                                       TextFormField(
@@ -827,7 +827,8 @@ class _CreateOnlineStoreState extends State<CreateOnlineStore> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => AllCategory(),
+                                        builder: (context) =>
+                                            AllCategory(isShow: true),
                                       ),
                                     );
                                   } else {

@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
+
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Helper/api.path.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../Helper/Custom_Text.dart';
 import '../Helper/Custom_textForm.dart';
 import '../Helper/appButton.dart';
@@ -19,12 +18,16 @@ import '../Model/ChildCategoryModel.dart';
 import '../Model/GetAddProductModel.dart';
 import '../Model/SubCategoryModel.dart';
 import '../Model/UnitTypeModel.dart';
-import 'HomeScreen.dart';
 
 class AddProduct extends StatefulWidget {
   bool? isEdit;
+
   String? productId;
-  AddProduct({Key? key, this.isEdit, this.productId}) : super(key: key);
+  AddProduct({
+    Key? key,
+    this.isEdit,
+    this.productId,
+  }) : super(key: key);
 
   @override
   State<AddProduct> createState() => _AddProductState();
@@ -37,13 +40,11 @@ String? broncherImageUrl1;
 String? category_id;
 var category;
 var subcat;
-int count=0;
-
+int count = 0;
 
 String? myCategory;
 String? mySub;
 String? myChild;
-
 
 int videoLinkindex = 0;
 int pressed = 0;
@@ -88,7 +89,7 @@ class _AddProductState extends State<AddProduct> {
     getUnits();
     getCategory("");
     getAddProduct();
-    getSubCategory(" "," ");
+    getSubCategory(" ", " ");
   }
 
   onclick() async {
@@ -112,12 +113,10 @@ class _AddProductState extends State<AddProduct> {
       setState(() {
         unitList = jsonResponse.data!.toList();
       });
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
-
 
   CategoryModel? getCatModel;
   getCategory(service_Id) async {
@@ -125,11 +124,9 @@ class _AddProductState extends State<AddProduct> {
     var headers = {
       'Cookie': 'ci_session=ea5681bb95a83750e0ee17de5e4aa2dca97184ef'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getCategories));
-    request.fields.addAll({
-      'parent_id': service_Id.toString(),
-      'roll': '1'
-    });
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getCategories));
+    request.fields.addAll({'parent_id': service_Id.toString(), 'roll': '1'});
     print("get category is ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -143,14 +140,14 @@ class _AddProductState extends State<AddProduct> {
       print(prefs.get('child'));
 
       //  myCategory=prefs.get('category') as String?;
-      String? s1=prefs.get('category') as String?;
-      myCategory = s1==null?"":s1;
+      String? s1 = prefs.get('category') as String?;
+      myCategory = s1 == null ? "" : s1;
 
-      String? s2=prefs.get('sub') as String?;
-      mySub=s2== null?"":s2;
+      String? s2 = prefs.get('sub') as String?;
+      mySub = s2 == null ? "" : s2;
 
-      String? s3=prefs.get('child') as String?;
-      myChild=s3== null?"":s3;
+      String? s3 = prefs.get('child') as String?;
+      myChild = s3 == null ? "" : s3;
 
       for (int i = 0; i < jsonResponse.data!.length; i++) {
         print("${jsonResponse.data?[i].id}");
@@ -169,12 +166,10 @@ class _AddProductState extends State<AddProduct> {
       //  print(prefs.get('category'));
       //  print(prefs.get('sub'));
       //  print(prefs.get('child'));
-
     } else {
       print(response.reasonPhrase);
     }
   }
-
 
   String? catId;
   String? service_Id;
@@ -185,7 +180,7 @@ class _AddProductState extends State<AddProduct> {
       'Cookie': 'ci_session=42a446b2158b0665d69eb924baea971b3adf8b1d'
     };
     var request =
-    http.MultipartRequest('POST', Uri.parse(ApiServicves.getSubCategories));
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getSubCategories));
     request.fields.addAll({
       'parent_id': service_Id.toString(),
       'roll': '1',
@@ -197,26 +192,25 @@ class _AddProductState extends State<AddProduct> {
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       final jsonResponse =
-      SubCategoryModel.fromJson(json.decode(finalResponse));
+          SubCategoryModel.fromJson(json.decode(finalResponse));
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? idSub = prefs.getString('sub');
       int kk = int.parse(idSub!);
       for (int i = 0; i < jsonResponse.data!.length; i++) {
         print("sub cat:${jsonResponse.data?[i].id}");
-        subCatId = jsonResponse.data?[i].id?? "";
+        subCatId = jsonResponse.data?[i].id ?? "";
 
         print(subCatId);
         print("aaaaaaaaaa111");
         print(idSub);
-        if(subCatId==idSub)
-        {setState(() {
-          sub =jsonResponse.data?[i].cName;
-        });
-        print("------mm-------pp-------");
-        print(sub);
+        if (subCatId == idSub) {
+          setState(() {
+            sub = jsonResponse.data?[i].cName;
+          });
+          print("------mm-------pp-------");
+          print(sub);
         }
-
       }
       setState(() {
         getSubCatModel = jsonResponse;
@@ -226,14 +220,15 @@ class _AddProductState extends State<AddProduct> {
     }
   }
 
-  GetAddProductModel?  productData;
+  GetAddProductModel? productData;
   getAddProduct() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     vendorId = prefs.getString("vendor_id");
     var headers = {
       'Cookie': 'ci_session=fb41c6310d2373ff3ea167bc9dea47a17138531f'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getAllAddProduct));
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.getAllAddProduct));
     request.fields.addAll({
       'vid': vendorId.toString(),
       'product_id': '${widget.productId}',
@@ -243,25 +238,31 @@ class _AddProductState extends State<AddProduct> {
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
-      final finalResult = GetAddProductModel.fromJson(json.decode(finalResponse));
+      final finalResult =
+          GetAddProductModel.fromJson(json.decode(finalResponse));
       print("child category responsee $finalResult");
       setState(() {
         productData = finalResult;
-        for(int i=0; i< productData!.products.first.productUnits.length; i++) {
+        for (int i = 0;
+            i < productData!.products.first.productUnits.length;
+            i++) {
           if (widget.isEdit == true) {
-          print("here product name ${productData?.products.first.productName}");
-          _nameCtr.text =  productData?.products.first.productName ?? "";
-          _priceCtr.text = productData?.products.first.productPrice ?? "";
-          _sellingPriceCtr.text = productData?.products.first.sellingPrice ?? "";
-          _fullDesCtr.text = productData?.products.first.productDescription ?? "";
-          // unit[i] = productData?.products.first.productUnits[i].unit ?? "";
-          // lang = widget.addressList?.lng ?? "";
+            print(
+                "here product name ${productData?.products.first.productName}");
+            _nameCtr.text = productData?.products.first.productName ?? "";
+            _priceCtr.text = productData?.products.first.productPrice ?? "";
+            _sellingPriceCtr.text =
+                productData?.products.first.sellingPrice ?? "";
+            _fullDesCtr.text =
+                productData?.products.first.productDescription ?? "";
+            // unit[i] = productData?.products.first.productUnits[i].unit ?? "";
+            // lang = widget.addressList?.lng ?? "";
+          }
         }
-        }
-        print("product name is nowww ${productData?.products.first.productName}");
+        print(
+            "product name is nowww ${productData?.products.first.productName}");
       });
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
     }
   }
@@ -271,16 +272,16 @@ class _AddProductState extends State<AddProduct> {
     var headers = {
       'Cookie': 'ci_session=e456fb4275aab002e5eb6c860cc3811ebb3a9fa7'
     };
-    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.productchildCategories));
-    request.fields.addAll({
-      'sub_cat_id': sub_Id.toString()
-    });
+    var request = http.MultipartRequest(
+        'POST', Uri.parse(ApiServicves.productchildCategories));
+    request.fields.addAll({'sub_cat_id': sub_Id.toString()});
     print("child categuruyry parar ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
-      final finalResult = ChildCategoryModel.fromJson(json.decode(finalResponse));
+      final finalResult =
+          ChildCategoryModel.fromJson(json.decode(finalResponse));
       print("child category responsee $finalResult");
       setState(() {
         childCategoryModel = finalResult;
@@ -295,12 +296,11 @@ class _AddProductState extends State<AddProduct> {
   var imageCode;
   Future getImageGallery() async {
     final pickedFile =
-    await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
-      }
-      else {
+      } else {
         print('no image picked');
       }
     });
@@ -387,9 +387,9 @@ class _AddProductState extends State<AddProduct> {
     setState(() {
       isLodding = true;
     });
-      var headers = {
-        'Cookie': 'ci_session=2844e71eb13a14bad7faba0b8d00d5626590d23e'
-      };
+    var headers = {
+      'Cookie': 'ci_session=2844e71eb13a14bad7faba0b8d00d5626590d23e'
+    };
     SharedPreferences prefs = await SharedPreferences.getInstance();
     category_Id = prefs.getString("catId");
     subCatId = prefs.getString("subCatId");
@@ -405,8 +405,8 @@ class _AddProductState extends State<AddProduct> {
       'cat_id': category_Id.toString(),
       'sub_cat_id': subCatId.toString(),
       'child_cat_id': childCatId.toString(),
-       // 'unit': _unitCtr.text,
-       // 'unit_type': unitValue.toString(),
+      // 'unit': _unitCtr.text,
+      // 'unit_type': unitValue.toString(),
       'vid': vendorId.toString(),
     };
     // for (var i = 0; i < (imagePathList.length ?? 0); i++) {
@@ -431,19 +431,22 @@ class _AddProductState extends State<AddProduct> {
       unittList.add(unitTypeData);
     }
     Map data = addMapListToData(param, unittList);
-    var request = http.MultipartRequest('POST',Uri.parse(ApiServicves.addProducts));
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.addProducts));
     data.forEach((key, value) {
       request.fields[key] = value;
     });
-   print("add product api parar ${request.fields} hrerer $param");
+    print("add product api parar ${request.fields} hrerer $param");
     for (var i = 0; i < (imagePathList.length ?? 0); i++) {
       print('Imageeeeee $imagePathList');
-      imagePathList[i] == "" ? null : request.files.add(await http.MultipartFile.fromPath('main_image[]', imagePathList[i].toString()));
+      imagePathList[i] == ""
+          ? null
+          : request.files.add(await http.MultipartFile.fromPath(
+              'main_image[]', imagePathList[i].toString()));
     }
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
-    if(response.statusCode==200)
-    {
+    if (response.statusCode == 200) {
       var result = await response.stream.bytesToString();
       var finalResult = jsonDecode(result);
       Fluttertoast.showToast(msg: "${finalResult['message']}");
@@ -451,15 +454,13 @@ class _AddProductState extends State<AddProduct> {
       setState(() {
         isLodding = false;
       });
-    }
-    else {
+    } else {
       setState(() {
         isLodding = false;
       });
-      print("rasponse"+response.reasonPhrase.toString());
+      print("rasponse" + response.reasonPhrase.toString());
     }
   }
-
 
   editProductApi() async {
     setState(() {
@@ -510,19 +511,22 @@ class _AddProductState extends State<AddProduct> {
       unittList.add(unitTypeData);
     }
     Map data = addMapListToData(param, unittList);
-    var request = http.MultipartRequest('POST',Uri.parse(ApiServicves.addProducts));
+    var request =
+        http.MultipartRequest('POST', Uri.parse(ApiServicves.addProducts));
     data.forEach((key, value) {
       request.fields[key] = value;
     });
     print("add product api parar ${request.fields} hrerer $param");
     for (var i = 0; i < (imagePathList.length ?? 0); i++) {
       print('Imageeeeee $imagePathList');
-      imagePathList[i] == "" ? null : request.files.add(await http.MultipartFile.fromPath('main_image[]', imagePathList[i].toString()));
+      imagePathList[i] == ""
+          ? null
+          : request.files.add(await http.MultipartFile.fromPath(
+              'main_image[]', imagePathList[i].toString()));
     }
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
-    if(response.statusCode==200)
-    {
+    if (response.statusCode == 200) {
       var result = await response.stream.bytesToString();
       var finalResult = jsonDecode(result);
       Fluttertoast.showToast(msg: "${finalResult['message']}");
@@ -530,12 +534,11 @@ class _AddProductState extends State<AddProduct> {
       setState(() {
         isLodding = false;
       });
-    }
-    else {
+    } else {
       setState(() {
         isLodding = false;
       });
-      print("rasponse"+response.reasonPhrase.toString());
+      print("rasponse" + response.reasonPhrase.toString());
     }
   }
 
@@ -548,6 +551,7 @@ class _AddProductState extends State<AddProduct> {
     }
     return data;
   }
+
   int? selectedSateIndex;
   int? selectedchildCatIndex;
   String? selectedState;
@@ -565,7 +569,6 @@ class _AddProductState extends State<AddProduct> {
 
   List<String?> unit = [''];
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -578,23 +581,22 @@ class _AddProductState extends State<AddProduct> {
               bottomRight: Radius.circular(25),
             ),
           ),
-          title:  widget.isEdit == true
+          title: widget.isEdit == true
               ? const Text(
-            'Edit Product',
-            style: TextStyle(
-                color: colors.whiteTemp,
-                fontWeight: FontWeight.bold),
-           ): const Text(
-            'Add Product',
-            style: TextStyle(
-                color: colors.whiteTemp,
-                fontWeight: FontWeight.bold),
-          ),
+                  'Edit Product',
+                  style: TextStyle(
+                      color: colors.whiteTemp, fontWeight: FontWeight.bold),
+                )
+              : const Text(
+                  'Add Product',
+                  style: TextStyle(
+                      color: colors.whiteTemp, fontWeight: FontWeight.bold),
+                ),
           backgroundColor: colors.primary),
       body:
-      // getBrandModel == null ? const Center(
-      //     child: CircularProgressIndicator()) :
-      SingleChildScrollView(
+          // getBrandModel == null ? const Center(
+          //     child: CircularProgressIndicator()) :
+          SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Card(
@@ -657,7 +659,7 @@ class _AddProductState extends State<AddProduct> {
                     controller: _fullDesCtr,
                     decoration: const InputDecoration(
                       contentPadding:
-                      EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                       border: OutlineInputBorder(),
                       hintStyle: TextStyle(color: Colors.grey),
                       hintText: 'Product Description',
@@ -680,7 +682,7 @@ class _AddProductState extends State<AddProduct> {
                     height: 10,
                   ),
                   Container(
-                    child:Text(myCategory ?? "") ,
+                    child: Text(myCategory ?? ""),
                   ),
                   // const SizedBox(
                   //   height: 10,
@@ -783,7 +785,7 @@ class _AddProductState extends State<AddProduct> {
                     height: 10,
                   ),
                   Container(
-                    child:Text(mySub! ?? "") ,
+                    child: Text(mySub! ?? ""),
                   ),
                   // getSubCatModel == null
                   //     ? SizedBox.shrink()
@@ -879,7 +881,7 @@ class _AddProductState extends State<AddProduct> {
                     height: 10,
                   ),
                   Container(
-                    child:Text(myChild!.toString()) ,
+                    child: Text(myChild!.toString()),
                   ),
                   // getSubCatModel == null
                   //     ? SizedBox.shrink()
@@ -1101,21 +1103,24 @@ class _AddProductState extends State<AddProduct> {
                   //     ),
                   //   ),
                   // ),
-                   widget.isEdit == true ?
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: productData!.products[0].productUnits.length,
-                    itemBuilder: (context, j){
-                      return editUnit(j);
-                    },):
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: unit.length,
-                    itemBuilder: (context, index){
-                    return addonUnit(index);
-                  },),
+                  widget.isEdit == true
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount:
+                              productData!.products[0].productUnits.length,
+                          itemBuilder: (context, j) {
+                            return editUnit(j);
+                          },
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: unit.length,
+                          itemBuilder: (context, index) {
+                            return addonUnit(index);
+                          },
+                        ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -1490,20 +1495,22 @@ class _AddProductState extends State<AddProduct> {
                     child: Btn(
                         height: 50,
                         width: 150,
-                        title:
-                        isLodding ? "please wait..." :
+                        title: isLodding
+                            ? "please wait..."
+                            :
                             // widget.isEdit == true ?
-                        "Add Product",
+                            "Add Product",
                         onPress: () {
                           if (_formKey.currentState!.validate()) {
-                            if(imagePathList.isEmpty){
-                              Fluttertoast.showToast(msg: "Please Select Images");
-                            } else{
+                            if (imagePathList.isEmpty) {
+                              Fluttertoast.showToast(
+                                  msg: "Please Select Images");
+                            } else {
                               addProductApi();
                             }
                             // widget.isEdit == true ?
-                          // : editProductApi();
-                           }
+                            // : editProductApi();
+                          }
                         }),
                   ),
                 ],
@@ -1516,184 +1523,187 @@ class _AddProductState extends State<AddProduct> {
   }
 
   editUnit(int j) {
-  return Card(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15.0),
-    ),
-    elevation: 5,
-    child:  Padding(
-      padding: const EdgeInsets.only(left: 5, top: 5),
-      child: Column(
-        children: [
-          Custom_Text(
-            text: 'Unit(Price)',
-            text2: '*',
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          TextFormField(
-            onChanged: (value) {
-              setState(() {
-                // unit[j] = value;
-              });
-            },
-            // initialValue : unit[j],
-            keyboardType: TextInputType.text,
-            cursorHeight: 25,
-            // controller: _unitCtr,
-            decoration:  InputDecoration(
-              hintText: "${productData?.products.first.productUnits[j].unit}",
-              hintStyle: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14
-              ),
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      elevation: 5,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 5, top: 5),
+        child: Column(
+          children: [
+            Custom_Text(
+              text: 'Unit(Price)',
+              text2: '*',
             ),
-            validator:(value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter Unit .';
-              }
-              return null;
-            },
-          ),
-          // CustomTextFormField(controller: _unitCtr, hintText: 'Unit'),
-          const SizedBox(
-            height: 10,
-          ),
-          Custom_Text(
-            text: 'Unit Type',
-            text2: '*',
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          // DropdownButton<String?>(
-          //   isExpanded: true,
-          //   hint: const Text(
-          //     'Select Unit',
-          //     style: TextStyle(
-          //         color: colors.text,
-          //         fontWeight: FontWeight.w500,
-          //         fontSize: 15),
-          //   ),
-          //   // dropdownColor: colors.primary,
-          //   value: unitType[j],
-          //   icon: const Padding(
-          //     padding: EdgeInsets.only(left: 10.0, top: 5),
-          //     child: Icon(
-          //       Icons.keyboard_arrow_down_rounded,
-          //       color: Colors.grey,
-          //       size: 25,
-          //     ),
-          //   ),
-          //   // elevation: 16,
-          //   style: const TextStyle(
-          //       color: colors.secondary,
-          //       fontWeight: FontWeight.bold),
-          //   underline: Padding(
-          //     padding: const EdgeInsets.only(left: 0, right: 0),
-          //     child: Container(
-          //       // height: 2,
-          //       color: Colors.white,
-          //     ),
-          //   ),
-          //   onChanged: (String? value) {
-          //     print("=====unit typee is ==========${unitType[j]}===========");
-          //     // This is called when the user selects an item.
-          //     setState(() {
-          //       unitType[j] = value ?? unitType[j] ;
-          //     });
-          //   },
-          //   items: unitTypes.map((items) {
-          //     return DropdownMenuItem(
-          //       value: items.toString(),
-          //       child: Column(
-          //         crossAxisAlignment: CrossAxisAlignment.start,
-          //         mainAxisAlignment: MainAxisAlignment.center,
-          //         children: [
-          //           Padding(
-          //             padding: const EdgeInsets.only(top: 5),
-          //             child: Container(
-          //               width:
-          //               MediaQuery.of(context).size.width/1.42,
-          //               child: Padding(
-          //                 padding:
-          //                 const EdgeInsets.only(top: 5),
-          //                 child: Text(
-          //                   items.toString(),
-          //                   overflow: TextOverflow.ellipsis,
-          //                   style: const TextStyle(
-          //                       color: colors.text),
-          //                 ),
-          //               ),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     );
-          //   }).toList(),
-          // ),
-          const Divider(color: Colors.grey,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color:colors.primary),
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      unit.add("");
-                      unitTypes.add("Kg");
-                    });
-                  },
-                  child: const Icon(
-                    Icons.add,
-                    size: 30,
-                    color: Colors.white,
-                  ),
-                ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              onChanged: (value) {
+                setState(() {
+                  // unit[j] = value;
+                });
+              },
+              // initialValue : unit[j],
+              keyboardType: TextInputType.text,
+              cursorHeight: 25,
+              // controller: _unitCtr,
+              decoration: InputDecoration(
+                hintText: "${productData?.products.first.productUnits[j].unit}",
+                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 5),
-                child: Container(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter Unit .';
+                }
+                return null;
+              },
+            ),
+            // CustomTextFormField(controller: _unitCtr, hintText: 'Unit'),
+            const SizedBox(
+              height: 10,
+            ),
+            Custom_Text(
+              text: 'Unit Type',
+              text2: '*',
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            // DropdownButton<String?>(
+            //   isExpanded: true,
+            //   hint: const Text(
+            //     'Select Unit',
+            //     style: TextStyle(
+            //         color: colors.text,
+            //         fontWeight: FontWeight.w500,
+            //         fontSize: 15),
+            //   ),
+            //   // dropdownColor: colors.primary,
+            //   value: unitType[j],
+            //   icon: const Padding(
+            //     padding: EdgeInsets.only(left: 10.0, top: 5),
+            //     child: Icon(
+            //       Icons.keyboard_arrow_down_rounded,
+            //       color: Colors.grey,
+            //       size: 25,
+            //     ),
+            //   ),
+            //   // elevation: 16,
+            //   style: const TextStyle(
+            //       color: colors.secondary,
+            //       fontWeight: FontWeight.bold),
+            //   underline: Padding(
+            //     padding: const EdgeInsets.only(left: 0, right: 0),
+            //     child: Container(
+            //       // height: 2,
+            //       color: Colors.white,
+            //     ),
+            //   ),
+            //   onChanged: (String? value) {
+            //     print("=====unit typee is ==========${unitType[j]}===========");
+            //     // This is called when the user selects an item.
+            //     setState(() {
+            //       unitType[j] = value ?? unitType[j] ;
+            //     });
+            //   },
+            //   items: unitTypes.map((items) {
+            //     return DropdownMenuItem(
+            //       value: items.toString(),
+            //       child: Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           Padding(
+            //             padding: const EdgeInsets.only(top: 5),
+            //             child: Container(
+            //               width:
+            //               MediaQuery.of(context).size.width/1.42,
+            //               child: Padding(
+            //                 padding:
+            //                 const EdgeInsets.only(top: 5),
+            //                 child: Text(
+            //                   items.toString(),
+            //                   overflow: TextOverflow.ellipsis,
+            //                   style: const TextStyle(
+            //                       color: colors.text),
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     );
+            //   }).toList(),
+            // ),
+            const Divider(
+              color: Colors.grey,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
                   height: 40,
                   width: 40,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color:colors.primary),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: colors.primary),
                   child: InkWell(
                     onTap: () {
                       setState(() {
-                        unit.remove("");
-                        unitTypes.last;
+                        unit.add("");
+                        unitTypes.add("Kg");
                       });
                     },
                     child: const Icon(
-                      Icons.remove,
+                      Icons.add,
                       size: 30,
                       color: Colors.white,
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 5,),
+                Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        color: colors.primary),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          unit.remove("");
+                          unitTypes.last;
+                        });
+                      },
+                      child: const Icon(
+                        Icons.remove,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
           ],
         ),
       ),
     );
   }
 
-
   addonUnit(int index) {
-    return
-      Card(
+    return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
       ),
       elevation: 5,
-      child:  Padding(
+      child: Padding(
         padding: const EdgeInsets.only(left: 5, top: 5),
         child: Column(
           children: [
@@ -1710,18 +1720,15 @@ class _AddProductState extends State<AddProduct> {
                   unit[index] = value;
                 });
               },
-              initialValue : unit[index],
+              initialValue: unit[index],
               keyboardType: TextInputType.text,
               cursorHeight: 25,
               // controller: _unitCtr,
               decoration: const InputDecoration(
                 hintText: "Unit",
-                hintStyle: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14
-                ),
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
               ),
-              validator:(value) {
+              validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter Unit .';
                 }
@@ -1742,13 +1749,12 @@ class _AddProductState extends State<AddProduct> {
             DropdownButton(
               isExpanded: true,
               value: unitTypes[index],
-              hint:  Text('Select Unit'),
-              icon:  Icon(Icons.keyboard_arrow_down),
+              hint: Text('Select Unit'),
+              icon: Icon(Icons.keyboard_arrow_down),
               items: unitList.map((items) {
                 return DropdownMenuItem(
                   value: items.name,
-                  child: Container(
-                      child: Text(items.name.toString())),
+                  child: Container(child: Text(items.name.toString())),
                 );
               }).toList(),
               onChanged: (dynamic value) {
@@ -1832,7 +1838,9 @@ class _AddProductState extends State<AddProduct> {
                 Container(
                   height: 40,
                   width: 40,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color:colors.primary),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: colors.primary),
                   child: InkWell(
                     onTap: () {
                       setState(() {
@@ -1847,28 +1855,31 @@ class _AddProductState extends State<AddProduct> {
                     ),
                   ),
                 ),
-                unit.length == 1 ? const SizedBox():
-                Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color: colors.primary),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          unit.remove("");
-                          unitTypes.last;
-                        });
-                      },
-                      child: const Icon(
-                        Icons.remove,
-                        size: 30,
-                        color: Colors.white,
+                unit.length == 1
+                    ? const SizedBox()
+                    : Padding(
+                        padding: const EdgeInsets.only(right: 5),
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              color: colors.primary),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                unit.remove("");
+                                unitTypes.last;
+                              });
+                            },
+                            child: const Icon(
+                              Icons.remove,
+                              size: 30,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 5),
@@ -1887,7 +1898,7 @@ class _AddProductState extends State<AddProduct> {
         ),
         InkWell(
           onTap: () async {
-            if(count<=3) {
+            if (count <= 3) {
               pickImageDialog(context, 1);
             }
             // await pickImages();
@@ -1904,7 +1915,10 @@ class _AddProductState extends State<AddProduct> {
                 child: const Center(
                   child: Text(
                     "Upload Images",
-                    style: TextStyle(color: colors.whiteTemp, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: TextStyle(
+                        color: colors.whiteTemp,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12),
                   ),
                 ),
               ),
@@ -1919,7 +1933,6 @@ class _AddProductState extends State<AddProduct> {
     );
   }
 
-
   Widget uploadMultiImmage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1929,7 +1942,7 @@ class _AddProductState extends State<AddProduct> {
         ),
         InkWell(
           onTap: () async {
-            if(count<=3) {
+            if (count <= 3) {
               pickImageDialog(context, 1);
             }
             // await pickImages();
@@ -1946,19 +1959,28 @@ class _AddProductState extends State<AddProduct> {
                 child: Center(
                   child: Text(
                     "Upload Images",
-                    style: TextStyle(color: colors.whiteTemp, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: TextStyle(
+                        color: colors.whiteTemp,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12),
                   ),
                 ),
               ),
-              SizedBox(height: 5,),
-              const Text("You Can Select Only 4 Imgaes", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),)
+              SizedBox(
+                height: 5,
+              ),
+              const Text(
+                "You Can Select Only 4 Imgaes",
+                style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12),
+              )
             ],
           ),
         ),
         const SizedBox(height: 10),
-        Visibility(
-            visible: isImages,
-            child:  buildGridView()),
+        Visibility(visible: isImages, child: buildGridView()),
       ],
     );
   }
@@ -1968,31 +1990,35 @@ class _AddProductState extends State<AddProduct> {
       height: 270,
       child: GridView.builder(
         itemCount: productData!.products.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+        gridDelegate:
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemBuilder: (BuildContext context, int index) {
           return Stack(
             children: [
               Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: colors.primary)
-                  ),
-                  width: MediaQuery.of(context).size.width/2.8,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: colors.primary)),
+                  width: MediaQuery.of(context).size.width / 2.8,
                   height: 170,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(10),
-                    ),
-                    child: Image.network(productData!.products.first.otherImage[index], fit: BoxFit.cover,)
-                    // Image.file(File(productData!.products.first.otherImage[index]), fit: BoxFit.cover),
-                  ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                      child: Image.network(
+                        productData!.products.first.otherImage[index],
+                        fit: BoxFit.cover,
+                      )
+                      // Image.file(File(productData!.products.first.otherImage[index]), fit: BoxFit.cover),
+                      ),
                 ),
               ),
               Positioned(
                 left: 109,
                 // bottom: 10,
-                child:
-                InkWell(
+                child: InkWell(
                   onTap: () {
                     setState(() {
                       imagePathList.remove(imagePathList[index]);
@@ -2012,38 +2038,36 @@ class _AddProductState extends State<AddProduct> {
       ),
     );
   }
-
-
 
   Widget buildGridView() {
     return Container(
       height: 270,
       child: GridView.builder(
         itemCount: imagePathList.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+        gridDelegate:
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemBuilder: (BuildContext context, int index) {
           return Stack(
             children: [
               Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: colors.primary)
-                  ),
-                  width: MediaQuery.of(context).size.width/2.8,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: colors.primary)),
+                  width: MediaQuery.of(context).size.width / 2.8,
                   height: 170,
                   child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
-                    child: Image.file(
-                        File(imagePathList[index]), fit: BoxFit.cover),
+                    child: Image.file(File(imagePathList[index]),
+                        fit: BoxFit.cover),
                   ),
                 ),
               ),
               Positioned(
                 left: 109,
                 // bottom: 10,
-                child:
-                InkWell(
+                child: InkWell(
                   onTap: () {
                     setState(() {
                       imagePathList.remove(imagePathList[index]);
@@ -2064,8 +2088,7 @@ class _AddProductState extends State<AddProduct> {
     );
   }
 
-
-  void pickImageDialog(BuildContext context,int i) async {
+  void pickImageDialog(BuildContext context, int i) async {
     return await showDialog<void>(
       context: context,
       // barrierDismissible: barrierDismissible, // user must tap button!
@@ -2081,9 +2104,9 @@ class _AddProductState extends State<AddProduct> {
                 onTap: () async {
                   _getFromGallery();
                 },
-                child:  Container(
+                child: Container(
                   child: ListTile(
-                    title:  Text("Gallery"),
+                    title: Text("Gallery"),
                     leading: Icon(
                       Icons.image,
                       color: colors.primary,
@@ -2118,7 +2141,6 @@ class _AddProductState extends State<AddProduct> {
     );
   }
 
-
   File? _imageFile;
 
   _getFromCamera() async {
@@ -2135,7 +2157,6 @@ class _AddProductState extends State<AddProduct> {
       Navigator.pop(context);
     }
   }
-
 
   _getFromGallery() async {
     PickedFile? pickedFile = await ImagePicker().getImage(
@@ -2342,8 +2363,6 @@ class _AddProductState extends State<AddProduct> {
     // myCategory=prefs.get('category') as String?;
     // mySub=prefs.get('sub') as String?;
     // myChild=prefs.get('child') as String?;
-
-
 
     prefs.remove('category'); //only
     prefs.remove('sub'); //only

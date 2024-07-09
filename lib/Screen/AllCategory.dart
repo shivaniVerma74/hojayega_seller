@@ -494,10 +494,8 @@ import 'Congratutation.dart';
 
 class AllCategory extends StatefulWidget {
   String? ShopId;
-  AllCategory({
-    super.key,
-    this.ShopId,
-  });
+  bool? isShow;
+  AllCategory({super.key, this.ShopId, this.isShow});
 
   @override
   State<AllCategory> createState() => _AllCategoryState();
@@ -1557,32 +1555,34 @@ class _AllCategoryState extends State<AllCategory> {
                                   const SizedBox(
                                     height: 93,
                                   ),
-                                  // widget.isTrue == true ?
-                                  Center(
-                                    child: Container(
-                                      height: 40,
-                                      width: 200,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green),
-                                        onPressed: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const Congratulation()));
-                                        },
-                                        child: const Text(
-                                          'Next',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                  // : SizedBox(),
+                                  widget.isShow == true
+                                      ? Center(
+                                          child: Container(
+                                            height: 40,
+                                            width: 200,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.green),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const Congratulation()));
+                                              },
+                                              child: const Text(
+                                                'Next',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : SizedBox(),
                                 ],
                               ),
                             ),

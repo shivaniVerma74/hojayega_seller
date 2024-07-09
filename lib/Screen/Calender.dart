@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Helper/api.path.dart';
@@ -199,6 +200,21 @@ class _CalenderState extends State<Calender> {
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.bold),
                                           ),
+                                          data?.transactionId == null ||
+                                                  data?.transactionId == ""
+                                              ? SizedBox()
+                                              : Container(
+                                                  width: 180,
+                                                  child: Text(
+                                                    "Transaction Id: ${data?.transactionId}",
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 2,
+                                                  ),
+                                                ),
                                           // Text("Hair cut",),
                                           // Text("Hair colour touch up",),
                                           // Text("Hair Wash",),
@@ -297,6 +313,39 @@ class _CalenderState extends State<Calender> {
                                         fontSize: 12, color: colors.grad1Color),
                                   ),
                                 ),
+                                data.transactionImage == null ||
+                                        data.transactionImage == ""
+                                    ? SizedBox()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(left: 5),
+                                        child: InkWell(
+                                          onTap: () {
+                                            final imageProvider = Image.network(
+                                                    "${ApiServicves.imageUrl}${data.transactionImage}")
+                                                .image;
+                                            showImageViewer(
+                                                context, imageProvider,
+                                                onViewerDismissed: () {
+                                              print("dismissed");
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 80,
+                                            width: 80,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              border: Border.all(
+                                                  color: colors.primary),
+                                            ),
+                                            child: Image.network(
+                                              "${ApiServicves.imageUrl}${data.transactionImage}",
+                                              fit: BoxFit.fill,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                SizedBox(height: 5),
                                 // Row(
                                 //   children: [
                                 //     Expanded(

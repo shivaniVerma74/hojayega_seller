@@ -64,8 +64,11 @@ class _Add15SecState extends State<Add15Sec> {
   final picker = ImagePicker();
 
   Future getImageGallery() async {
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        maxWidth: 300,
+        maxHeight: 300);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
@@ -77,8 +80,11 @@ class _Add15SecState extends State<Add15Sec> {
   }
 
   Future _getImageFromCamera() async {
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 50,
+        maxWidth: 300,
+        maxHeight: 300);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
@@ -195,7 +201,7 @@ class _Add15SecState extends State<Add15Sec> {
                             child: Column(
                               children: const [
                                 Text(
-                                  "Upload Image",
+                                  "Upload image on 15 sec ads",
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600),
@@ -328,7 +334,8 @@ class _Add15SecState extends State<Add15Sec> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: EdgeInsets.only(top: 0, left: 12, right: 8),
+                          padding:
+                              const EdgeInsets.only(top: 0, left: 12, right: 8),
                           height: 60,
                           decoration: BoxDecoration(
                               color: colors.whiteTemp,
@@ -386,7 +393,7 @@ class _Add15SecState extends State<Add15Sec> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 16,
               ),
               Column(

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hojayega_seller/Helper/api.path.dart';
@@ -7,7 +6,6 @@ import 'package:hojayega_seller/Helper/color.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Model/EarningsModel.dart';
 
 class Earning extends StatefulWidget {

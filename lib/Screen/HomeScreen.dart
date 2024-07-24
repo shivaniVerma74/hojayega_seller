@@ -761,19 +761,19 @@ class _HomePageState extends State<HomeScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        PromotionAdds()));
+                                                        const PromotionAdds()));
                                           } else if (index == 1) {
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        Reports()));
+                                                        const Reports()));
                                           } else {
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        PickDrop()));
+                                                        const PickDrop()));
                                           }
                                         },
                                         child: Container(

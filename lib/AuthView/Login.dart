@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('vendor_id', finaResult['data']['id'].toString());
         await prefs.setString('roll', finaResult['data']['roll'].toString());
         print(
-            '____vendor data is___$vendor_id $vendor_email $vendor_mobile ${vendor_name} roll in login ${roll}___');
+            '____vendor data is___$vendor_id $vendor_email $vendor_mobile $vendor_name roll in login ${roll}___');
         setState(() {});
         Fluttertoast.showToast(msg: '${finaResult['message']}');
         prefs.setBool("isLogIn", true);

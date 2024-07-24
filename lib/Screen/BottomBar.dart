@@ -622,7 +622,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => PrivacyPolicy()),
+                    MaterialPageRoute(
+                        builder: (context) => const PrivacyPolicy()),
                   );
                   setState(() {
                     currentIndex = 16;
@@ -791,7 +792,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   item,
                   Container(
                     width: MediaQuery.of(context).size.width * 0.25 - 25,
-                    margin: EdgeInsets.only(top: 40),
+                    margin: const EdgeInsets.only(top: 40),
                     child: Center(
                       child: Text(
                         icon.extras!["label"],

@@ -478,6 +478,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -927,39 +928,39 @@ class _AllCategoryState extends State<AllCategory> {
                   },
                 ),
               ),
-              const SizedBox(
-                height: 6,
-              ),
-              Center(
-                child: SizedBox(
-                  width: 100,
-                  height: 6,
-                  child: Center(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: categoryImageList.length ?? 0,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          height: 6,
-                          width: 6,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: index == currentIndex
-                                ? colors.primary
-                                : Colors.grey,
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return const SizedBox(
-                          width: 5,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
+              // const SizedBox(
+              //   height: 6,
+              // ),
+              // Center(
+              //   child: SizedBox(
+              //     width: 100,
+              //     height: 6,
+              //     child: Center(
+              //       child: ListView.separated(
+              //         shrinkWrap: true,
+              //         itemCount: categoryImageList.length ?? 0,
+              //         scrollDirection: Axis.horizontal,
+              //         itemBuilder: (context, index) {
+              //           return Container(
+              //             height: 6,
+              //             width: 6,
+              //             decoration: BoxDecoration(
+              //               borderRadius: BorderRadius.circular(10),
+              //               color: index == currentIndex
+              //                   ? colors.primary
+              //                   : Colors.grey,
+              //             ),
+              //           );
+              //         },
+              //         separatorBuilder: (context, index) {
+              //           return const SizedBox(
+              //             width: 5,
+              //           );
+              //         },
+              //       ),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(
                 height: 10,
               ),
@@ -1256,300 +1257,314 @@ class _AllCategoryState extends State<AllCategory> {
                                           EdgeInsets.only(left: 5, right: 5),
                                       height: 270,
                                       width: 280,
-                                      child:
-                                          chidcatId == null ||
-                                                  productList.isEmpty
-                                              ? const Center(
-                                                  child:
-                                                      Text('Product Not Found'))
-                                              : GridView.builder(
-                                                  gridDelegate:
-                                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                                    crossAxisCount: 2,
-                                                    crossAxisSpacing: 10,
-                                                    mainAxisSpacing: 10,
-                                                    mainAxisExtent: 170,
-                                                  ),
-                                                  itemCount: productList.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return InkWell(
-                                                      onTap: () {
-                                                        // Navigator.push(
-                                                        //     context,
-                                                        //     MaterialPageRoute(
-                                                        //         builder: (context) =>
-                                                        //             ProductDetails(
-                                                        //               productId:
-                                                        //                   productList[
-                                                        //                       index],
-                                                        //             )));
-                                                      },
-                                                      child: Container(
-                                                        margin: const EdgeInsets
-                                                            .only(top: 0),
-                                                        decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            color:
-                                                                Colors.white),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      top: 0),
-                                                              child: productList[index]
-                                                                              .otherImage
-                                                                              ?.first ==
-                                                                          null ||
-                                                                      productList[index]
-                                                                              .otherImage
-                                                                              ?.first ==
-                                                                          ""
-                                                                  ? Center(
-                                                                      child:
-                                                                          Container(
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(5),
-                                                                        color: Colors
-                                                                            .black,
-                                                                      ),
-                                                                      child: Image
-                                                                          .asset(
-                                                                        "assets/images/placeholder.png",
+                                      child: chidcatId == null ||
+                                              productList.isEmpty
+                                          ? const Center(
+                                              child: Text('Product Not Found'))
+                                          : GridView.builder(
+                                              gridDelegate:
+                                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                                      crossAxisCount: 2,
+                                                      crossAxisSpacing: 10,
+                                                      mainAxisSpacing: 10,
+                                                      mainAxisExtent: 170,
+                                                      childAspectRatio: 0.8),
+                                              itemCount: productList.length,
+                                              itemBuilder: (context, index) {
+                                                return InkWell(
+                                                  onTap: () {
+                                                    // Navigator.push(
+                                                    //     context,
+                                                    //     MaterialPageRoute(
+                                                    //         builder: (context) =>
+                                                    //             ProductDetails(
+                                                    //               productId:
+                                                    //                   productList[
+                                                    //                       index],
+                                                    //             )));
+                                                  },
+                                                  child: Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            top: 0),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color: Colors.white),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(top: 0),
+                                                          child: productList[index]
+                                                                          .otherImage
+                                                                          ?.first ==
+                                                                      null ||
+                                                                  productList[index]
+                                                                          .otherImage
+                                                                          ?.first ==
+                                                                      ""
+                                                              ? Center(
+                                                                  child:
+                                                                      Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(5),
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                                  child: Image
+                                                                      .asset(
+                                                                    "assets/images/placeholder.png",
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  ),
+                                                                ))
+                                                              : InkWell(
+                                                                  onTap: () {
+                                                                    final imageProvider =
+                                                                        Image.network("${productList[index].otherImage?[0]}")
+                                                                            .image;
+                                                                    showImageViewer(
+                                                                        context,
+                                                                        imageProvider,
+                                                                        onViewerDismissed:
+                                                                            () {
+                                                                      print(
+                                                                          "dismissed");
+                                                                    });
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    height: 90,
+                                                                    width: 120,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      // borderRadius:
+                                                                      //     BorderRadius.circular(5),
+                                                                      // color: Colors
+                                                                      //     .black,
+                                                                      image:
+                                                                          DecorationImage(
+                                                                        image: NetworkImage(
+                                                                            '${productList[index].otherImage?[0]}'),
                                                                         fit: BoxFit
-                                                                            .cover,
-                                                                      ),
-                                                                    ))
-                                                                  : Container(
-                                                                      height:
-                                                                          95,
-                                                                      width:
-                                                                          120,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(5),
-                                                                        color: Colors
-                                                                            .black,
-                                                                        image:
-                                                                            DecorationImage(
-                                                                          image:
-                                                                              NetworkImage('${productList[index].otherImage?[0]}'),
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                        ),
+                                                                            .contain,
                                                                       ),
                                                                     ),
-                                                              // CarouselSlider(
-                                                              //   options:
-                                                              //       CarouselOptions(
-                                                              //     height: 50,
-                                                              //     aspectRatio:
-                                                              //         16 / 9,
-                                                              //     viewportFraction:
-                                                              //         1.0,
-                                                              //     initialPage: 0,
-                                                              //     enableInfiniteScroll:
-                                                              //         true,
-                                                              //     reverse: false,
-                                                              //     autoPlay: true,
-                                                              //     autoPlayInterval:
-                                                              //         const Duration(seconds: 3),
-                                                              //     autoPlayAnimationDuration:
-                                                              //         const Duration(milliseconds: 800),
-                                                              //     autoPlayCurve:
-                                                              //         Curves.fastOutSlowIn,
-                                                              //     enlargeCenterPage: false,
-                                                              //     onPageChanged:
-                                                              //         (index, reason) {
-                                                              //       setState(() {
-                                                              //         currentIndex = index;
-                                                              //       });
-                                                              //     },
-                                                              //   ),
-                                                              //   items: productList[index].otherImage!.map(
-                                                              //         (item) => Padding(padding: const EdgeInsets.only(left: 5, right: 5),
-                                                              //           child:
-                                                              //               Container(
-                                                              //             width: MediaQuery.of(context)
-                                                              //                 .size
-                                                              //                 .width,
-                                                              //             decoration:
-                                                              //                 BoxDecoration(
-                                                              //               borderRadius:
-                                                              //                   BorderRadius.circular(8),
-                                                              //               image: DecorationImage(
-                                                              //                   image: NetworkImage("$item"),
-                                                              //                   fit: BoxFit.fill),
-                                                              //             ),
-                                                              //           ),
-                                                              //         ),
-                                                              //       )
-                                                              //       .toList(),
+                                                                  ),
+                                                                ),
+                                                          // CarouselSlider(
+                                                          //   options:
+                                                          //       CarouselOptions(
+                                                          //     height: 50,
+                                                          //     aspectRatio:
+                                                          //         16 / 9,
+                                                          //     viewportFraction:
+                                                          //         1.0,
+                                                          //     initialPage: 0,
+                                                          //     enableInfiniteScroll:
+                                                          //         true,
+                                                          //     reverse: false,
+                                                          //     autoPlay: true,
+                                                          //     autoPlayInterval:
+                                                          //         const Duration(seconds: 3),
+                                                          //     autoPlayAnimationDuration:
+                                                          //         const Duration(milliseconds: 800),
+                                                          //     autoPlayCurve:
+                                                          //         Curves.fastOutSlowIn,
+                                                          //     enlargeCenterPage: false,
+                                                          //     onPageChanged:
+                                                          //         (index, reason) {
+                                                          //       setState(() {
+                                                          //         currentIndex = index;
+                                                          //       });
+                                                          //     },
+                                                          //   ),
+                                                          //   items: productList[index].otherImage!.map(
+                                                          //         (item) => Padding(padding: const EdgeInsets.only(left: 5, right: 5),
+                                                          //           child:
+                                                          //               Container(
+                                                          //             width: MediaQuery.of(context)
+                                                          //                 .size
+                                                          //                 .width,
+                                                          //             decoration:
+                                                          //                 BoxDecoration(
+                                                          //               borderRadius:
+                                                          //                   BorderRadius.circular(8),
+                                                          //               image: DecorationImage(
+                                                          //                   image: NetworkImage("$item"),
+                                                          //                   fit: BoxFit.fill),
+                                                          //             ),
+                                                          //           ),
+                                                          //         ),
+                                                          //       )
+                                                          //       .toList(),
+                                                          // ),
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        // Center(
+                                                        //   child: SizedBox(
+                                                        //     width: 100,
+                                                        //     height: 6,
+                                                        //     child: Center(
+                                                        //       child: ListView
+                                                        //           .separated(
+                                                        //         shrinkWrap:
+                                                        //             true,
+                                                        //         itemCount: productList[
+                                                        //                     index]
+                                                        //                 .otherImage
+                                                        //                 ?.length ??
+                                                        //             0,
+                                                        //         scrollDirection:
+                                                        //             Axis.horizontal,
+                                                        //         itemBuilder:
+                                                        //             (context,
+                                                        //                 index) {
+                                                        //           return Container(
+                                                        //             height: 6,
+                                                        //             width: 6,
+                                                        //             decoration:
+                                                        //                 BoxDecoration(
+                                                        //               borderRadius:
+                                                        //                   BorderRadius.circular(10),
+                                                        //               color: index ==
+                                                        //                       currentIndex
+                                                        //                   ? colors.secondary
+                                                        //                   : const Color(0xffFEE9E9E9),
+                                                        //             ),
+                                                        //           );
+                                                        //         },
+                                                        //         separatorBuilder:
+                                                        //             (context, index) {
+                                                        //           return const SizedBox(
+                                                        //             width: 5,
+                                                        //           );
+                                                        //         },
+                                                        //       ),
+                                                        //     ),
+                                                        //   ),
+                                                        // ),
+                                                        // ClipRRect(
+                                                        //   child: Image.network("${productList[index].productImage}", height: 110),
+                                                        // ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(5),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                '${productList[index].productName}',
+                                                                style: const TextStyle(
+                                                                    color: colors
+                                                                        .primary,
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                              ),
+                                                              // Text(
+                                                              //   "${productList[index].unit ?? ""}kg",
+                                                              //   style: const TextStyle(
+                                                              //       color: colors
+                                                              //           .primary,
+                                                              //       fontWeight:
+                                                              //           FontWeight
+                                                              //               .w600,
+                                                              //       fontSize:
+                                                              //           16),
                                                               // ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            // Center(
-                                                            //   child: SizedBox(
-                                                            //     width: 100,
-                                                            //     height: 6,
-                                                            //     child: Center(
-                                                            //       child: ListView
-                                                            //           .separated(
-                                                            //         shrinkWrap:
-                                                            //             true,
-                                                            //         itemCount: productList[
-                                                            //                     index]
-                                                            //                 .otherImage
-                                                            //                 ?.length ??
-                                                            //             0,
-                                                            //         scrollDirection:
-                                                            //             Axis.horizontal,
-                                                            //         itemBuilder:
-                                                            //             (context,
-                                                            //                 index) {
-                                                            //           return Container(
-                                                            //             height: 6,
-                                                            //             width: 6,
-                                                            //             decoration:
-                                                            //                 BoxDecoration(
-                                                            //               borderRadius:
-                                                            //                   BorderRadius.circular(10),
-                                                            //               color: index ==
-                                                            //                       currentIndex
-                                                            //                   ? colors.secondary
-                                                            //                   : const Color(0xffFEE9E9E9),
-                                                            //             ),
-                                                            //           );
-                                                            //         },
-                                                            //         separatorBuilder:
-                                                            //             (context, index) {
-                                                            //           return const SizedBox(
-                                                            //             width: 5,
-                                                            //           );
-                                                            //         },
-                                                            //       ),
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                            // ClipRRect(
-                                                            //   child: Image.network("${productList[index].productImage}", height: 110),
-                                                            // ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                              Text(
+                                                                "\u{20B9} ${productList[index].sellingPrice}",
+                                                                style: const TextStyle(
+                                                                    color: colors
+                                                                        .primary,
+                                                                    fontSize:
+                                                                        13),
+                                                              ),
+                                                              Row(
                                                                 children: [
                                                                   Text(
-                                                                    '${productList[index].productName}',
-                                                                    style: const TextStyle(
-                                                                        color: colors
-                                                                            .primary,
-                                                                        fontSize:
-                                                                            14,
-                                                                        fontWeight:
-                                                                            FontWeight.w600),
-                                                                  ),
-                                                                  // Text(
-                                                                  //   "${productList[index].unit ?? ""}kg",
-                                                                  //   style: const TextStyle(
-                                                                  //       color: colors
-                                                                  //           .primary,
-                                                                  //       fontWeight:
-                                                                  //           FontWeight
-                                                                  //               .w600,
-                                                                  //       fontSize:
-                                                                  //           16),
+                                                                      "\u{20B9} ${productList[index].productPrice}",
+                                                                      style: const TextStyle(
+                                                                          color: colors
+                                                                              .primary,
+                                                                          decoration: TextDecoration
+                                                                              .lineThrough,
+                                                                          fontSize:
+                                                                              16)),
+                                                                  Spacer(),
+                                                                  // InkWell(
+                                                                  //   onTap: () async {
+                                                                  //     SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                                  //     log(prefs.get('category').toString());
+                                                                  //     log(prefs.get('catId').toString());
+                                                                  //     log(prefs.get('sunCatId').toString());
+                                                                  //     log("subid$subcatid");
+                                                                  //     print(prefs.get('sub'));
+                                                                  //     print(prefs.get('child'));
+                                                                  //     if (Selectcat == null ||
+                                                                  //         Selectcat == "" ||
+                                                                  //         subcatid == null ||
+                                                                  //         subcatid!.isEmpty ||
+                                                                  //         chidcatId == null ||
+                                                                  //         chidcatId!.isEmpty) {
+                                                                  //       Fluttertoast.showToast(msg: "Please select Categories");
+                                                                  //     } else {
+                                                                  //       print("dklsdskds ${productList[index].productId}");
+                                                                  //       Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct(isEdit: true, productId:productList[index].productId))).then((value) {
+                                                                  //         setState(() {
+                                                                  //           subcatid = null;
+                                                                  //           chidcatId = null;
+                                                                  //           getAll();
+                                                                  //         });
+                                                                  //       });
+                                                                  //     }
+                                                                  //   },
+                                                                  //
+                                                                  //   child: Container(
+                                                                  //     alignment: Alignment.bottomRight,
+                                                                  //     height: 20,
+                                                                  //     width: 50,
+                                                                  //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),
+                                                                  //         color: colors.secondary),
+                                                                  //     child: const Center(
+                                                                  //       child:
+                                                                  //           Text(
+                                                                  //         'Edit',
+                                                                  //         style: TextStyle(
+                                                                  //             color:
+                                                                  //                 Colors.white),
+                                                                  //       ),
+                                                                  //     ),
+                                                                  //   ),
                                                                   // ),
-                                                                  Text(
-                                                                    "\u{20B9} ${productList[index].sellingPrice}",
-                                                                    style: const TextStyle(
-                                                                        color: colors
-                                                                            .primary,
-                                                                        fontSize:
-                                                                            13),
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      Text(
-                                                                          "\u{20B9} ${productList[index].productPrice}",
-                                                                          style: const TextStyle(
-                                                                              color: colors.primary,
-                                                                              decoration: TextDecoration.lineThrough,
-                                                                              fontSize: 16)),
-                                                                      Spacer(),
-                                                                      // InkWell(
-                                                                      //   onTap: () async {
-                                                                      //     SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                                      //     log(prefs.get('category').toString());
-                                                                      //     log(prefs.get('catId').toString());
-                                                                      //     log(prefs.get('sunCatId').toString());
-                                                                      //     log("subid$subcatid");
-                                                                      //     print(prefs.get('sub'));
-                                                                      //     print(prefs.get('child'));
-                                                                      //     if (Selectcat == null ||
-                                                                      //         Selectcat == "" ||
-                                                                      //         subcatid == null ||
-                                                                      //         subcatid!.isEmpty ||
-                                                                      //         chidcatId == null ||
-                                                                      //         chidcatId!.isEmpty) {
-                                                                      //       Fluttertoast.showToast(msg: "Please select Categories");
-                                                                      //     } else {
-                                                                      //       print("dklsdskds ${productList[index].productId}");
-                                                                      //       Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct(isEdit: true, productId:productList[index].productId))).then((value) {
-                                                                      //         setState(() {
-                                                                      //           subcatid = null;
-                                                                      //           chidcatId = null;
-                                                                      //           getAll();
-                                                                      //         });
-                                                                      //       });
-                                                                      //     }
-                                                                      //   },
-                                                                      //
-                                                                      //   child: Container(
-                                                                      //     alignment: Alignment.bottomRight,
-                                                                      //     height: 20,
-                                                                      //     width: 50,
-                                                                      //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),
-                                                                      //         color: colors.secondary),
-                                                                      //     child: const Center(
-                                                                      //       child:
-                                                                      //           Text(
-                                                                      //         'Edit',
-                                                                      //         style: TextStyle(
-                                                                      //             color:
-                                                                      //                 Colors.white),
-                                                                      //       ),
-                                                                      //     ),
-                                                                      //   ),
-                                                                      // ),
-                                                                    ],
-                                                                  ),
                                                                 ],
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
                                     ),
                                   ),
                                   const SizedBox(

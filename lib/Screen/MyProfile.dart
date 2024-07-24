@@ -1484,19 +1484,21 @@ class _MyProfileState extends State<MyProfile> {
                                                     TextInputType.number,
                                                 controller:
                                                     accountNumberController,
-                                                decoration: const InputDecoration(
-                                                    hintText: 'Account Number',
-                                                    enabledBorder:
-                                                        OutlineInputBorder(
-                                                            borderSide:
-                                                                BorderSide(
-                                                                    color: Colors
-                                                                        .white)),
-                                                    focusedBorder:
-                                                        OutlineInputBorder(
-                                                            borderSide: BorderSide(
-                                                                color: Colors
-                                                                    .white))),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  hintText: 'Account Number',
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  color: Colors
+                                                                      .white)),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1579,16 +1581,16 @@ class _MyProfileState extends State<MyProfile> {
                                         children: [
                                           Card(
                                             child: Container(
-                                                width: 50,
-                                                height: 50,
-                                                // color: Colors.black,
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    color: colors.lightgray),
-                                                child: Image.asset(
-                                                    'assets/images/upiid.png')),
+                                              width: 50,
+                                              height: 50,
+                                              // color: Colors.black,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  color: colors.lightgray),
+                                              child: Image.asset(
+                                                  'assets/images/upiid.png'),
+                                            ),
                                           ),
                                           Card(
                                             child: Container(
@@ -1762,7 +1764,6 @@ class _MyProfileState extends State<MyProfile> {
                                 InkWell(
                                   onTap: () {
                                     imageCode = 1;
-
                                     _showPickerOptions();
                                     // getImageGallery();
                                     // _getImageFromCamera();
@@ -1869,7 +1870,7 @@ class _MyProfileState extends State<MyProfile> {
                                 const Padding(
                                   padding: EdgeInsets.only(top: 10, left: 6),
                                   child: Text(
-                                    "Aadhaar Card (Back)",
+                                    "Aadhaar Card Back(Optional)",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: colors.text),
@@ -1924,16 +1925,17 @@ class _MyProfileState extends State<MyProfile> {
                                         color: colors.lightgray),
                                     child: TextFormField(
                                       controller: gstNumberController,
-
                                       // style: (color: Colors.red
                                       //  ),
                                       decoration: const InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white))),
+                                        enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.white)),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),

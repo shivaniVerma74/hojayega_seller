@@ -744,7 +744,6 @@ class _MyListViewState extends State<MyListView> {
     var headers = {
       'Cookie': 'ci_session=2af0bd20724524e1ebfba0e830885dbff718f536'
     };
-
     var request = http.MultipartRequest(
         'POST', Uri.parse(ApiServicves.updateServiceStatus));
     request.fields.addAll({

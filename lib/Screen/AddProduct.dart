@@ -1956,7 +1956,7 @@ class _AddProductState extends State<AddProduct> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: colors.primary),
-                child: Center(
+                child: const Center(
                   child: Text(
                     "Upload Images",
                     style: TextStyle(
@@ -2060,7 +2060,7 @@ class _AddProductState extends State<AddProduct> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     child: Image.file(File(imagePathList[index]),
-                        fit: BoxFit.cover),
+                        fit: BoxFit.contain),
                   ),
                 ),
               ),

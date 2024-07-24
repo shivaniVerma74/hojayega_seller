@@ -37,8 +37,11 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
   final picker = ImagePicker();
 
   Future getImageGallery() async {
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        maxWidth: 300,
+        maxHeight: 300);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);
@@ -49,8 +52,11 @@ class _AddPromotionAddsState extends State<AddPromotionAdds> {
   }
 
   Future _getImageFromCamera() async {
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 50,
+        maxWidth: 300,
+        maxHeight: 300);
     setState(() {
       if (pickedFile != null && imageCode == 1) {
         _image = File(pickedFile.path);

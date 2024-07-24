@@ -1984,18 +1984,26 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
-                                              return 'Enter UPI ID';
+                                              return 'Please enter a UPI ID';
+                                            }
+                                            final regExp =
+                                                RegExp(r'^[\w.-]+@[\w.-]+$');
+                                            if (!regExp.hasMatch(value)) {
+                                              return 'Invalid UPI ID format';
                                             }
                                             return null;
                                           },
                                           decoration: const InputDecoration(
-                                              hintText: 'Upi Id',
-                                              enabledBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color: Colors.white)),
-                                              focusedBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color: Colors.white))),
+                                            hintText: 'Upi Id',
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -2472,7 +2480,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     return Scaffold(
       backgroundColor: colors.appbarColor,
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             fit: BoxFit.fill,
             image: AssetImage(
@@ -2493,7 +2501,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: const [
                     Text(
                       "Sign up",
                       style: TextStyle(
@@ -2562,7 +2570,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                                             _selectedOption = "3";
                                           });
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.arrow_back,
                         color: colors.whiteTemp,
                       ))

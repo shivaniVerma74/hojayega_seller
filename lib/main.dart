@@ -4,7 +4,7 @@ import 'package:hojayega_seller/Helper/color.dart';
 
 import 'SplashScreen.dart';
 
-void main() async{
+void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
   await SystemChrome.setPreferredOrientations([
@@ -20,9 +20,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'HoJayega Seller',
-      theme: ThemeData(textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: colors.primary,
-      ),
+      theme: ThemeData(
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: colors.primary,
+        ),
         // focusColor: colors.primary,
         primarySwatch: Colors.blue,
       ),

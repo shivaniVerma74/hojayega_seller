@@ -301,80 +301,96 @@ class _PromotionAddsState extends State<PromotionAdds> {
                       children: [
                         Text(
                           "${promotionAdsList?.data?[i].startDate}",
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: colors.primary,
                               fontSize: 18),
                         ),
                         Text(
-                            "${promotionAdsList?.data?[i].totalDay}Day = ${promotionAdsList?.data?[i].amount}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: colors.primary,
-                                fontSize: 18))
+                          "${promotionAdsList?.data?[i].endDate}",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: colors.primary,
+                              fontSize: 18),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 5),
-                  promotionAdsList?.data?[i].status == "0"
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Container(
-                            width: 70,
-                            height: 30,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: colors.primary),
-                            child: const Center(
-                                child: Text(
-                              "Pending",
-                              style: TextStyle(color: colors.whiteTemp),
-                            )),
-                          ),
-                        )
-                      : const SizedBox(),
-                  promotionAdsList?.data?[i].status == "1"
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Container(
-                            width: 70,
-                            height: 30,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: colors.primary),
-                            child: const Center(
-                                child: Text(
-                              "Active",
-                              style: TextStyle(color: colors.whiteTemp),
-                            )),
-                          ),
-                        )
-                      : SizedBox(),
-                  promotionAdsList?.data?[i].status == "2"
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Container(
-                            width: 70,
-                            height: 30,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: colors.primary),
-                            child: const Center(
-                                child: Text(
-                              "Reject",
-                              style: TextStyle(color: colors.whiteTemp),
-                            )),
-                          ),
-                        )
-                      : SizedBox(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      promotionAdsList?.data?[i].status == "0"
+                          ? Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Container(
+                                width: 70,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: colors.primary),
+                                child: const Center(
+                                    child: Text(
+                                  "Pending",
+                                  style: TextStyle(color: colors.whiteTemp),
+                                )),
+                              ),
+                            )
+                          : const SizedBox(),
+                      promotionAdsList?.data?[i].status == "1"
+                          ? Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Container(
+                                width: 70,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: colors.primary),
+                                child: const Center(
+                                  child: Text(
+                                    "Active",
+                                    style: TextStyle(color: colors.whiteTemp),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : SizedBox(),
+                      promotionAdsList?.data?[i].status == "2"
+                          ? Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Container(
+                                width: 70,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: colors.primary),
+                                child: const Center(
+                                  child: Text(
+                                    "Reject",
+                                    style: TextStyle(color: colors.whiteTemp),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : SizedBox(),
+                      Text(
+                        "${promotionAdsList?.data?[i].totalDay}Day = ${promotionAdsList?.data?[i].amount}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: colors.primary,
+                            fontSize: 18),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 5),
                   Container(
-                      height: 200,
-                      width: MediaQuery.of(context).size.width,
-                      child: Image.network(
-                        "https://developmentalphawizz.com/hojayega/${promotionAdsList?.data?[i].image}",
-                        fit: BoxFit.cover,
-                      )),
+                    height: 200,
+                    width: MediaQuery.of(context).size.width,
+                    child: Image.network(
+                      "https://developmentalphawizz.com/hojayega/${promotionAdsList?.data?[i].image}",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ],
               );
             });

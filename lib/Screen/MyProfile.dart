@@ -1668,7 +1668,7 @@ class _MyProfileState extends State<MyProfile> {
                                                         fit: BoxFit.fill,
                                                       )
                                                     : Image.network(
-                                                        "https://developmentalphawizz.com/hojayega${selfiImage!}",
+                                                        "https://developmentalphawizz.com/hojayega$selfiImage",
                                                         fit: BoxFit.fill,
                                                       ),
                                               ),
@@ -1773,13 +1773,13 @@ class _MyProfileState extends State<MyProfile> {
                                         height: 120,
                                         width: double.infinity,
                                         decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: colors.primary)
-                                            // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                            ),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white,
+                                          // border: Border.all(
+                                          //     color: colors.primary)
+                                          // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                        ),
                                         child: _image != null
                                             ? Image.file(
                                                 _image!.absolute,
@@ -1811,13 +1811,13 @@ class _MyProfileState extends State<MyProfile> {
                                         height: 120,
                                         width: double.infinity,
                                         decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: colors.primary)
-                                            // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                            ),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white,
+                                          // border: Border.all(
+                                          //     color: colors.primary)
+                                          // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                        ),
                                         child: _image2 != null
                                             ? Image.file(
                                                 _image2!.absolute,
@@ -1849,13 +1849,13 @@ class _MyProfileState extends State<MyProfile> {
                                         height: 120,
                                         width: double.infinity,
                                         decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: colors.primary)
-                                            // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                            ),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white,
+                                          // border: Border.all(
+                                          //     color: colors.primary)
+                                          // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                        ),
                                         child: _image3 != null
                                             ? Image.file(
                                                 _image3!.absolute,
@@ -1887,13 +1887,12 @@ class _MyProfileState extends State<MyProfile> {
                                       height: 120,
                                       width: double.infinity,
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.white,
-                                          border:
-                                              Border.all(color: colors.primary)
-                                          // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                          ),
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.white,
+                                        // border:
+                                        //     Border.all(color: colors.primary)
+                                        // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                      ),
                                       child: _image4 != null
                                           ? Image.file(
                                               _image4!.absolute,
@@ -1959,8 +1958,8 @@ class _MyProfileState extends State<MyProfile> {
                                         height: 120,
                                         width: double.infinity,
                                         decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: colors.primary),
+                                          // border:
+                                          //     Border.all(color: colors.primary),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           color: Colors.white,
@@ -2007,13 +2006,13 @@ class _MyProfileState extends State<MyProfile> {
                                         height: 120,
                                         width: double.infinity,
                                         decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: colors.primary)
-                                            // image: DecorationImage(image:FileImage(_image!.absolute) )
-                                            ),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white,
+                                          // border: Border.all(
+                                          //     color: colors.primary)
+                                          // image: DecorationImage(image:FileImage(_image!.absolute) )
+                                        ),
                                         child: _image6 != null
                                             ? Image.file(
                                                 _image6!.absolute,

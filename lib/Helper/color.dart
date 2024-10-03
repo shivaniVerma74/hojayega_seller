@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Color getColor(number) {
 //   if (number > 0 && number < 100) return Colors. red;
@@ -11,13 +11,16 @@ import 'package:flutter/material.dart';
 
 var milestoneCount;
 
-List milestoneList = [1,2,3,4];
+List milestoneList = [1, 2, 3, 4];
 
-Color getColor(double item) {if (item < milestoneCount) {
-  return colors.primary;}
-else if (item > milestoneCount && item == item++) {return Colors.teal;}
-return Colors.red; }
-
+Color getColor(double item) {
+  if (item < milestoneCount) {
+    return colors.primary;
+  } else if (item > milestoneCount && item == item++) {
+    return Colors.teal;
+  }
+  return Colors.red;
+}
 
 extension colors on ColorScheme {
   static MaterialColor primary_app = const MaterialColor(
@@ -33,15 +36,14 @@ extension colors on ColorScheme {
       700: primary,
       800: primary,
       900: primary,
-      1000 : primary,
+      1000: primary,
     },
   );
 
-  static const Color primary =Color(0xff112C48);
+  static const Color primary = Color(0xff112C48);
   static const Color secondary = Color(0xff3A9F3E);
   static const Color appbarColor = Color(0xFFE2EBFE);
   static const Color text = Color(0xFF100F0F);
-
 
   // bool get apcolor  =>
   //      this.apcolor == number > 0 && number < 100;
@@ -76,7 +78,6 @@ extension colors on ColorScheme {
   static const Color darkYellow = Color(0xFFF58634);
   static const Color darkRed = Color(0xFFED2F59);
   static const Color lightgray = Color(0xFFFBFBFB);
-
 
   static const Color yellow = Color(0xfffdb403);
 
@@ -137,4 +138,12 @@ extension colors on ColorScheme {
   Color get back5 => this.brightness == Brightness.dark
       ? Color(0xff0F1412)
       : Color(0x66C6F8E5);
+}
+
+changeStatusBarColor(Color color) {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: color, // navigation bar color
+      statusBarColor: color,
+      statusBarIconBrightness: Brightness.dark // status bar color
+      ));
 }

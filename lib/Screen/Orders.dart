@@ -364,11 +364,16 @@ class _OrdersState extends State<Orders> {
                                         Icons.arrow_forward_ios,
                                         size: 15,
                                       ),
-                                      Text(
-                                        "${vendorOrderModel?.orders?[i].address}",
-                                        style: const TextStyle(
-                                            fontSize: 15,
-                                            color: colors.primary),
+                                      Container(
+                                        width: 290,
+                                        child: Text(
+                                          "${vendorOrderModel?.orders?[i].address}",
+                                          style: const TextStyle(
+                                              fontSize: 15,
+                                              color: colors.primary),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
                                       ),
                                     ],
                                   ),
